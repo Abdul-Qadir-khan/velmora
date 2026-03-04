@@ -6,29 +6,29 @@ import Button from "./Button";
 
 const slides = [
   {
-    title: "Professional CCTV Installation Services",
+    title: "No.1 CCTV Installation Services in Noida",
     subtitle:
-      "Secure your home & business with advanced surveillance systems tailored to your needs.",
+      "Protect your home, office & shop with expert CCTV installation in Noida. We also serve Delhi & nearby NCR areas with fast, reliable setup.",
     image: "/images/hero1.jpg",
-    buttonText: "Get Free Quote",
+    buttonText: "Get Free Site Visit",
     buttonLink: "/contact",
     buttonVariant: "primary",
   },
   {
-    title: "High-Quality Security Cameras",
+    title: "Advanced HD & 4K Security Cameras",
     subtitle:
-      "Protect what matters most with our reliable, high-definition surveillance cameras.",
+      "Crystal-clear surveillance, night vision & mobile monitoring. Secure your property in Noida, Delhi & surrounding areas with trusted professionals.",
     image: "/images/hero2.jpg",
-    buttonText: "Shop Now",
+    buttonText: "View CCTV Packages",
     buttonLink: "/products",
     buttonVariant: "accent",
   },
   {
-    title: "24/7 Monitoring & Support",
+    title: "24/7 Support & Quick Installation",
     subtitle:
-      "Stay connected and secure with round-the-clock monitoring from our expert team.",
-    image: "/images/bullet-camera.webp",
-    buttonText: "Learn More",
+      "Same-day installation in Noida. Emergency support available in Delhi NCR. Affordable pricing with complete installation & warranty.",
+    image: "/images/hero3.jpg",
+    buttonText: "Book Installation Now",
     buttonLink: "/services",
     buttonVariant: "secondary",
   },
@@ -65,24 +65,24 @@ export default function HeroSlider() {
       {slides.map((slide, index) => (
         <div
           key={index}
-          className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
-            index === current
+          className={`absolute inset-0 transition-all duration-1000 ease-in-out ${index === current
               ? "opacity-100 scale-100 z-10"
               : "opacity-0 scale-110 z-0"
-          }`}
+            }`}
         >
           {/* Background Image */}
           <div
-            className="w-full h-full bg-center bg-cover transition-transform duration-[6000ms] ease-linear"
+            className={`w-full h-full bg-center bg-cover transition-transform duration-6000ms ease-linear ${index === current ? "scale-105" : "scale-110"
+              }`}
             style={{ backgroundImage: `url(${slide.image})` }}
           />
 
           {/* Dark Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/70 flex items-center justify-center">
+          <div className="absolute inset-0 bg-linear-to-r from-black/90 via-black/70 to-black/80 flex items-center justify-center">
             <div className="text-center px-6 max-w-3xl">
-              
+
               {/* Title */}
-              <h2 className="text-white  text-3xl md:text-5xl font-bold leading-tight mb-6 drop-shadow-lg">
+              <h2 className="text-white  text-3xl md:text-6xl font-bold leading-tight mb-6 drop-shadow-lg">
                 {slide.title}
               </h2>
 
@@ -128,11 +128,10 @@ export default function HeroSlider() {
           <button
             key={idx}
             onClick={() => setCurrent(idx)}
-            className={`h-3 rounded-full transition-all duration-300 ${
-              idx === current
+            className={`h-3 rounded-full transition-all duration-300 ${idx === current
                 ? "w-8 bg-accent"
                 : "w-3 bg-gray-400/60 hover:bg-gray-300"
-            }`}
+              }`}
             aria-label={`Go to slide ${idx + 1}`}
           />
         ))}
