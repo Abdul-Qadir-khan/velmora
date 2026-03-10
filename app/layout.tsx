@@ -3,6 +3,7 @@ import { Bruno_Ace, Montserrat, Roboto } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import { CartProvider } from "./context/CartContext";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -140,7 +141,9 @@ export default function RootLayout({
         />
 
         <Navbar />
-        {children}
+        <CartProvider>
+          {children}
+        </CartProvider>
         <Footer />
       </body>
     </html>

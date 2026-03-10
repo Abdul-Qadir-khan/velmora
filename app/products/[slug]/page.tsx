@@ -6,6 +6,10 @@ import { products } from "../../../data/product";
 import Link from "next/link";
 import TestimonialSection from "@/app/components/Testimonials";
 
+// new
+import { useRouter } from "next/navigation";
+import { useCart } from "@/app/context/CartContext";
+
 export default function ProductDetailsPage() {
   const params = useParams();
   const slug = params.slug as string;
@@ -53,6 +57,8 @@ export default function ProductDetailsPage() {
     .filter((p) => p.slug !== product.slug)
     .slice(0, 3);
 
+    const router = useRouter();
+const { addToCart } = useCart();
   return (
     <>
       <section className="py-12 bg-black"></section>
@@ -196,9 +202,26 @@ export default function ProductDetailsPage() {
             </div>
 
             {/* ADD TO CART */}
-            <button className="w-full bg-black text-white py-4 rounded-xl md:rounded-2xl text-lg font-semibold hover:bg-gray-900 transition">
+            {/* <button className="w-full bg-black text-white py-4 rounded-xl md:rounded-2xl text-lg font-semibold hover:bg-gray-900 transition">
               Add to Cart
-            </button>
+            </button> */}
+
+            <button
+  onClick={() => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.images[0],
+      qty: 1,
+    });
+
+    router.push("/checkout");
+  }}
+  className="w-full bg-black text-white py-4 rounded-xl text-lg font-semibold hover:bg-gray-900 transition"
+>
+  Buy Now
+</button>
 
             {/* TRUST SECTION */}
             <div className="mt-8 space-y-4 text-sm text-gray-600">
@@ -253,7 +276,6 @@ export default function ProductDetailsPage() {
           </div>
 
         </section>
-
 
         {/* ================= REVIEWS ================= */}
         <TestimonialSection />
