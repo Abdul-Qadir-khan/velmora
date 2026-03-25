@@ -2,6 +2,7 @@
 
 import { useCart } from "../context/CartContext";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function CheckoutPage() {
   const { cart, removeFromCart } = useCart();
@@ -28,7 +29,17 @@ export default function CheckoutPage() {
   const shipping = subtotal > 0 ? 50 : 0;
   const total = subtotal + shipping;
 
-  return (
+  return (<>
+    <section className="bg-black text-white pt-12 pb-5">
+      <div className="max-w-7xl mx-auto mt-10 text-center">
+        <h1 className="text-5xl">Checkout</h1>
+        <ul className="flex flex-wrap text-white gap-4 mt-4 text-center mx-auto justify-center">
+          <li><Link href="/">Home</Link></li>
+            <li><Link href="/">Shop</Link></li>
+            <li><Link href="/">Checkout</Link></li>
+        </ul>
+      </div>
+    </section>
     <section className="bg-[#f7f7f7] min-h-screen pt-28 pb-16 px-6 md:px-12">
 
       <div className="max-w-7xl mx-auto">
@@ -41,11 +52,10 @@ export default function CheckoutPage() {
               <div key={i} className="flex items-center gap-2">
 
                 <div
-                  className={`w-8 h-8 flex items-center justify-center rounded-full border ${
-                    step === i + 1
-                      ? "bg-black text-white"
-                      : "text-gray-400"
-                  }`}
+                  className={`w-8 h-8 flex items-center justify-center rounded-full border ${step === i + 1
+                    ? "bg-black text-white"
+                    : "text-gray-400"
+                    }`}
                 >
                   {i + 1}
                 </div>
@@ -251,6 +261,7 @@ export default function CheckoutPage() {
 
         </div>
       </div>
-    </section>
+    </section></>
+
   );
 }

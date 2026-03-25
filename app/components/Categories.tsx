@@ -21,16 +21,16 @@ const CategoriesSection: FC<CategoriesSectionProps> = ({ filterProducts }) => {
       <div className="md:max-w-7xl w-full mx-auto">
         {/* Header */}
         <div className="text-center md:mb-10 mb-4">
-          <h2 className="text-4xl font-bold mt-4 md:leading-tight leading-tighter text-gray-900">
+          <h2 className="text-3xl md:text-4xl font-bold mt-4 md:leading-tight leading-tighter text-gray-900">
             Select a Category
-            <span className="block text-gray-400 text-lg mt-2 font-medium">
+            <span className="block text-gray-400 text-sm md:text-lg mt-2 font-medium">
               Browse through our curated categories
             </span>
           </h2>
         </div>
 
         {/* Categories Horizontal Scrolling */}
-        <div className="overflow-x-auto scrollbar-hide mx-auto flex justify-center">
+        <div className="overflow-x-auto scrollbar-hide mx-auto flex md:justify-center">
           <div className="flex space-x-8 py-6">
             {categories.map((category) => (
               <div
@@ -39,7 +39,7 @@ const CategoriesSection: FC<CategoriesSectionProps> = ({ filterProducts }) => {
                 onClick={() => filterProducts(category.slug)} // On hover, clicking the circle now also triggers filterProducts
               >
                 {/* Category Image Circle */}
-                <div className="relative w-40 h-40 rounded-full overflow-hidden bg-gray-200 shadow-lg transition-all duration-500 group-hover:scale-105">
+                <div className="relative md:w-40 md:h-40 w-30 h-30 rounded-full overflow-hidden bg-gray-200 shadow-lg transition-all duration-500 group-hover:scale-105">
                   <img
                     src={category.image}
                     alt={category.name}
@@ -49,7 +49,7 @@ const CategoriesSection: FC<CategoriesSectionProps> = ({ filterProducts }) => {
                 </div>
 
                 {/* Category Name Below Circle */}
-                <h3 className="text-center mt-3 text-xl font-semibold text-gray-900">{category.name}</h3>
+                <h3 className="text-center mt-3 md:text-xl text-lg font-semibold text-gray-900">{category.name}</h3>
               </div>
             ))}
           </div>

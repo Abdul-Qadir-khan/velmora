@@ -2,141 +2,155 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useRef } from "react";
+import { FaFacebook, FaInstagram, FaPinterest } from "react-icons/fa";
 
-export default function FooterSitefinityStyle() {
+export default function VelmoraFooter() {
+  const footerRef = useRef<HTMLDivElement>(null);
+
+  // Fade-in on scroll
+  useEffect(() => {
+    const el = footerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("opacity-100", "translate-y-0");
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <footer className="bg-[#0B1F3A] text-gray-300 text-sm font-sans">
-      {/* Main content */}
-      <div className="max-w-7xl mx-auto px-4 md:px-20 py-8 md:py-16 grid grid-cols-1 md:grid-cols-4 gap-12">
+    <footer
+      ref={footerRef}
+      className="bg-[#050505] text-gray-400 text-sm tracking-wide opacity-0 translate-y-10 transition-all duration-1000"
+    >
+      {/* Main */}
+      <div className="max-w-7xl mx-auto px-6 md:px-20 py-20 grid grid-cols-1 md:grid-cols-4 gap-16">
 
-        {/* Left Section: Brand + Services */}
+        {/* Brand */}
         <div className="space-y-6">
-          {/* Replace src with your actual GuardVisionlogo */}
           <Image
-            src="/images/logo.png"
-            alt="GuardVision"
-            title="GuardVision"
+            src="/images/velmora-gdd.png"
+            alt="Velmora"
             width={150}
             height={30}
-            className="object-contain"
           />
-          <p className="leading-relaxed max-w-xs">
-            Providing industry-leading CCTV cameras, NVRs, and accessories to secure your world with cutting-edge technology.
+
+          <p className="text-gray-500 leading-relaxed max-w-xs">
+            A study in refined elegance. Velmora blends timeless silhouettes with
+            modern expression for those who embody quiet luxury.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8 max-w-xs text-gray-400 text-xs">
-            <div>
-              <h3 className="text-white font-semibold">CCTV Cameras</h3>
-              <p>High-definition cameras with night vision and AI analytics.</p>
-            </div>
-            <div>
-              <h3 className="text-white font-semibold">Network Video Recorders</h3>
-              <p>Reliable NVR systems for seamless video management.</p>
-            </div>
-            <div>
-              <h3 className="text-white font-semibold">Accessories</h3>
-              <p>Power supplies, cables, mounts, and more for easy installation.</p>
-            </div>
-            <div>
-              <h3 className="text-white font-semibold">Support & Services</h3>
-              <p>Dedicated customer support and installation services.</p>
+          {/* Newsletter */}
+          <div>
+            <h3 className="text-white text-[10px] uppercase tracking-[0.35em] mb-4">
+              Join Velmora
+            </h3>
+
+            <div className="flex border-b border-gray-700">
+              <input
+                type="email"
+                placeholder="Your email"
+                className="bg-transparent w-full py-2 text-white placeholder-gray-600 outline-none"
+              />
+              <button className="text-white text-xs uppercase tracking-widest hover:opacity-60 transition">
+                →
+              </button>
             </div>
           </div>
         </div>
 
-        {/* desktop */}
-        {/* Quick Links */}
-        <div className="hidden md:block">
-          <h3 className="text-gray-400 uppercase tracking-widest text-xs mb-6">Quick Links</h3>
-          <ul className="space-y-3">
-            <li><Link href="/products" className="hover:text-white font-semibold transition">Products</Link></li>
-            <li><Link href="/services" className="hover:text-white font-semibold transition">Services</Link></li>
-            <li><Link href="/support" className="hover:text-white font-semibold transition">Support</Link></li>
-            <li><Link href="/about" className="hover:text-white font-semibold transition">About Us</Link></li>
-            <li><Link href="/contact" className="hover:text-white font-semibold transition">Contact</Link></li>
-          </ul>
-        </div>
-
-        {/* Company Info */}
-        <div className="hidden md:block">
-          <h3 className="text-gray-400 uppercase tracking-widest text-xs mb-6">Company</h3>
-          <ul className="space-y-3">
-            <li><Link href="/company" className="hover:text-white font-semibold transition">Overview</Link></li>
-            <li><Link href="/careers" className="hover:text-white font-semibold transition">Careers</Link></li>
-            <li><Link href="/news" className="hover:text-white font-semibold transition">News</Link></li>
-            <li><Link href="/investors" className="hover:text-white font-semibold transition">Investors</Link></li>
-            <li><Link href="/offices" className="hover:text-white font-semibold transition">Offices</Link></li>
-          </ul>
-        </div>
-
-        {/* mobile */}
-        <div className="grid grid-cols-2 md:hidden">
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-gray-400 uppercase tracking-widest text-xs mb-6">Quick Links</h3>
+        {/* Links Column Component */}
+        {[
+          {
+            title: "Collections",
+            links: ["Men", "Women", "New Arrivals", "Essentials", "Sale"],
+          },
+          {
+            title: "Experience",
+            links: ["Contact", "Shipping & Delivery", "Returns", "FAQs", "Track Order"],
+          },
+          {
+            title: "Maison Velmora",
+            links: ["Our Story", "Craftsmanship", "Sustainability", "Careers"],
+          },
+        ].map((col, i) => (
+          <div key={i}>
+            <h3 className="text-gray-500 uppercase tracking-[0.35em] text-[10px] mb-6">
+              {col.title}
+            </h3>
             <ul className="space-y-3">
-              <li><Link href="/products" className="hover:text-white font-semibold transition">Products</Link></li>
-              <li><Link href="/services" className="hover:text-white font-semibold transition">Services</Link></li>
-              <li><Link href="/support" className="hover:text-white font-semibold transition">Support</Link></li>
-              <li><Link href="/about" className="hover:text-white font-semibold transition">About Us</Link></li>
-              <li><Link href="/contact" className="hover:text-white font-semibold transition">Contact</Link></li>
+              {col.links.map((link, idx) => (
+                <li key={idx}>
+                  <Link
+                    href="#"
+                    className="relative inline-block hover:text-white transition group"
+                  >
+                    {link}
+                    {/* Underline animation */}
+                    <span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
-
-          {/* Company Info */}
-          <div>
-            <h3 className="text-gray-400 uppercase tracking-widest text-xs mb-6">Company</h3>
-            <ul className="space-y-3">
-              <li><Link href="/company" className="hover:text-white font-semibold transition">Overview</Link></li>
-              <li><Link href="/careers" className="hover:text-white font-semibold transition">Careers</Link></li>
-              <li><Link href="/news" className="hover:text-white font-semibold transition">News</Link></li>
-              <li><Link href="/investors" className="hover:text-white font-semibold transition">Investors</Link></li>
-              <li><Link href="/offices" className="hover:text-white font-semibold transition">Offices</Link></li>
-            </ul>
-          </div>
-        </div>
+        ))}
 
         {/* Contact */}
-        <div className="flex flex-col justify-between">
-          <button className="w-fit md:w-auto border border-[#FF6B00] text-[#FF6B00] font-semibold py-3 px-6 uppercase tracking-wider mb-8 hover:bg-[#FF6B00] hover:text-white transition">
-            Contact Us
-          </button>
-          <Link href="tel:7817835909" className="flex items-center gap-2 hover:text-orange-500 font-semibold text-lg tracking-wide">
-          <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.05 12.05 0 00.6 2.81 2 2 0 01-.45 2.11L9.91 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.05 12.05 0 002.81.6A2 2 0 0122 16.92z" />
-            </svg> +91 781 7835 909
-          </Link>
+        <div className="flex flex-col justify-end">
+          <p className="text-white text-lg tracking-wide">+91 781 7835 909</p>
+          <p className="text-gray-600 text-xs mt-1">
+            Mon – Sat / 10:00 – 19:00
+          </p>
         </div>
       </div>
 
-      {/* Bottom bar */}
-      <div className="border-t border-[#2f3c4a] py-6 max-w-7xl mx-auto px-5 md:px-20 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-400 select-none">
-        <div className="flex items-center space-x-4 text-center">          
+      {/* Bottom */}
+      <div className="border-t border-gray-800">
+        <div className="max-w-7xl mx-auto px-6 md:px-20 py-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-gray-600">
+
           <span>
-            Terms of Use | Privacy Policy | Trademarks | License Agreements
+            © {new Date().getFullYear()} Velmora. All rights reserved.
           </span>
-        </div>
 
-        <span className="text-[10px] max-w-125">
-          © {new Date().getFullYear()} GuardVisionCorporation. All Rights Reserved.
-        </span>
+          {/* Policies */}
+          <div className="flex gap-6">
+            {["Privacy", "Terms", "Cookies"].map((item) => (
+              <Link
+                key={item}
+                href="#"
+                className="relative group hover:text-white transition"
+              >
+                {item}
+                <span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            ))}
+          </div>
 
-        {/* Social icons */}
-        <div className="flex space-x-6">
-          {/* Insert your social SVGs or icons here */}
-          <Link href="#" className="hover:text-[#FF6B00] transition">Facebook</Link>
-          <Link href="#" className="hover:text-[#FF6B00] transition">Twitter</Link>
-          <Link href="#" className="hover:text-[#FF6B00] transition">LinkedIn</Link>
-          <Link href="#" className="hover:text-[#FF6B00] transition">Instagram</Link>
+          {/* Social Icons */}
+          <div className="flex gap-5">
+            {/* Instagram */}
+            <Link href="#" className="hover:opacity-70 transition">
+              <FaInstagram />
+            </Link>
+
+            {/* Pinterest */}
+            <Link href="#" className="hover:opacity-70 transition">
+              <FaPinterest />
+            </Link>
+
+            {/* Facebook */}
+            <Link href="#" className="hover:opacity-70 transition">
+              <FaFacebook />
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
