@@ -35,7 +35,8 @@ export default function ShopPage() {
       <div className="py-16 px-6 md:px-12 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-semibold mb-6">Shop Our Collection</h2>
-          <ProductSection /> {/* Pass filtered products to Product Section */}
+          {/* <ProductSection /> Pass filtered products to Product Section */}
+          <ProductSection products={filteredProducts} />
         </div>
       </div>
     </div>

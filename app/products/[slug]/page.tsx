@@ -8,7 +8,6 @@ import { useState } from "react";
 import { Heart } from "lucide-react";
 import Link from "next/link"
 
-
 export default function ProductDetails() {
   const router = useRouter();
   const { addToCart } = useCart();
@@ -20,7 +19,6 @@ export default function ProductDetails() {
       qty,
     });
   };
-
 
   const params = useParams();
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
@@ -44,7 +42,18 @@ export default function ProductDetails() {
     );
 
   return (
-    <section className="px-6 md:px-12 py-10 bg-white mt-20">
+    <>
+    <section className="bg-black text-white pt-12 pb-5">
+      <div className="max-w-7xl mx-auto mt-10 text-center">
+        <h1 className="text-5xl">Product</h1>
+        <ul className="flex flex-wrap text-white gap-4 mt-4 text-center mx-auto justify-center">
+          <li><Link href="/">Home</Link></li>
+          <li><Link href="/">Shop</Link></li>
+          <li><Link href="/">Product</Link></li>
+        </ul>
+      </div>
+    </section>
+     <section className="px-6 md:px-12 py-10 bg-white mt-20">
       <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12">
 
         {/* ================= IMAGES ================= */}
@@ -120,8 +129,8 @@ export default function ProductDetails() {
                   key={c}
                   onClick={() => setSelectedColor(c)}
                   className={`px-4 py-1 border rounded-full text-sm ${selectedColor === c
-                      ? "bg-black text-white"
-                      : "hover:bg-black hover:text-white"
+                    ? "bg-black text-white"
+                    : "hover:bg-black hover:text-white"
                     }`}
                 >
                   {c}
@@ -139,8 +148,8 @@ export default function ProductDetails() {
                   key={s}
                   onClick={() => setSelectedSize(s)}
                   className={`px-4 py-1 border rounded-full text-sm ${selectedSize === s
-                      ? "bg-black text-white"
-                      : "hover:bg-black hover:text-white"
+                    ? "bg-black text-white"
+                    : "hover:bg-black hover:text-white"
                     }`}
                 >
                   {s}
@@ -174,8 +183,8 @@ export default function ProductDetails() {
               disabled={!selectedSize || !selectedColor}
               onClick={handleAddToCart}
               className={`px-8 py-3 rounded-full text-white transition-all ${selectedSize && selectedColor
-                  ? "bg-black hover:bg-gray-800 hover:scale-105"
-                  : "bg-gray-300 cursor-not-allowed"
+                ? "bg-black hover:bg-gray-800 hover:scale-105"
+                : "bg-gray-300 cursor-not-allowed"
                 }`}
             >
               Add to Cart
@@ -189,8 +198,8 @@ export default function ProductDetails() {
                 router.push("/checkout");
               }}
               className={`px-8 py-3 rounded-full border transition-all ${selectedSize && selectedColor
-                  ? "hover:bg-black hover:text-white hover:scale-105"
-                  : "opacity-50 cursor-not-allowed"
+                ? "hover:bg-black hover:text-white hover:scale-105"
+                : "opacity-50 cursor-not-allowed"
                 }`}
             >
               Buy Now
@@ -250,5 +259,6 @@ export default function ProductDetails() {
       </div>
 
     </section>
+    </>
   );
 }

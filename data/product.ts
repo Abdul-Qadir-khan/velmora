@@ -1,3 +1,14 @@
+export type Category =
+  | "CCTV Camera"
+  | "Dome Camera"
+  | "Wireless Camera"
+  | "AI Camera"
+  | "Bullet Camera";
+
+export type Color = "Black" | "White" | "Grey";
+
+export type Size = "Small" | "Medium" | "Large";
+
 export type Product = {
   id: number;
   slug: string;
@@ -5,19 +16,24 @@ export type Product = {
   description: string;
   price: number;
   originalPrice?: number;
-  images: string[]; // Main images (first image for hover, second for alternative view)
+  images: string[];
+
   brand: {
     name: string;
     logo: string;
   };
-  category: string;
+
+  category: Category; // ✅ typed
+
   rating: number;
   stock: number;
-  isNew?: boolean; // To indicate new arrivals
-  bestSeller?: boolean; // Flag to mark if the product is a best-seller
+
+  isNew?: boolean;
+  bestSeller?: boolean;
+
   variations: {
-    colors: string[];
-    sizes: string[];
+    colors: Color[]; // ✅ typed
+    sizes: Size[];   // ✅ typed
     specs: {
       resolution: string;
       lens: string;
@@ -29,9 +45,9 @@ export type Product = {
       appSupport?: string;
     };
   };
-  // Adding Cart and Wishlist info for interactive elements
-  isInCart: boolean;  // To check if the item is already in cart
-  isInWishlist: boolean; // To track if the item is in wishlist
+
+  isInCart: boolean;
+  isInWishlist: boolean;
 };
 
 export const products: Product[] = [
@@ -227,6 +243,6 @@ export const products: Product[] = [
 const bestSellerProductIds = [1, 2]; // Example of best seller product IDs
 
 // Create the best sellers list dynamically
-export const bestSellers = products.filter((product) =>
-  bestSellerProductIds.includes(product.id)
+export const bestSellers = products.filter(
+  (product) => product.bestSeller
 );

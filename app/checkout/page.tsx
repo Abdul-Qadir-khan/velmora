@@ -35,8 +35,8 @@ export default function CheckoutPage() {
         <h1 className="text-5xl">Checkout</h1>
         <ul className="flex flex-wrap text-white gap-4 mt-4 text-center mx-auto justify-center">
           <li><Link href="/">Home</Link></li>
-            <li><Link href="/">Shop</Link></li>
-            <li><Link href="/">Checkout</Link></li>
+          <li><Link href="/">Shop</Link></li>
+          <li><Link href="/">Checkout</Link></li>
         </ul>
       </div>
     </section>
@@ -45,16 +45,16 @@ export default function CheckoutPage() {
       <div className="max-w-7xl mx-auto">
 
         {/* ================= STEP INDICATOR ================= */}
-        <div className="flex justify-center mb-12">
-          <div className="flex items-center gap-6 text-sm">
+        <div className="flex justify-center mb-8 px-2">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm">
 
             {["Cart", "Shipping", "Payment"].map((label, i) => (
               <div key={i} className="flex items-center gap-2">
 
                 <div
-                  className={`w-8 h-8 flex items-center justify-center rounded-full border ${step === i + 1
-                    ? "bg-black text-white"
-                    : "text-gray-400"
+                  className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full border ${step === i + 1
+                      ? "bg-black text-white"
+                      : "text-gray-400"
                     }`}
                 >
                   {i + 1}
@@ -68,7 +68,9 @@ export default function CheckoutPage() {
                   {label}
                 </span>
 
-                {i !== 2 && <div className="w-10 h-[1px] bg-gray-300" />}
+                {i !== 2 && (
+                  <div className="w-6 sm:w-10 h-[1px] bg-gray-300" />
+                )}
               </div>
             ))}
 
