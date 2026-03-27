@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useState } from "react";
 import Hero from "./components/Hero";
 import CategoriesSection from "./components/Categories";
@@ -35,8 +36,10 @@ export default function Home() {
       <BrandsSlider />
 
       {/* Categories Section */}
-      <CategoriesSection filterProducts={filterProducts} />
-<hr className="border-gray-300" />
+      <Suspense fallback={<div>Loading categories...</div>}>
+        <CategoriesSection filterProducts={filterProducts} />
+      </Suspense>
+      <hr className="border-gray-300" />
       {/* Best Sellers Section */}
       <BestSellerSection />
 
@@ -51,7 +54,7 @@ export default function Home() {
 
       {/* Why Choose Us Section */}
       <WhyChoose />
-    
+
     </div>
   );
 }

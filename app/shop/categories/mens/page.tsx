@@ -1,4 +1,5 @@
 "use client"
+import { Suspense } from "react";
 import { useState, useEffect } from "react";
 import ProductSection from "../../../components/Product";
 import CategoriesSection from "../../../components/Categories";
@@ -17,7 +18,7 @@ export default function CategoryPage({ categoryName, bannerImage }: CategoryPage
       console.error('Category name is required');
       return; // Handle the case when categoryName is missing
     }
-  
+
     const filtered = products.filter(
       (p) => p.category && p.category.toLowerCase() === categoryName.toLowerCase()
     );
@@ -37,12 +38,13 @@ export default function CategoryPage({ categoryName, bannerImage }: CategoryPage
         </div>
       </section>
 
-
       {/* Products */}
       <div className="py-16 px-6 md:px-12 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-semibold mb-6">Shop {categoryName}</h2>
-          <ProductSection filteredProducts={filteredProducts} />
+          <Suspense fallback={<div>Loading products...</div>}>
+            <ProductSection products={filteredProducts} />
+          </Suspense>
         </div>
       </div>
     </div>
