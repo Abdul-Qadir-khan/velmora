@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-
 const brands = [
   "/images/brands/versace.svg",
   "/images/brands/zara.svg",
@@ -11,48 +9,55 @@ const brands = [
 ];
 
 export default function BrandSlider() {
-  const sliderRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const slider = sliderRef.current;
-    if (!slider) return;
-
-    let scrollAmount = 0;
-    const speed = 1; // pixels per frame
-    const frame = () => {
-      if (!slider) return;
-      scrollAmount += speed;
-      if (scrollAmount >= slider.scrollWidth / 2) {
-        scrollAmount = 0; // loop back
-      }
-      slider.scrollLeft = scrollAmount;
-      requestAnimationFrame(frame);
-    };
-
-    frame();
-  }, []);
-
   return (
-    <section className="py-4 bg-black">
-      {/* <h3 className="text-center text-2xl md:text-3xl font-semibold mb-4">Trusted By Leading Brands</h3> */}
-      <div
-        ref={sliderRef}
-        className="flex gap-20 overflow-hidden whitespace-nowrap px-6 md:px-12"
-      >
-        {/* Duplicate logos for seamless scrolling */}
-        {[...brands, ...brands].map((logo, idx) => (
-          <div
-            key={idx}
-            className="shrink-0 w-32 h-16 md:w-40 md:h-20 flex items-center justify-center"
-          >
-            <img
-              src={logo}
-              alt={`Brand ${idx + 1}`}
-              className="max-h-15 h-10git w-35 object-contain grayscale hover:grayscale-0 transition duration-300"
-            />
-          </div>
-        ))}
+    <section className="py-6 md:py-10 bg-black overflow-hidden">
+      <div className="relative w-full">
+        
+        {/* Gradient Fade (Luxury touch) */}
+        <div className="pointer-events-none absolute left-0 top-0 h-full w-16 bg-gradient-to-r from-black to-transparent z-10" />
+        <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-black to-transparent z-10" />
+
+        {/* Slider Track */}
+        <div className="flex w-max animate-marquee hover:[animation-play-state:paused] gap-12 md:gap-20 px-6 md:px-12">
+          
+          {/* Loop Twice */}
+          {[...brands, ...brands].map((logo, idx) => (
+            <div
+              key={idx}
+              className="flex items-center justify-center w-28 h-14 md:w-40 md:h-20 shrink-0"
+            >
+              <img
+                src={logo}
+                alt="brand logo"
+                className="h-8 md:h-10 w-auto object-contain grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition duration-300"
+              />
+            </div>
+          ))}
+
+        </div>
       </div>
+
+      {/* Animation */}
+      <style jsx>{`
+        @keyframes marquee {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+
+        .animate-marquee {
+          animation: marquee 25s linear infinite;
+        }
+
+        @media (max-width: 768px) {
+          .animate-marquee {
+            animation-duration: 18s;
+          }
+        }
+      `}</style>
     </section>
   );
 }
