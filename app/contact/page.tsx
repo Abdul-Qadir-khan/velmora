@@ -90,7 +90,7 @@ export default function ContactPage() {
                 />
                 <Button
                   type="submit"
-                  variant="accent"
+                  variant="primary"
                   className="md:px-10 py-4 text-lg rounded-2xl w-max hover:scale-105 transition-transform duration-300 ease-in-out mt-2 shadow-lg hover:shadow-xl"
                 >
                   Send Message

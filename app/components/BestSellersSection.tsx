@@ -157,7 +157,7 @@ return ( <section className="py-16 px-4 md:px-12 bg-gradient-to-t from-primary/5
                   )}
 
                   {/* Image */}
-                  <Link href={`/products/${product.slug}`}>
+                  <div >
                     <div className="relative w-full h-64 md:h-72 bg-gray-100 overflow-hidden">
                       <Image
                         src={product.images[0]}
@@ -206,7 +206,7 @@ return ( <section className="py-16 px-4 md:px-12 bg-gradient-to-t from-primary/5
                         </button>
                       </div>
                     </div>
-                  </Link>
+                  </div>
 
                   {/* Info */}
                   <div className="p-4">

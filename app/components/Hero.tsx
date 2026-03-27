@@ -62,7 +62,7 @@ export default function VelmoraHero() {
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
 
           {/* CONTENT */}
-          <div className="relative z-10 h-full flex items-center max-w-7xl mx-auto px-6 md:px-20">
+          <div className="relative z-10 h-full flex items-center max-w-7xl mx-auto px-5 md:px-0">
 
             <div className="max-w-xl text-white space-y-4 md:space-y-6">
 

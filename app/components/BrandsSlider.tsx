@@ -3,14 +3,11 @@
 import { useEffect, useRef } from "react";
 
 const brands = [
-  "/images/brands/cp-plus.png",
-  "/images/brands/dahua.png",
-  "/images/brands/hikvision.png",
-  "/images/brands/honeywell.png",
-  "/images/brands/lexar.png",
-  "/images/brands/samsung.png",
-  "/images/brands/sony.png",
-  "/images/brands/sandisk.svg",
+  "/images/brands/versace.svg",
+  "/images/brands/zara.svg",
+  "/images/brands/gucci.svg",
+  "/images/brands/prada.svg",
+  "/images/brands/calvin-klein.svg",
 ];
 
 export default function BrandSlider() {
