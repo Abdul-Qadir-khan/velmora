@@ -8,6 +8,7 @@ import { useCart } from "../context/CartContext";
 
 export default function Header() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false); // Add client detection
 
   const toggleMenu = (menu: string) => {
     setOpenMenu(openMenu === menu ? null : menu);
@@ -20,10 +21,27 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
+  // Detect client-side rendering
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Load wishlist count safely
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("wishlist");
+        if (stored) setWishlistCount(JSON.parse(stored).length);
+      } catch (e) {
+        setWishlistCount(0);
+      }
+    }
   }, []);
 
   const navLinks = [
@@ -33,16 +51,6 @@ export default function Header() {
     { name: "Sale", href: "/sale" },
   ];
 
-
-   // Load wishlist count
-   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("wishlist");
-      if (stored) setWishlistCount(JSON.parse(stored).length);
-    } catch (e) {
-      setWishlistCount(0);
-    }
-  }, []);
   return (
     <>
       {/* HEADER */}
@@ -63,9 +71,7 @@ export default function Header() {
           <nav className="hidden md:flex gap-10 text-sm tracking-wide">
 
             {/* MEN */}
-            <div
-              className="group"
-            >
+            <div className="group">
               <span className="cursor-pointer relative">
                 Men
                 <span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-current transition-all duration-300 group-hover:w-full"></span>
@@ -184,8 +190,8 @@ export default function Header() {
             <Image
               src={
                 isScrolled
-                  ? "/images/velmora-d.png" // dark logo after scroll
-                  : "/images/velmora-white.png" // white logo on hero
+                  ? "/images/velmora-d.png"
+                  : "/images/velmora-white.png"
               }
               alt="Velmora"
               width={isScrolled ? 100 : 120}
@@ -208,17 +214,17 @@ export default function Header() {
             {/* Wishlist */}
             <Link href="/wishlist" className="relative">
               <Heart className="hover:opacity-70 transition" />
-              {wishlistCount > 0 && (
+              {isClient && wishlistCount > 0 && (
                 <span className="absolute -top-2 -right-2 text-xs bg-black text-white w-5 h-5 flex items-center justify-center rounded-full">
                   {wishlistCount}
                 </span>
               )}
             </Link>
 
-            {/* CART */}
+            {/* CART - FIXED */}
             <Link href="/checkout" className="relative">
               <ShoppingCart className="hover:opacity-70 transition" />
-              {cartCount > 0 && (
+              {isClient && cartCount > 0 && (
                 <span className="absolute -top-2 -right-2 text-xs bg-black text-white w-5 h-5 flex items-center justify-center rounded-full">
                   {cartCount}
                 </span>
@@ -277,7 +283,8 @@ export default function Header() {
                   height={30}
                   className="transition-all duration-500"
                 />
-              </Link></span>
+              </Link>
+            </span>
             <button onClick={() => setMobileOpen(false)}>
               <X size={26} />
             </button>
@@ -359,7 +366,7 @@ export default function Header() {
             </div>
             <div className="flex items-center gap-2">
               <ShoppingCart size={18} />
-              Cart ({cartCount})
+              Cart ({isClient ? cartCount : 0})
             </div>
           </div>
         </div>

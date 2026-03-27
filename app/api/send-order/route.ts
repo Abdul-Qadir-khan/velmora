@@ -1,64 +1,44 @@
-import { NextResponse } from "next/server";
+// app/api/send-order/route.ts
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: Request) {
-  const data = await req.json();
-  const resendApiKey = process.env.RESEND_API_KEY;
-  const adminEmail = process.env.ADMIN_EMAIL;
+export async function POST(req: NextRequest) {
+  console.log("🛒 API Route Hit!");
 
-  if (!resendApiKey || !adminEmail) {
-    return NextResponse.json({ error: "Missing Resend API key or admin email" }, { status: 500 });
+  try {
+    const data = await req.json();
+    console.log("📦 Order Data:", {
+      orderId: data.orderId,
+      name: data.name,
+      email: data.email,
+      total: data.total,
+      itemsCount: data.items?.length || 0
+    });
+
+    // 🎭 Simulate email sending delay (1.5 seconds)
+    console.log("⏳ Simulating email sending...");
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // 🎉 Simulate success
+    console.log("✅ Mock emails sent to:", data.email, "and admin");
+    
+    return NextResponse.json({ 
+      success: true,
+      orderId: data.orderId,
+      message: "Order confirmed! Mock emails sent successfully ✅",
+      timestamp: new Date().toISOString()
+    }, { 
+      status: 200 
+    });
+
+  } catch (error) {
+    console.error("💥 API Error:", error);
+    
+    return NextResponse.json({
+      success: false,
+      error: "Server error processing order",
+      details: error instanceof Error ? error.message : "Unknown error"
+    }, { 
+      status: 500 
+    });
   }
-
-  const orderId = data.orderId;
-
-  const adminHtml = `
-    <h2>New Order Received</h2>
-    <p><b>Order ID:</b> ${orderId}</p>
-    <h3>Customer Details</h3>
-    <p>Name: ${data.name}</p>
-    <p>Email: ${data.email}</p>
-    <p>Phone: ${data.phone}</p>
-    <p>Address: ${data.address}, ${data.city}, ${data.zip}</p>
-    <h3>Order Items</h3>
-    ${data.items.map((item: any) => `<p>${item.name} x ${item.qty} = $${item.price * item.qty}</p>`).join("")}
-    <h3>Total: $${data.total}</h3>
-  `;
-
-  const userHtml = `
-    <h2>Thank you for your order!</h2>
-    <p>Your Order ID is: <b>${orderId}</b></p>
-    <p>Keep this ID to track your order.</p>
-  `;
-
-  // Send admin email
-  await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendApiKey}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      from: "onboarding@resend.dev",
-      to: [adminEmail],
-      subject: `New Order ${orderId}`,
-      html: adminHtml
-    })
-  });
-
-  // Send customer email
-  await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendApiKey}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      from: "onboarding@resend.dev",
-      to: [data.email],
-      subject: `Your Order Confirmation ${orderId}`,
-      html: userHtml
-    })
-  });
-
-  return NextResponse.json({ success: true });
 }
