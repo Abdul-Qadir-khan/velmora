@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Product } from "../../data/product";
 import { ShoppingCart, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "../context/CartContext";
 
 interface WishlistItemProps {
   product: Product;
@@ -14,6 +15,9 @@ interface WishlistItemProps {
 }
 
 function WishlistItem({ product, onRemove, onAddToCart }: WishlistItemProps) {
+  // Safe image: use first image or placeholder
+  const imageSrc = product.images?.[0] || "/placeholder.png";
+
   return (
     <motion.div
       layout
@@ -26,7 +30,7 @@ function WishlistItem({ product, onRemove, onAddToCart }: WishlistItemProps) {
       <Link href={`/products/${product.slug}`}>
         <div className="relative h-56 bg-gray-100">
           <Image
-            src={product.images[0]}
+            src={imageSrc}
             alt={product.name}
             fill
             className="object-contain p-4"
@@ -42,7 +46,7 @@ function WishlistItem({ product, onRemove, onAddToCart }: WishlistItemProps) {
           </h3>
         </Link>
 
-        <p className="text-lg font-bold mt-2 text-gray-900">${product.price}</p>
+        <p className="text-lg font-bold mt-2 text-gray-900">₹{product.price}</p>
 
         <div className="flex items-center justify-between mt-4">
           <button
@@ -50,7 +54,7 @@ function WishlistItem({ product, onRemove, onAddToCart }: WishlistItemProps) {
             className="flex items-center gap-2 text-sm bg-black text-white px-3 py-2 rounded-lg hover:bg-gray-800 transition"
           >
             <ShoppingCart size={16} />
-            Add
+            Add to Cart
           </button>
 
           <button
@@ -67,8 +71,9 @@ function WishlistItem({ product, onRemove, onAddToCart }: WishlistItemProps) {
 
 export default function WishlistPage() {
   const [wishlist, setWishlist] = useState<Product[]>([]);
+  const { addToCart } = useCart();
 
-  // Load wishlist
+  // Load wishlist from localStorage
   useEffect(() => {
     try {
       const stored = localStorage.getItem("wishlist");
@@ -90,8 +95,15 @@ export default function WishlistPage() {
   };
 
   const handleAddToCart = (product: Product) => {
-    alert(`${product.name} added to cart`);
-    // Optional: integrate with cart context
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      qty: 1,
+      images: product.images || ["/placeholder.png"],
+    });
+
+    // Remove from wishlist
     removeItem(product.id);
   };
 
@@ -110,11 +122,8 @@ export default function WishlistPage() {
         </div>
       </section>
 
-
       <section className="min-h-screen px-4 md:px-12 py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto">
-
-
           {/* Empty State */}
           {wishlist.length === 0 ? (
             <motion.div

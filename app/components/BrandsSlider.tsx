@@ -10,7 +10,7 @@ const brands = [
 
 export default function BrandSlider() {
   return (
-    <section className="py-6 md:py-10 bg-black overflow-hidden">
+    <section className="py-3 md:py-5 bg-black overflow-hidden">
       <div className="relative w-full">
         
         {/* Gradient Fade (Luxury touch) */}
@@ -18,7 +18,7 @@ export default function BrandSlider() {
         <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-black to-transparent z-10" />
 
         {/* Slider Track */}
-        <div className="flex w-max animate-marquee hover:[animation-play-state:paused] gap-12 md:gap-20 px-6 md:px-12">
+        <div className="flex w-max animate-marquee hover:[animation-play-state:paused] gap-12 md:gap-20 px-5 md:px-12">
           
           {/* Loop Twice */}
           {[...brands, ...brands].map((logo, idx) => (

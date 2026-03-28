@@ -184,7 +184,7 @@ export default function Header() {
             </Link>
 
           </nav>
-
+          
           {/* LOGO */}
           <Link href="/" className="absolute left-1/2 -translate-x-1/2">
             <Image
