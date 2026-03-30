@@ -1,14 +1,50 @@
-generator client {
-  provider = "prisma-client-js"
-}
+export async function PUT(req: NextRequest, { params }: { params: Params }) {
+  try {
+    const body = await req.json();
 
-datasource db {
-  provider = "postgresql"
-}
+    // Ensure variations is an array
+    const variationsArray = Array.isArray(body.variations)
+      ? body.variations
+      : [body.variations];
 
-model Product {
-  id        Int      @id @default(autoincrement())
-  name      String
-  price     Float
-  createdAt DateTime @default(now())
+    const product = await prisma.product.update({
+      where: { id: params.id },
+      data: {
+        name: body.name,
+        description: body.description,
+        price: body.price,
+        originalPrice: body.originalPrice, // ✅ works if client is up-to-date
+        stock: body.stock,
+        rating: body.rating,
+        category: body.category,
+        isNew: body.isNew,
+        bestSeller: body.bestSeller,
+        images: body.images,
+
+        // Brand: use upsert to handle update or create if missing
+        brand: {
+          upsert: {
+            update: { name: body.brand.name, logo: body.brand.logo },
+            create: { name: body.brand.name, logo: body.brand.logo },
+          },
+        },
+
+        // Variations: update many or create new
+        variations: {
+          deleteMany: {}, // remove old variations first
+          create: variationsArray.map((v: any) => ({
+            colors: v.colors,
+            sizes: v.sizes,
+            specs: v.specs,
+          })),
+        },
+      },
+      include: { brand: true, variations: true },
+    });
+
+    return NextResponse.json(product);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "Failed to update product" }, { status: 500 });
+  }
 }

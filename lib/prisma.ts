@@ -1,14 +1,4 @@
-// prisma.config.ts
-import { defineConfig } from '@prisma/accelerate'; // Prisma 7 requires this package
+// app/lib/prisma.ts
+import { PrismaClient } from "@prisma/client";
 
-export default defineConfig({
-  client: {
-    // optional logging or other client options
-  },
-  migrate: {
-    adapter: {
-      type: 'postgresql',
-      url: process.env.DATABASE_URL!, // <-- your DB URL from .env
-    },
-  },
-});
+export const prisma = new PrismaClient();

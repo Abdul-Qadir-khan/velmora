@@ -1,25 +1,77 @@
-import { NextResponse } from "next/server";
-import { readProducts, writeProducts } from "@/lib/file-db";
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
-// PUT (update product)
-export async function PUT(req: Request, { params }: any) {
-  const body = await req.json();
-  const products = readProducts();
-
-  const updatedProducts = products.map((p: any) =>
-    p.id === Number(params.id) ? { ...p, ...body } : p
-  );
-
-  writeProducts(updatedProducts);
-  return NextResponse.json({ success: true });
+interface Params {
+  id: string;
 }
 
-// DELETE (remove product)
-export async function DELETE(_: Request, { params }: any) {
-  const products = readProducts();
+export async function GET(req: NextRequest, { params }: { params: Params }) {
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id: params.id },
+      include: { brand: true, variations: true },
+    });
+    if (!product)
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    return NextResponse.json(product);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
+  }
+}
 
-  const filteredProducts = products.filter((p: any) => p.id !== Number(params.id));
+export async function PUT(req: NextRequest, { params }: { params: Params }) {
+  try {
+    const body = await req.json();
 
-  writeProducts(filteredProducts);
-  return NextResponse.json({ success: true });
+    const variationsArray = Array.isArray(body.variations)
+      ? body.variations
+      : [body.variations];
+
+    const product = await prisma.product.update({
+      where: { id: params.id },
+      data: {
+        name: body.name,
+        description: body.description,
+        price: body.price,
+        originalPrice: body.originalPrice,
+        stock: body.stock,
+        rating: body.rating,
+        category: body.category,
+        isNew: body.isNew,
+        bestSeller: body.bestSeller,
+        images: body.images,
+        brand: {
+          upsert: {
+            update: { name: body.brand.name, logo: body.brand.logo },
+            create: { name: body.brand.name, logo: body.brand.logo },
+          },
+        },
+        variations: {
+          deleteMany: {}, // remove old variations
+          create: variationsArray.map((v: any) => ({
+            colors: v.colors,
+            sizes: v.sizes,
+            specs: v.specs,
+          })),
+        },
+      },
+      include: { brand: true, variations: true },
+    });
+
+    return NextResponse.json(product);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "Failed to update product" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest, { params }: { params: Params }) {
+  try {
+    await prisma.product.delete({ where: { id: params.id } });
+    return NextResponse.json({ message: "Product deleted" });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "Failed to delete product" }, { status: 500 });
+  }
 }

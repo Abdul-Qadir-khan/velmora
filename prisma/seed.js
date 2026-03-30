@@ -1,38 +1,49 @@
 // prisma/seed.js
 const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient({
-  adapter: {
-    type: 'postgresql',        // your database type
-    url: process.env.DATABASE_URL, // make sure this is in your .env
-  },
-  log: ['query'], // optional: see queries in console
-});
+const prisma = new PrismaClient();
 
 async function main() {
   console.log('Seeding database...');
 
-  await prisma.product.deleteMany();
+  await prisma.product.deleteMany(); // optional: clear old data
 
   await prisma.product.createMany({
     data: [
       {
-        name: 'Red Chair',
-        description: 'Comfortable red chair',
+        name: 'Classic White T-Shirt',
+        description: '100% cotton, comfortable and stylish',
+        price: 19.99,
+        originalPrice: 25.99,
+        category: 'T-shirt',
+        brand: 'Velmora',
+        stock: 50,
+        rating: 4.5,
+        isNew: true,
+        bestSeller: true,
+      },
+      {
+        name: 'Blue Jeans',
+        description: 'Slim-fit denim jeans',
         price: 49.99,
-        image: 'https://via.placeholder.com/150/FF0000/FFFFFF?text=Red+Chair',
+        originalPrice: 59.99,
+        category: 'Jeans',
+        brand: 'DenimPro',
+        stock: 30,
+        rating: 4.2,
+        isNew: false,
+        bestSeller: true,
       },
       {
-        name: 'Blue Table',
-        description: 'Stylish blue table',
-        price: 89.99,
-        image: 'https://via.placeholder.com/150/0000FF/FFFFFF?text=Blue+Table',
-      },
-      {
-        name: 'Green Lamp',
-        description: 'Eco-friendly green lamp',
-        price: 29.99,
-        image: 'https://via.placeholder.com/150/00FF00/FFFFFF?text=Green+Lamp',
+        name: 'Red Hoodie',
+        description: 'Warm hoodie with front pocket',
+        price: 39.99,
+        originalPrice: 49.99,
+        category: 'Hoodie',
+        brand: 'UrbanWear',
+        stock: 20,
+        rating: 4.7,
+        isNew: true,
+        bestSeller: false,
       },
     ],
   });
