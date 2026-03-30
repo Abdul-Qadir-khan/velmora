@@ -1,24 +1,22 @@
-import { NextResponse } from "next/server";
-import { readProducts, writeProducts } from "@/lib/file-db";
+import { prisma } from '../../../lib/prisma';
+import { NextResponse } from 'next/server';
 
-// GET all products
 export async function GET() {
-  const products = readProducts();
+  const products = await prisma.product.findMany({
+    orderBy: { createdAt: 'desc' },
+  });
   return NextResponse.json(products);
 }
 
-// POST (create new product)
 export async function POST(req: Request) {
   const body = await req.json();
-  const products = readProducts();
-
-  const newProduct = {
-    ...body,
-    id: Date.now() // simple unique ID
-  };
-
-  products.push(newProduct);
-  writeProducts(products);
-
-  return NextResponse.json(newProduct);
+  const product = await prisma.product.create({
+    data: {
+      name: body.name,
+      description: body.description,
+      price: parseFloat(body.price),
+      image: body.image,
+    },
+  });
+  return NextResponse.json(product);
 }
