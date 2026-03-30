@@ -8,8 +8,11 @@ export async function GET() {
     });
     return NextResponse.json(products);
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
+    console.error("GET /api/products error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch products" },
+      { status: 500 }
+    );
   }
 }
 
@@ -17,34 +20,71 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    // Ensure variations is an array
+    // ---------- VALIDATIONS ----------
+    if (!body.name || !body.name.trim()) {
+      return NextResponse.json(
+        { error: "Product name is required" },
+        { status: 400 }
+      );
+    }
+    if (!body.brand || !body.brand.name || !body.brand.name.trim()) {
+      return NextResponse.json(
+        { error: "Brand name is required" },
+        { status: 400 }
+      );
+    }
+
+    const name = body.name.trim();
+    const description = body.description || "";
+    const price = Number(body.price) || 0;
+    const originalPrice = Number(body.originalPrice) || 0;
+    const stock = Number(body.stock) || 0;
+    const rating = Number(body.rating) || 0;
+    const category = body.category || "";
+    const isNew = Boolean(body.isNew);
+    const bestSeller = Boolean(body.bestSeller);
+    const images = JSON.stringify(Array.isArray(body.images) ? body.images : []);
+    const seoTitle = body.seo?.title || "";
+    const seoDescription = body.seo?.description || "";
+    const seoKeywords = body.seo?.keywords || "";
+
+    // Normalize variations
     const variationsArray = Array.isArray(body.variations)
       ? body.variations
-      : [body.variations];
+      : body.variations
+      ? [body.variations]
+      : [];
 
+    // ---------- CREATE PRODUCT ----------
     const product = await prisma.product.create({
       data: {
-        name: body.name,
-        description: body.description,
-        price: body.price,
-        originalPrice: body.originalPrice,
-        stock: body.stock,
-        rating: body.rating,
-        category: body.category,
-        isNew: body.isNew,
-        bestSeller: body.bestSeller,
-        images: body.images,
+        name,
+        description,
+        price,
+        originalPrice,
+        stock,
+        rating,
+        category,
+        isNew,
+        bestSeller,
+        images,
+        seoTitle,
+        seoDescription,
+        seoKeywords,
         brand: {
-          create: {
-            name: body.brand.name,
-            logo: body.brand.logo,
+          connectOrCreate: {
+            where: { name: body.brand.name.trim() }, // requires Brand.name @unique
+            create: {
+              name: body.brand.name.trim(),
+              logo: body.brand.logo || "",
+            },
           },
         },
         variations: {
           create: variationsArray.map((v: any) => ({
-            colors: v.colors,
-            sizes: v.sizes,
-            specs: v.specs,
+            colors: JSON.stringify(Array.isArray(v.colors) ? v.colors : []),
+            sizes: JSON.stringify(Array.isArray(v.sizes) ? v.sizes : []),
+            specs: JSON.stringify(v.specs || {}),
           })),
         },
       },
@@ -53,7 +93,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(product);
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
+    console.error("POST /api/products error:", error);
+    return NextResponse.json(
+      { error: "Failed to create product" },
+      { status: 500 }
+    );
   }
 }

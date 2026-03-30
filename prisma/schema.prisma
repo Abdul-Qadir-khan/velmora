@@ -1,50 +1,53 @@
-export async function PUT(req: NextRequest, { params }: { params: Params }) {
-  try {
-    const body = await req.json();
+generator client {
+  provider = "prisma-client-js"
+}
 
-    // Ensure variations is an array
-    const variationsArray = Array.isArray(body.variations)
-      ? body.variations
-      : [body.variations];
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
 
-    const product = await prisma.product.update({
-      where: { id: params.id },
-      data: {
-        name: body.name,
-        description: body.description,
-        price: body.price,
-        originalPrice: body.originalPrice, // ✅ works if client is up-to-date
-        stock: body.stock,
-        rating: body.rating,
-        category: body.category,
-        isNew: body.isNew,
-        bestSeller: body.bestSeller,
-        images: body.images,
+model Product {
+  id            String      @id @default(cuid())
+  name          String
+  slug          String?     @unique
+  description   String?
+  price         Float
+  originalPrice Float?
+  stock         Int         @default(0)
+  rating        Float?      @default(0)
+  category      String
+  isNew         Boolean     @default(false)
+  bestSeller    Boolean     @default(false)
+  images        String      // JSON string of image URLs
 
-        // Brand: use upsert to handle update or create if missing
-        brand: {
-          upsert: {
-            update: { name: body.brand.name, logo: body.brand.logo },
-            create: { name: body.brand.name, logo: body.brand.logo },
-          },
-        },
+  brandId       String
+  brand         Brand       @relation(fields: [brandId], references: [id])
 
-        // Variations: update many or create new
-        variations: {
-          deleteMany: {}, // remove old variations first
-          create: variationsArray.map((v: any) => ({
-            colors: v.colors,
-            sizes: v.sizes,
-            specs: v.specs,
-          })),
-        },
-      },
-      include: { brand: true, variations: true },
-    });
+  variations    Variation[]
 
-    return NextResponse.json(product);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Failed to update product" }, { status: 500 });
-  }
+  seoTitle       String?
+  seoDescription String?
+  seoKeywords    String?
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Brand {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  logo     String?
+
+  products Product[]
+}
+
+model Variation {
+  id        String   @id @default(cuid())
+  colors    String   // JSON string
+  sizes     String   // JSON string
+  specs     String   // JSON string
+
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
 }

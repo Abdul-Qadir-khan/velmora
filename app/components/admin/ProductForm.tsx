@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface ProductFormProps {
@@ -11,36 +11,49 @@ export default function ProductForm({ initialData }: ProductFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const [form, setForm] = useState(
-    initialData || {
-      name: "",
-      description: "",
-      price: 0,
-      originalPrice: 0,
-      stock: 0,
-      rating: 0,
-      category: "T-Shirt",
-      isNew: false,
-      bestSeller: false,
-      images: [] as string[],
-      brand: { name: "", logo: "" },
-      variations: {
-        colors: [] as string[],
-        sizes: [] as string[],
-        specs: {
-          material: "",
-          fit: "",
-          sleeve: "",
-          pattern: "",
-          washing: "",
+  // Ensure images are always an array
+  const initialFormData = initialData
+    ? {
+        ...initialData,
+        images: Array.isArray(initialData.images)
+          ? initialData.images
+          : initialData.images
+          ? [initialData.images]
+          : [],
+        variations: {
+          colors: initialData.variations?.colors || [],
+          sizes: initialData.variations?.sizes || [],
+          specs: initialData.variations?.specs || { material: "", fit: "", sleeve: "", pattern: "", washing: "" },
         },
-      },
-    }
-  );
+        brand: initialData.brand || { name: "", logo: "" },
+        seo: initialData.seo || { title: "", description: "", keywords: "" },
+      }
+    : {
+        name: "",
+        description: "",
+        price: 0,
+        originalPrice: 0,
+        stock: 0,
+        rating: 0,
+        category: "T-Shirt",
+        isNew: false,
+        bestSeller: false,
+        images: [] as string[],
+        brand: { name: "", logo: "" },
+        variations: {
+          colors: [] as string[],
+          sizes: [] as string[],
+          specs: { material: "", fit: "", sleeve: "", pattern: "", washing: "" },
+        },
+        seo: { title: "", description: "", keywords: "" },
+      };
+
+  const [form, setForm] = useState(initialFormData);
 
   const handleChange = (e: any) => {
     const { name, value, type, checked } = e.target;
     if (type === "checkbox") setForm({ ...form, [name]: checked });
+    else if (type === "number") setForm({ ...form, [name]: parseFloat(value) });
     else setForm({ ...form, [name]: value });
   };
 
@@ -68,24 +81,46 @@ export default function ProductForm({ initialData }: ProductFormProps) {
   };
 
   const handleImagesChange = (e: any) => {
-    const urls = e.target.value.split(",").map((url: string) => url.trim());
+    const urls = e.target.value
+      .split(",")
+      .map((url: string) => url.trim())
+      .filter((url: string) => url.length > 0);
     setForm({ ...form, images: urls });
   };
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    setLoading(true);
+ const handleSubmit = async (e: any) => {
+  e.preventDefault();
+  setLoading(true);
+
+  try {
+    // Ensure numbers are numbers before sending
+    const payload = {
+      ...form,
+      price: Number(form.price),
+      originalPrice: Number(form.originalPrice),
+      stock: Number(form.stock),
+      rating: Number(form.rating),
+    };
+
     const method = initialData ? "PUT" : "POST";
     const url = initialData ? `/api/products/${initialData.id}` : "/api/products";
 
-    await fetch(url, {
+    const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify(payload),
     });
 
+    if (!res.ok) throw new Error("Failed to update product");
+
     router.push("/admin/products");
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Error updating product");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl mx-auto p-6 bg-white rounded shadow-lg">
@@ -130,17 +165,23 @@ export default function ProductForm({ initialData }: ProductFormProps) {
       </section>
 
       {/* Images */}
-      <input name="images" placeholder="Image URLs (comma separated)" value={form.images.join(", ")} onChange={handleImagesChange} className="border p-2 w-full rounded" />
+      <input
+        name="images"
+        placeholder="Image URLs (comma separated)"
+        value={Array.isArray(form.images) ? form.images.join(", ") : ""}
+        onChange={handleImagesChange}
+        className="border p-2 w-full rounded"
+      />
 
       {/* Variations */}
       <section className="space-y-3">
         <p>Colors:</p>
-        {["Black","White","Blue","Red"].map(c => (
-          <label key={c}><input type="checkbox" value={c} checked={form.variations.colors.includes(c)} onChange={(e) => handleArrayChange(e,"colors")} /> {c}</label>
+        {["Black", "White", "Blue", "Red"].map(c => (
+          <label key={c}><input type="checkbox" value={c} checked={form.variations.colors.includes(c)} onChange={(e) => handleArrayChange(e, "colors")} /> {c}</label>
         ))}
         <p>Sizes:</p>
-        {["S","M","L","XL"].map(s => (
-          <label key={s}><input type="checkbox" value={s} checked={form.variations.sizes.includes(s)} onChange={(e) => handleArrayChange(e,"sizes")} /> {s}</label>
+        {["S", "M", "L", "XL"].map(s => (
+          <label key={s}><input type="checkbox" value={s} checked={form.variations.sizes.includes(s)} onChange={(e) => handleArrayChange(e, "sizes")} /> {s}</label>
         ))}
       </section>
 
@@ -148,8 +189,32 @@ export default function ProductForm({ initialData }: ProductFormProps) {
       <section className="space-y-3">
         <p>Specifications:</p>
         {Object.keys(form.variations.specs).map(key => (
-          <input key={key} placeholder={key} value={form.variations.specs[key]} onChange={(e)=>handleNestedChange(e,["variations","specs",key])} className="border p-2 w-full rounded"/>
+          <input key={key} placeholder={key} value={form.variations.specs[key]} onChange={(e) => handleNestedChange(e, ["variations", "specs", key])} className="border p-2 w-full rounded" />
         ))}
+      </section>
+
+      {/* SEO */}
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold border-b pb-1">SEO Meta</h2>
+        <input
+          placeholder="SEO Title"
+          value={form.seo?.title || ""}
+          onChange={(e) => setForm({ ...form, seo: { ...form.seo, title: e.target.value } })}
+          className="border p-2 w-full rounded"
+        />
+        <textarea
+          placeholder="SEO Description"
+          value={form.seo?.description || ""}
+          onChange={(e) => setForm({ ...form, seo: { ...form.seo, description: e.target.value } })}
+          className="border p-2 w-full rounded"
+          rows={2}
+        />
+        <input
+          placeholder="SEO Keywords (comma separated)"
+          value={form.seo?.keywords || ""}
+          onChange={(e) => setForm({ ...form, seo: { ...form.seo, keywords: e.target.value } })}
+          className="border p-2 w-full rounded"
+        />
       </section>
 
       <button type="submit" disabled={loading} className="w-full p-3 rounded bg-blue-600 text-white">
