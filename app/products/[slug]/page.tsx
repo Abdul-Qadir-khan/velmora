@@ -1,59 +1,67 @@
-import { notFound } from "next/navigation";
-import ProductClient from "./ProductClient";
+'use client';
 
-// Fetch product by slug
-async function getProduct(slug: string) {
-  try {
-    const res = await fetch(`http://localhost:3000/api/products/slug/${slug}`, {
-      cache: "no-store", // always fresh
-    });
-    if (!res.ok) return null;
-    return res.json();
-  } catch (err) {
-    console.error(err);
-    return null;
-  }
+import { useState } from "react";
+
+interface ProductClientProps {
+  product: any;
+  recommendedProducts: any[];
 }
 
-// Fetch recommended products
-async function getRecommendedProducts() {
-  try {
-    const res = await fetch(`http://localhost:3000/api/products?limit=8`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return [];
-    return res.json();
-  } catch {
-    return [];
-  }
-}
+export default function ProductClient({ product, recommendedProducts }: ProductClientProps) {
+  const [loading, setLoading] = useState(false);
 
-export default async function ProductPage({ params }: { params: { slug: string } }) {
-  const product = await getProduct(params.slug);
-  const recommendedProducts = await getRecommendedProducts();
+  // 1. Null check for product
+  if (!product) return <div>Product not found</div>;
 
-  if (!product) return notFound();
+  // 2. Parse images safely
+  const images: string[] = (() => {
+    try {
+      return JSON.parse(product.images || "[]");
+    } catch {
+      return [];
+    }
+  })();
 
-  // Fix images array
-  let images: string[] = [];
-  try {
-    images = JSON.parse(product.images || "[]");
-  } catch {
-    images = [];
-  }
-
-  // Fix variations
-  const variations = (product.variations || []).map((v: any) => ({
-    ...v,
-    colors: JSON.parse(v.colors || "[]"),
-    sizes: JSON.parse(v.sizes || "[]"),
-    specs: JSON.parse(v.specs || "{}"),
-  }));
+  // 3. Corrected addToCart function
+  const addToCart = async (slug: string, quantity = 1) => {
+    setLoading(true);
+    try {
+      // Replace this with your actual cart logic, e.g., API call
+      console.log(`Adding ${quantity} of ${slug} to cart`);
+      await new Promise((resolve) => setTimeout(resolve, 500)); // mock async delay
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <ProductClient
-      product={{ ...product, images, variations }}
-      recommendedProducts={recommendedProducts}
-    />
+    <div>
+      <h1>{product.name}</h1>
+      <p>{product.description}</p>
+      {images[0] && (
+        <img
+          src={images[0]}
+          alt={product.name}
+          style={{ width: 150, height: 150 }}
+        />
+      )}
+
+      <div>
+        <button onClick={() => addToCart(product.slug)} disabled={loading}>
+          {loading ? "Adding..." : "Buy"}
+        </button>
+      </div>
+
+      <h2>Recommended Products</h2>
+      <div style={{ display: "flex", gap: "10px" }}>
+        {recommendedProducts.map((p: any) => (
+          <div key={p.id || p.slug}>
+            <p>{p.name || "Unnamed Product"}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

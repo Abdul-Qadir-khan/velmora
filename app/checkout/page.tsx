@@ -1,11 +1,20 @@
 "use client";
 
-import { useCart, CartItem } from "../context/CartContext";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { orders } from "../api/orders-storage"; // Import in-memory orders store
 
 // Types
+interface CartProduct {
+  id: number;
+  quantity: number;
+  product: {
+    id: number;
+    name: string;
+    price: number;
+    images: string[];
+  };
+}
+
 interface OrderForm {
   name: string;
   email: string;
@@ -15,68 +24,52 @@ interface OrderForm {
   pincode: string;
 }
 
-// Step 1: Cart
+// Cart Step
 const CartStep = ({
   cart,
   removeFromCart,
   onNext,
-  isClient,
 }: {
-  cart: (CartItem & { uniqueKey: string })[];
-  removeFromCart: (item: CartItem) => void;
+  cart: CartProduct[];
+  removeFromCart: (id: number) => void;
   onNext: () => void;
-  isClient: boolean;
-}) => {
-  return (
-    <div className="bg-white p-6 rounded-2xl">
-      <h2 className="text-xl font-semibold mb-6">Your Cart</h2>
-
-      {cart.length === 0 ? (
-        <p>Your cart is empty</p>
-      ) : isClient ? (
-        cart.map((item) => (
-          <div key={item.uniqueKey} className="flex gap-4 border-b pb-4 mb-4">
-            <img src={item.images[0]} className="w-16 h-16 object-contain" />
-            <div className="flex-1">
-              <p>{item.name}</p>
-              <p className="text-sm text-gray-500">
-                {item.selectedColor} • {item.selectedSize}
-              </p>
-              <p className="text-sm">Qty: {item.qty}</p>
-            </div>
-            <button
-              onClick={() => removeFromCart(item)}
-              className="text-red-500 text-sm"
-            >
-              Remove
-            </button>
+}) => (
+  <div className="bg-white p-6 rounded-2xl">
+    <h2 className="text-xl font-semibold mb-6">Your Cart</h2>
+    {cart.length === 0 ? (
+      <p>Your cart is empty</p>
+    ) : (
+      cart.map((item) => (
+        <div key={item.id} className="flex gap-4 border-b pb-4 mb-4">
+          <img
+            src={item.product.images?.[0] || "/placeholder.png"}
+            className="w-16 h-16 object-contain"
+          />
+          <div className="flex-1">
+            <p>{item.product.name}</p>
+            <p className="text-sm">Qty: {item.quantity}</p>
+            <p className="text-sm">Price: ₹{item.product.price}</p>
           </div>
-        ))
-      ) : (
-        Array.from({ length: cart.length }).map((_, i) => (
-          <div key={i} className="flex gap-4 border-b pb-4 mb-4 animate-pulse">
-            <div className="w-16 h-16 bg-gray-200 rounded"></div>
-            <div className="flex-1 space-y-2">
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-            </div>
-            <div className="w-16 h-8 bg-gray-200 rounded"></div>
-          </div>
-        ))
-      )}
+          <button
+            onClick={() => removeFromCart(item.id)}
+            className="text-red-500 text-sm"
+          >
+            Remove
+          </button>
+        </div>
+      ))
+    )}
+    <button
+      disabled={cart.length === 0}
+      onClick={onNext}
+      className="mt-6 bg-black text-white px-6 py-2 rounded-full disabled:opacity-40"
+    >
+      Continue
+    </button>
+  </div>
+);
 
-      <button
-        disabled={cart.length === 0}
-        onClick={onNext}
-        className="mt-6 bg-black text-white px-6 py-2 rounded-full disabled:opacity-40"
-      >
-        Continue
-      </button>
-    </div>
-  );
-};
-
-// Step 2: Shipping
+// Shipping Step
 const ShippingStep = ({
   form,
   errors,
@@ -89,13 +82,12 @@ const ShippingStep = ({
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onBack: () => void;
   onNext: () => void;
-}) => {
-  const fields: (keyof OrderForm)[] = ["name", "email", "phone", "city", "pincode"];
-  return (
-    <div className="bg-white p-6 rounded-2xl">
-      <h2 className="text-xl font-semibold mb-6">Shipping Details</h2>
-      <div className="grid md:grid-cols-2 gap-4">
-        {fields.map((field) => (
+}) => (
+  <div className="bg-white p-6 rounded-2xl">
+    <h2 className="text-xl font-semibold mb-6">Shipping Details</h2>
+    <div className="grid md:grid-cols-2 gap-4">
+      {(["name", "email", "phone", "city", "pincode"] as (keyof OrderForm)[]).map(
+        (field) => (
           <div key={field}>
             <input
               name={field}
@@ -106,37 +98,38 @@ const ShippingStep = ({
                 errors[field] ? "border-red-500" : ""
               }`}
             />
-            {errors[field] && <p className="text-red-500 text-xs">{errors[field]}</p>}
+            {errors[field] && (
+              <p className="text-red-500 text-xs">{errors[field]}</p>
+            )}
           </div>
-        ))}
-      </div>
-
-      <div className="mt-4">
-        <textarea
-          name="address"
-          placeholder="Address"
-          value={form.address}
-          onChange={onChange}
-          className={`border p-3 rounded-xl w-full ${
-            errors.address ? "border-red-500" : ""
-          }`}
-        />
-        {errors.address && <p className="text-red-500 text-xs">{errors.address}</p>}
-      </div>
-
-      <div className="flex gap-4 mt-6">
-        <button onClick={onBack} className="border px-6 py-2 rounded-full">
-          Back
-        </button>
-        <button onClick={onNext} className="bg-black text-white px-6 py-2 rounded-full">
-          Continue
-        </button>
-      </div>
+        )
+      )}
     </div>
-  );
-};
+    <div className="mt-4">
+      <textarea
+        name="address"
+        placeholder="Address"
+        value={form.address}
+        onChange={onChange}
+        className={`border p-3 rounded-xl w-full ${
+          errors.address ? "border-red-500" : ""
+        }`}
+      />
+      {errors.address && <p className="text-red-500 text-xs">{errors.address}</p>}
+    </div>
 
-// Step 3: Payment
+    <div className="flex gap-4 mt-6">
+      <button onClick={onBack} className="border px-6 py-2 rounded-full">
+        Back
+      </button>
+      <button onClick={onNext} className="bg-black text-white px-6 py-2 rounded-full">
+        Continue
+      </button>
+    </div>
+  </div>
+);
+
+// Payment Step
 const PaymentStep = ({
   onBack,
   onPlaceOrder,
@@ -148,12 +141,10 @@ const PaymentStep = ({
 }) => (
   <div className="bg-white p-6 rounded-2xl">
     <h2 className="text-xl font-semibold mb-6">Payment</h2>
-
     <div className="border p-4 rounded-xl mb-4 flex justify-between">
       Cash on Delivery
       <input type="radio" defaultChecked />
     </div>
-
     <div className="flex gap-4 mt-6">
       <button onClick={onBack} className="border px-6 py-2 rounded-full">
         Back
@@ -169,16 +160,12 @@ const PaymentStep = ({
   </div>
 );
 
-// Main Checkout Page
 export default function CheckoutPage() {
-  const { cart, removeFromCart, clearCart } = useCart();
   const router = useRouter();
+  const [cart, setCart] = useState<CartProduct[]>([]);
+  const [loadingCart, setLoadingCart] = useState(true);
 
   const [step, setStep] = useState(1);
-  const [errors, setErrors] = useState<Partial<Record<keyof OrderForm, string>>>({});
-  const [loading, setLoading] = useState(false);
-  const [isClient, setIsClient] = useState(false);
-
   const [form, setForm] = useState<OrderForm>({
     name: "",
     email: "",
@@ -187,86 +174,89 @@ export default function CheckoutPage() {
     city: "",
     pincode: "",
   });
+  const [errors, setErrors] = useState<Partial<Record<keyof OrderForm, string>>>({});
+  const [placingOrder, setPlacingOrder] = useState(false);
 
-  useEffect(() => setIsClient(true), []);
+  // Fetch cart from API
+  const fetchCart = async () => {
+    setLoadingCart(true);
+    try {
+      const res = await fetch("/api/cart");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Failed to fetch cart");
+      setCart(data.cart);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingCart(false);
+    }
+  };
 
-  const cartWithKeys = useMemo(
-    () => cart.map((item, index) => ({ ...item, uniqueKey: `${item.id}-${index}` })),
-    [cart]
-  );
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
+  const removeFromCart = async (id: number) => {
+    try {
+      await fetch("/api/cart/remove", { // optional: you can create a DELETE route
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cartItemId: id }),
+      });
+      fetchCart();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const subtotal = cart.reduce((acc, item) => acc + item.quantity * item.product.price, 0);
+  const shipping = subtotal > 0 ? 50 : 0;
+  const total = subtotal + shipping;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const validateStep2 = (): boolean => {
+  const validateStep2 = () => {
     const newErrors: Partial<Record<keyof OrderForm, string>> = {};
-
     if (!form.name.trim()) newErrors.name = "Name is required";
-    if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(form.email))
-      newErrors.email = "Enter valid email";
+    if (!/^\S+@\S+\.\S+$/.test(form.email)) newErrors.email = "Enter valid email";
     if (!/^[6-9]\d{9}$/.test(form.phone)) newErrors.phone = "Enter valid phone number";
     if (!form.city.trim()) newErrors.city = "City is required";
     if (!/^\d{6}$/.test(form.pincode)) newErrors.pincode = "Enter valid pincode";
     if (!form.address.trim()) newErrors.address = "Address is required";
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
-  const subtotal = cart.reduce<number>((acc, item) => acc + item.price * item.qty, 0);
-  const shipping = subtotal > 0 ? 50 : 0;
-  const total = subtotal + shipping;
 
   const handlePlaceOrder = async () => {
     if (!validateStep2()) {
       setStep(2);
       return;
     }
-    if (cart.length === 0) return;
-
-    setLoading(true);
+    if (cart.length === 0) {
+      alert("Cart is empty");
+      return;
+    }
+    setPlacingOrder(true);
     try {
       const orderId = `VEL${Math.floor(100000 + Math.random() * 900000)}`;
-
-      const orderData = {
-        orderId,
-        ...form,
-        zip: form.pincode,
-        items: cart.map((item) => ({ name: item.name, qty: item.qty, price: item.price })),
-        total,
-        status: "Processing",
-        date: new Date().toISOString(),
-      };
-
-      // **Add order to in-memory store**
-      orders.push(orderData);
-
-      // Call your existing API if needed, or skip
-      /*
-      const res = await fetch("/api/send-order", {
+      const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderData),
+        body: JSON.stringify({ orderId, ...form, items: cart, total, status: "Processing" }),
       });
-
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || `API Error ${res.status}`);
-      */
-
-      clearCart();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Order failed");
       router.push(`/order-success?orderId=${orderId}`);
     } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Something went wrong. Please try again.");
+      alert(err.message || "Order failed");
     } finally {
-      setLoading(false);
+      setPlacingOrder(false);
     }
   };
 
-  const handleStep2Next = () => {
-    if (validateStep2()) setStep(3);
-  };
+  if (loadingCart) return <p>Loading cart...</p>;
 
   return (
     <>
@@ -276,7 +266,6 @@ export default function CheckoutPage() {
 
       <section className="bg-[#f7f7f7] min-h-screen pt-20 pb-16 px-6 md:px-12">
         <div className="max-w-7xl mx-auto">
-          {/* STEP INDICATOR */}
           <div className="flex justify-center mb-10">
             {["Cart", "Shipping", "Payment"].map((label, i) => (
               <div key={i} className="flex items-center gap-2 mx-3 text-sm">
@@ -287,21 +276,17 @@ export default function CheckoutPage() {
                 >
                   {i + 1}
                 </div>
-                <span className={step === i + 1 ? "text-black" : "text-gray-400"}>{label}</span>
+                <span className={step === i + 1 ? "text-black" : "text-gray-400"}>
+                  {label}
+                </span>
               </div>
             ))}
           </div>
 
           <div className="grid lg:grid-cols-[1.5fr_1fr] gap-10">
-            {/* LEFT SIDE */}
             <div className="space-y-8">
               {step === 1 && (
-                <CartStep
-                  cart={cartWithKeys}
-                  removeFromCart={removeFromCart}
-                  onNext={() => setStep(2)}
-                  isClient={isClient}
-                />
+                <CartStep cart={cart} removeFromCart={removeFromCart} onNext={() => setStep(2)} />
               )}
               {step === 2 && (
                 <ShippingStep
@@ -309,15 +294,14 @@ export default function CheckoutPage() {
                   errors={errors}
                   onChange={handleChange}
                   onBack={() => setStep(1)}
-                  onNext={handleStep2Next}
+                  onNext={() => validateStep2() && setStep(3)}
                 />
               )}
               {step === 3 && (
-                <PaymentStep onBack={() => setStep(2)} onPlaceOrder={handlePlaceOrder} loading={loading} />
+                <PaymentStep onBack={() => setStep(2)} onPlaceOrder={handlePlaceOrder} loading={placingOrder} />
               )}
             </div>
 
-            {/* RIGHT SUMMARY */}
             <div className="bg-white p-6 rounded-2xl h-fit sticky top-20">
               <h2 className="text-lg font-semibold mb-4">Summary</h2>
               <div className="flex justify-between text-sm mb-2">

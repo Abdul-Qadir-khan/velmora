@@ -109,7 +109,7 @@ export default function ProductClient({
       </Head>
 
       {/* HEADER */}
-      <section className="bg-black text-white py-12">
+      <section className="bg-black text-white pt-12 pb-5">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold">{product.name}</h1>
           <ul className="flex justify-center gap-4 mt-4 text-sm md:text-base">

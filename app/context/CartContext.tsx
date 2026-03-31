@@ -1,55 +1,88 @@
-// CartContext.tsx
 "use client";
 
-import { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import { Product } from "../../data/product";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+
+export interface CartItem {
+  id: number;
+  name: string;
+  price: number;
+  qty: number;
+  selectedSize: string;
+  selectedColor: string;
+  images: string[];
+}
 
 interface CartContextType {
-  cart: Product[];
-  addToCart: (product: Product) => void;
-  removeFromCart: (id: number) => void;
+  cart: CartItem[];
+  addToCart: (item: CartItem) => Promise<void>;
+  removeFromCart: (id: number) => Promise<void>;
+  clearCart: () => void;
   cartCount: number;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [cart, setCart] = useState<Product[]>(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("cart");
-      return stored ? JSON.parse(stored) : [];
-    }
-    return [];
-  });
+  const [cart, setCart] = useState<CartItem[]>([]);
 
-  const updateLocalStorage = (items: Product[]) => {
-    setCart(items);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("cart", JSON.stringify(items));
-    }
+  // 🔥 Fetch cart from backend
+  const fetchCart = async () => {
+    const res = await fetch("/api/cart");
+    const data = await res.json();
+    setCart(data);
   };
 
-  const addToCart = (product: Product) => {
-    if (!cart.find((p) => p.id === product.id)) {
-      updateLocalStorage([...cart, product]);
-    }
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
+  // ✅ Add to cart (backend)
+  const addToCart = async (item: CartItem) => {
+    const res = await fetch("/api/cart", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(item),
+    });
+
+    const data = await res.json();
+    setCart(data);
   };
 
-  const removeFromCart = (id: number) => {
-    updateLocalStorage(cart.filter((p) => p.id !== id));
+  // ✅ Remove from cart (backend)
+  const removeFromCart = async (id: number) => {
+    const res = await fetch("/api/cart", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id }),
+    });
+
+    const data = await res.json();
+    setCart(data);
   };
 
-  const cartCount = cart.length;
+  const clearCart = () => setCart([]);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, cartCount }}>
+    <CartContext.Provider
+      value={{
+        cart,
+        addToCart,
+        removeFromCart,
+        clearCart,
+        cartCount: cart.length,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
 };
 
-export const useCart = (): CartContextType => {
+export const useCart = () => {
   const context = useContext(CartContext);
-  if (!context) throw new Error("useCart must be used within a CartProvider");
+  if (!context) throw new Error("CartContext missing");
   return context;
 };

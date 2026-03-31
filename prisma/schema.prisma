@@ -1,3 +1,5 @@
+// prisma/schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,46 +10,58 @@ datasource db {
 }
 
 model Product {
-  id            String      @id @default(cuid())
+  id            String  @id @default(cuid())
   name          String
-  slug          String?     @unique
+  slug          String? @unique
   description   String?
   price         Float
   originalPrice Float?
-  stock         Int         @default(0)
-  rating        Float?      @default(0)
+  stock         Int     @default(0)
+  rating        Float?  @default(0)
   category      String
-  isNew         Boolean     @default(false)
-  bestSeller    Boolean     @default(false)
-  images        String      // JSON string of image URLs
+  isNew         Boolean @default(false)
+  bestSeller    Boolean @default(false)
+  images        String // JSON string of image URLs
 
-  brandId       String
-  brand         Brand       @relation(fields: [brandId], references: [id])
+  brandId String
+  brand   Brand  @relation(fields: [brandId], references: [id])
 
-  variations    Variation[]
+  variations Variation[]
+  cartItems  CartItem[] // <-- opposite relation added
 
   seoTitle       String?
   seoDescription String?
   seoKeywords    String?
 
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Brand {
-  id       String    @id @default(cuid())
-  name     String    @unique
-  logo     String?
+  id   String  @id @default(cuid())
+  name String  @unique
+  logo String?
 
   products Product[]
 }
 
 model Variation {
-  id        String   @id @default(cuid())
-  colors    String   // JSON string
-  sizes     String   // JSON string
-  specs     String   // JSON string
+  id     String @id @default(cuid())
+  colors String // JSON string
+  sizes  String // JSON string
+  specs  String // JSON string
 
   productId String
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model CartItem {
+  id        String @id @default(cuid())
+  userId    String
+  productId String
+  quantity  Int    @default(1)
+
   product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
