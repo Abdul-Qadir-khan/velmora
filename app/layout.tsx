@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { CartProvider } from "./context/CartContext";
+import { WishlistProvider } from "./context/WishlistContext";
 
 /* ================= FONTS ================= */
 const playfair = Playfair_Display({
@@ -100,8 +101,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-  className={`${playfair.variable} ${inter.variable} ${dmSans.variable} antialiased bg-white text-black`}
->
+        className={`${playfair.variable} ${inter.variable} ${dmSans.variable} antialiased bg-white text-black`}
+      >
         {/* STRUCTURED DATA (ECOMMERCE) */}
         <script
           type="application/ld+json"
@@ -121,9 +122,11 @@ export default function RootLayout({
         />
 
         <CartProvider>
-          <Navbar />
-          {children}
-          <Footer />
+          <WishlistProvider>
+            <Navbar />
+            {children}
+            <Footer />
+          </WishlistProvider>
         </CartProvider>
       </body>
     </html>

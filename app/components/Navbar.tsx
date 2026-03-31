@@ -5,6 +5,9 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Menu, X, Search, ShoppingCart, User, Heart } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
+
+// const { wishlistCount } useWishlist();
 
 export default function Header() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
@@ -15,7 +18,8 @@ export default function Header() {
   };
 
   const { cartCount } = useCart();
-  const [wishlistCount, setWishlistCount] = useState(0);
+  // const [wishlistCount, setWishlistCount] = useState(0);
+  const { wishlistCount } = useWishlist(); // ✅ get wishlistCount from context
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -30,18 +34,6 @@ export default function Header() {
     const handleScroll = () => setIsScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Load wishlist count safely
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem("wishlist");
-        if (stored) setWishlistCount(JSON.parse(stored).length);
-      } catch (e) {
-        setWishlistCount(0);
-      }
-    }
   }, []);
 
   const navLinks = [
@@ -184,7 +176,7 @@ export default function Header() {
             </Link>
 
           </nav>
-          
+
           {/* LOGO */}
           <Link href="/" className="absolute left-1/2 -translate-x-1/2">
             <Image
@@ -221,7 +213,7 @@ export default function Header() {
               )}
             </Link>
 
-            {/* CART - FIXED */}
+            {/* Cart */}
             <Link href="/checkout" className="relative">
               <ShoppingCart className="hover:opacity-70 transition" />
               {isClient && cartCount > 0 && (
@@ -361,12 +353,13 @@ export default function Header() {
           {/* BOTTOM ACTIONS */}
           <div className="absolute bottom-10 left-8 right-8 flex justify-between text-sm">
             <div className="flex items-center gap-2">
-              <User size={18} />
-              Account
-            </div>
-            <div className="flex items-center gap-2">
               <ShoppingCart size={18} />
               Cart ({isClient ? cartCount : 0})
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Heart size={18} />
+              Wishlist ({isClient ? wishlistCount : 0})
             </div>
           </div>
         </div>

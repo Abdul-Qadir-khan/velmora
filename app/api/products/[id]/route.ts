@@ -1,105 +1,141 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-interface Params {
-  id?: string;
-}
-
-// GET single product
-export async function GET(req: NextRequest, { params }: { params: Params }) {
+// ---------------- UPDATE PRODUCT ----------------
+export async function PUT(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> } // 👈 params is Promise now
+) {
   try {
-    if (!params?.id) {
-      return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
-    }
+    const { id } = await context.params; // 👈 IMPORTANT FIX
 
-    const product = await prisma.product.findUnique({
-      where: { id: params.id },
-      include: { brand: true, variations: true },
-    });
-
-    if (!product) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(product);
-  } catch (error) {
-    console.error("GET /api/products/[id] error:", error);
-    return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
-  }
-}
-
-// PUT update product
-export async function PUT(req: NextRequest, { params }: { params: Params }) {
-  try {
-    if (!params?.id) {
-      return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
+    if (!id) {
+      return NextResponse.json(
+        { error: "Product ID is required" },
+        { status: 400 }
+      );
     }
 
     const body = await req.json();
-    const variationsArray = Array.isArray(body.variations)
-      ? body.variations
-      : body.variations
-      ? [body.variations]
+
+    // ---------- NORMALIZE ----------
+    const name = body.name?.trim();
+    const description = body.description || "";
+
+    const price = Number(body.price) || 0;
+    const originalPrice = Number(body.originalPrice) || 0;
+    const stock = Number(body.stock) || 0;
+    const rating = Number(body.rating) || 0;
+
+    const category = body.category || "";
+    const isNew = Boolean(body.isNew);
+    const bestSeller = Boolean(body.bestSeller);
+
+    const images = JSON.stringify(
+      Array.isArray(body.images) ? body.images : []
+    );
+
+    const seoTitle = body.seo?.title || "";
+    const seoDescription = body.seo?.description || "";
+    const seoKeywords = body.seo?.keywords || "";
+
+    // variations normalize
+    const variationsArray = body.variations
+      ? [
+          {
+            colors: JSON.stringify(body.variations.colors || []),
+            sizes: JSON.stringify(body.variations.sizes || []),
+            specs: JSON.stringify(body.variations.specs || {}),
+          },
+        ]
       : [];
 
-    const product = await prisma.product.update({
-      where: { id: params.id },
+    // ---------- UPDATE ----------
+    const updatedProduct = await prisma.product.update({
+      where: { id },
+
       data: {
-        name: body.name,
-        description: body.description || "",
-        price: Number(body.price) || 0,
-        originalPrice: Number(body.originalPrice) || 0,
-        stock: Number(body.stock) || 0,
-        rating: Number(body.rating) || 0,
-        category: body.category || "",
-        isNew: Boolean(body.isNew),
-        bestSeller: Boolean(body.bestSeller),
-        images: JSON.stringify(Array.isArray(body.images) ? body.images : []),
+        name,
+        description,
+        price,
+        originalPrice,
+        stock,
+        rating,
+        category,
+        isNew,
+        bestSeller,
+        images,
+        seoTitle,
+        seoDescription,
+        seoKeywords,
+
+        // ✅ BRAND FIX
         brand: {
-          upsert: {
+          connectOrCreate: {
+            where: { name: body.brand.name.trim() },
             create: {
-              name: body.brand?.name || "Unknown",
-              logo: body.brand?.logo || "",
-            },
-            update: {
-              name: body.brand?.name || "Unknown",
-              logo: body.brand?.logo || "",
+              name: body.brand.name.trim(),
+              logo: body.brand.logo || "",
             },
           },
         },
+
+        // ✅ VARIATIONS (reset + recreate)
         variations: {
-          deleteMany: {}, // delete old variations
-          create: variationsArray.map((v: any) => ({
-            colors: JSON.stringify(Array.isArray(v.colors) ? v.colors : []),
-            sizes: JSON.stringify(Array.isArray(v.sizes) ? v.sizes : []),
-            specs: JSON.stringify(v.specs || {}),
-          })),
+          deleteMany: {}, // remove old
+          create: variationsArray,
         },
-        seoTitle: body.seo?.title || "",
-        seoDescription: body.seo?.description || "",
-        seoKeywords: body.seo?.keywords || "",
       },
-      include: { brand: true, variations: true },
+
+      include: {
+        brand: true,
+        variations: true,
+      },
     });
 
-    return NextResponse.json(product);
-  } catch (error) {
+    return NextResponse.json(updatedProduct);
+  } catch (error: any) {
     console.error("PUT /api/products/[id] error:", error);
-    return NextResponse.json({ error: "Failed to update product" }, { status: 500 });
+
+    return NextResponse.json(
+      {
+        error: "Failed to update product",
+        details: error.message,
+      },
+      { status: 500 }
+    );
   }
 }
 
-// DELETE product
-export async function DELETE(req: NextRequest, { params }: { params: Params }) {
+// ---------------- DELETE PRODUCT ----------------
+export async function DELETE(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
-    if (!params?.id) {
-      return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
+    const { id } = await context.params; // 👈 IMPORTANT
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Product ID is required" },
+        { status: 400 }
+      );
     }
 
-    await prisma.product.delete({ where: { id: params.id } });
-    return NextResponse.json({ message: "Product deleted" });
-  } catch (error) {
+    await prisma.product.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
     console.error("DELETE /api/products/[id] error:", error);
-    return NextResponse.json({ error: "Failed to delete product" }, { status: 500 });
+
+    return NextResponse.json(
+      {
+        error: "Failed to delete product",
+        details: error.message,
+      },
+      { status: 500 }
+    );
   }
 }

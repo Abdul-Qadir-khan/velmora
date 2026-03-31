@@ -1,93 +1,51 @@
+// CartContext.tsx
 "use client";
 
-import { createContext, useContext, useMemo, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { Product } from "../../data/product";
 
-// ✅ Cart item type
-export interface CartItem {
-  id: string | number;
-  name: string;
-  price: number;
-  qty: number;
-  images: string[];
-  selectedColor?: string;
-  selectedSize?: string;
-}
-
-// ✅ Cart context type
 interface CartContextType {
-  cart: CartItem[];
-  addToCart: (item: CartItem) => void;
-  removeFromCart: (item: CartItem) => void;
-  clearCart: () => void;
+  cart: Product[];
+  addToCart: (product: Product) => void;
+  removeFromCart: (id: number) => void;
   cartCount: number;
-  cartTotal: number;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [cart, setCart] = useState<CartItem[]>(() => {
+  const [cart, setCart] = useState<Product[]>(() => {
     if (typeof window !== "undefined") {
-      const storedCart = localStorage.getItem("velmora_cart");
-      return storedCart ? JSON.parse(storedCart) : [];
+      const stored = localStorage.getItem("cart");
+      return stored ? JSON.parse(stored) : [];
     }
     return [];
   });
 
-  const addToCart = (item: CartItem) => {
-    setCart((prev) => {
-      const existing = prev.find(
-        (p) =>
-          p.id === item.id &&
-          p.selectedSize === item.selectedSize &&
-          p.selectedColor === item.selectedColor
-      );
-      if (existing) {
-        return prev.map((p) =>
-          p.id === item.id &&
-          p.selectedSize === item.selectedSize &&
-          p.selectedColor === item.selectedColor
-            ? { ...p, qty: p.qty + item.qty }
-            : p
-        );
-      }
-      return [...prev, item];
-    });
+  const updateLocalStorage = (items: Product[]) => {
+    setCart(items);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("cart", JSON.stringify(items));
+    }
   };
 
-  const removeFromCart = (itemToRemove: CartItem) => {
-    setCart((prev) =>
-      prev.filter(
-        (item) =>
-          !(
-            item.id === itemToRemove.id &&
-            item.selectedSize === itemToRemove.selectedSize &&
-            item.selectedColor === itemToRemove.selectedColor
-          )
-      )
-    );
+  const addToCart = (product: Product) => {
+    if (!cart.find((p) => p.id === product.id)) {
+      updateLocalStorage([...cart, product]);
+    }
   };
 
-  const clearCart = () => setCart([]);
+  const removeFromCart = (id: number) => {
+    updateLocalStorage(cart.filter((p) => p.id !== id));
+  };
 
-  const cartCount = cart.reduce<number>((acc, item) => acc + item.qty, 0);
-  const cartTotal = cart.reduce<number>((acc, item) => acc + item.price * item.qty, 0);
+  const cartCount = cart.length;
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (typeof window !== "undefined") {
-        localStorage.setItem("velmora_cart", JSON.stringify(cart));
-      }
-    }, 300);
-    return () => clearTimeout(timeout);
-  }, [cart]);
-
-  const contextValue = useMemo(
-    () => ({ cart, addToCart, removeFromCart, clearCart, cartCount, cartTotal }),
-    [cart]
+  return (
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, cartCount }}>
+      {children}
+    </CartContext.Provider>
   );
-
-  return <CartContext.Provider value={contextValue}>{children}</CartContext.Provider>;
 };
 
 export const useCart = (): CartContextType => {

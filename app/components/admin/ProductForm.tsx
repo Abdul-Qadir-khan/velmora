@@ -12,41 +12,73 @@ export default function ProductForm({ initialData }: ProductFormProps) {
   const [loading, setLoading] = useState(false);
 
   // Ensure images are always an array
-  const initialFormData = initialData
-    ? {
+ const initialFormData = initialData
+  ? (() => {
+      const firstVariation = initialData.variations?.[0] || {};
+
+      return {
         ...initialData,
-        images: Array.isArray(initialData.images)
-          ? initialData.images
-          : initialData.images
-          ? [initialData.images]
+
+        // ✅ parse images
+        images: initialData.images
+          ? JSON.parse(initialData.images)
           : [],
+
+        // ✅ parse variations
         variations: {
-          colors: initialData.variations?.colors || [],
-          sizes: initialData.variations?.sizes || [],
-          specs: initialData.variations?.specs || { material: "", fit: "", sleeve: "", pattern: "", washing: "" },
+          colors: firstVariation.colors
+            ? JSON.parse(firstVariation.colors)
+            : [],
+          sizes: firstVariation.sizes
+            ? JSON.parse(firstVariation.sizes)
+            : [],
+          specs: firstVariation.specs
+            ? JSON.parse(firstVariation.specs)
+            : {
+                material: "",
+                fit: "",
+                sleeve: "",
+                pattern: "",
+                washing: "",
+              },
         },
+
+        // ✅ brand safe
         brand: initialData.brand || { name: "", logo: "" },
-        seo: initialData.seo || { title: "", description: "", keywords: "" },
-      }
-    : {
-        name: "",
-        description: "",
-        price: 0,
-        originalPrice: 0,
-        stock: 0,
-        rating: 0,
-        category: "T-Shirt",
-        isNew: false,
-        bestSeller: false,
-        images: [] as string[],
-        brand: { name: "", logo: "" },
-        variations: {
-          colors: [] as string[],
-          sizes: [] as string[],
-          specs: { material: "", fit: "", sleeve: "", pattern: "", washing: "" },
+
+        // ✅ map SEO fields
+        seo: {
+          title: initialData.seoTitle || "",
+          description: initialData.seoDescription || "",
+          keywords: initialData.seoKeywords || "",
         },
-        seo: { title: "", description: "", keywords: "" },
       };
+    })()
+  : {
+      name: "",
+      description: "",
+      price: 0,
+      originalPrice: 0,
+      stock: 0,
+      rating: 0,
+      category: "T-Shirt",
+      isNew: false,
+      bestSeller: false,
+      images: [],
+      brand: { name: "", logo: "" },
+      variations: {
+        colors: [],
+        sizes: [],
+        specs: {
+          material: "",
+          fit: "",
+          sleeve: "",
+          pattern: "",
+          washing: "",
+        },
+      },
+      seo: { title: "", description: "", keywords: "" },
+    };
 
   const [form, setForm] = useState(initialFormData);
 
@@ -88,39 +120,39 @@ export default function ProductForm({ initialData }: ProductFormProps) {
     setForm({ ...form, images: urls });
   };
 
- const handleSubmit = async (e: any) => {
-  e.preventDefault();
-  setLoading(true);
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    // Ensure numbers are numbers before sending
-    const payload = {
-      ...form,
-      price: Number(form.price),
-      originalPrice: Number(form.originalPrice),
-      stock: Number(form.stock),
-      rating: Number(form.rating),
-    };
+    try {
+      // Ensure numbers are numbers before sending
+      const payload = {
+        ...form,
+        price: Number(form.price),
+        originalPrice: Number(form.originalPrice),
+        stock: Number(form.stock),
+        rating: Number(form.rating),
+      };
 
-    const method = initialData ? "PUT" : "POST";
-    const url = initialData ? `/api/products/${initialData.id}` : "/api/products";
+      const method = initialData ? "PUT" : "POST";
+      const url = initialData ? `/api/products/${initialData.id}` : "/api/products";
 
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    if (!res.ok) throw new Error("Failed to update product");
+      if (!res.ok) throw new Error("Failed to update product");
 
-    router.push("/admin/products");
-  } catch (err) {
-    console.error(err);
-    alert("Error updating product");
-  } finally {
-    setLoading(false);
-  }
-};
+      router.push("/admin/products");
+    } catch (err) {
+      console.error(err);
+      alert("Error updating product");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl mx-auto p-6 bg-white rounded shadow-lg">
