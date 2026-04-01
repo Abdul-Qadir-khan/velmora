@@ -139,7 +139,7 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
   };
 
   const goToProduct = (product: Product) => {
-    router.push(`/products/${product.slug}`);
+    router.push(`/shop/${product.slug}`);
   };
 
   return (
