@@ -1,44 +1,70 @@
-// app/api/send-order/route.ts
 import { NextRequest, NextResponse } from "next/server";
+import nodemailer from "nodemailer";
 
 export async function POST(req: NextRequest) {
-  console.log("🛒 API Route Hit!");
-
   try {
     const data = await req.json();
-    console.log("📦 Order Data:", {
-      orderId: data.orderId,
-      name: data.name,
-      email: data.email,
-      total: data.total,
-      itemsCount: data.items?.length || 0
+    const { orderId, name, email, total, items } = data;
+
+    // Log the incoming order data
+    console.log("📦 Order Data:", { orderId, name, email, total, itemsCount: items?.length });
+
+    // Create a Nodemailer transporter using Gmail
+    const transporter = nodemailer.createTransport({
+      service: "gmail",  // Gmail service
+      auth: {
+        user: process.env.EMAIL_USER,  // Email address from .env
+        pass: process.env.EMAIL_PASS,  // App password from .env
+      },
     });
 
-    // 🎭 Simulate email sending delay (1.5 seconds)
-    console.log("⏳ Simulating email sending...");
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Email content for the customer
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,  // Customer's email
+      subject: `Order Confirmation #${orderId}`,
+      text: `Thank you for your order! Your order ID is ${orderId}. Total: ₹${total}.`,
+    };
 
-    // 🎉 Simulate success
-    console.log("✅ Mock emails sent to:", data.email, "and admin");
-    
-    return NextResponse.json({ 
+    // Email content for the admin
+    const adminMailOptions = {
+      from: process.env.EMAIL_USER,
+      to: process.env.ADMIN_EMAIL,  // Admin email from .env
+      subject: `New Order Received #${orderId}`,
+      text: `Order ID: ${orderId}\nCustomer: ${name}\nEmail: ${email}\nTotal: ₹${total}\nItems: ${JSON.stringify(items)}`,
+    };
+
+    // Send both emails (Customer + Admin)
+    console.log("✉️ Sending order confirmation emails...");
+    const results = await Promise.allSettled([
+      transporter.sendMail(mailOptions),
+      transporter.sendMail(adminMailOptions),
+    ]);
+
+    // Log success/failure results
+    results.forEach((res, i) => {
+      if (res.status === "fulfilled") {
+        console.log(i === 0 ? "✅ Customer email sent" : "✅ Admin email sent");
+      } else {
+        console.error(i === 0 ? "❌ Customer email failed" : "❌ Admin email failed", res.reason);
+      }
+    });
+
+    // Send success response back
+    return NextResponse.json({
       success: true,
-      orderId: data.orderId,
-      message: "Order confirmed! Mock emails sent successfully ✅",
-      timestamp: new Date().toISOString()
-    }, { 
-      status: 200 
+      message: "Order emails sent successfully ✅",
+      orderId,
     });
 
   } catch (error) {
-    console.error("💥 API Error:", error);
-    
+    console.error("💥 Error sending email:", error);
+
+    // Send error response back if email fails
     return NextResponse.json({
       success: false,
-      error: "Server error processing order",
-      details: error instanceof Error ? error.message : "Unknown error"
-    }, { 
-      status: 500 
-    });
+      error: "Failed to send email",
+      details: error instanceof Error ? error.message : "Unknown error",
+    }, { status: 500 });
   }
 }

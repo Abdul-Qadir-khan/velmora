@@ -5,14 +5,13 @@ import { useRouter } from "next/navigation";
 
 // Types
 interface CartProduct {
-  id: number;
-  quantity: number;
-  product: {
-    id: number;
-    name: string;
-    price: number;
-    images: string[];
-  };
+  productId: string;
+  name: string;
+  price: number;
+  qty: number;
+  size: string;
+  color: string;
+  image: string;
 }
 
 interface OrderForm {
@@ -39,19 +38,21 @@ const CartStep = ({
     {cart.length === 0 ? (
       <p>Your cart is empty</p>
     ) : (
-      cart.map((item) => (
-        <div key={item.id} className="flex gap-4 border-b pb-4 mb-4">
+      cart.map((item, idx) => (
+        <div key={idx} className="flex gap-4 border-b pb-4 mb-4">
           <img
-            src={item.product.images?.[0] || "/placeholder.png"}
+            src={item.image || "/placeholder.png"}
             className="w-16 h-16 object-contain"
           />
           <div className="flex-1">
-            <p>{item.product.name}</p>
-            <p className="text-sm">Qty: {item.quantity}</p>
-            <p className="text-sm">Price: ₹{item.product.price}</p>
+            <p>{item.name}</p>
+            <p className="text-sm">Qty: {item.qty}</p>
+            <p className="text-sm">Price: ₹{item.price}</p>
+            <p className="text-sm">Color: {item.color}</p>
+            <p className="text-sm">Size: {item.size}</p>
           </div>
           <button
-            onClick={() => removeFromCart(item.id)}
+            onClick={() => removeFromCart(idx)}
             className="text-red-500 text-sm"
           >
             Remove
@@ -177,39 +178,23 @@ export default function CheckoutPage() {
   const [errors, setErrors] = useState<Partial<Record<keyof OrderForm, string>>>({});
   const [placingOrder, setPlacingOrder] = useState(false);
 
-  // Fetch cart from API
-  const fetchCart = async () => {
-    setLoadingCart(true);
-    try {
-      const res = await fetch("/api/cart");
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "Failed to fetch cart");
-      setCart(data.cart);
-    } catch (err) {
-      console.error(err);
-    } finally {
+  // Fetch cart from localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+      setCart(storedCart);
       setLoadingCart(false);
     }
-  };
-
-  useEffect(() => {
-    fetchCart();
   }, []);
 
-  const removeFromCart = async (id: number) => {
-    try {
-      await fetch("/api/cart/remove", { // optional: you can create a DELETE route
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cartItemId: id }),
-      });
-      fetchCart();
-    } catch (err) {
-      console.error(err);
-    }
+  const removeFromCart = (idx: number) => {
+    const updatedCart = [...cart];
+    updatedCart.splice(idx, 1);
+    setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
-  const subtotal = cart.reduce((acc, item) => acc + item.quantity * item.product.price, 0);
+  const subtotal = cart.reduce((acc, item) => acc + item.qty * item.price, 0);
   const shipping = subtotal > 0 ? 50 : 0;
   const total = subtotal + shipping;
 
@@ -241,14 +226,11 @@ export default function CheckoutPage() {
     setPlacingOrder(true);
     try {
       const orderId = `VEL${Math.floor(100000 + Math.random() * 900000)}`;
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId, ...form, items: cart, total, status: "Processing" }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "Order failed");
-      router.push(`/order-success?orderId=${orderId}`);
+      // Simulate API call
+      setTimeout(() => {
+        localStorage.removeItem("cart"); // clear cart
+        router.push(`/order-success?orderId=${orderId}`);
+      }, 1000);
     } catch (err: any) {
       alert(err.message || "Order failed");
     } finally {

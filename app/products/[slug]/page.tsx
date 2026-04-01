@@ -1,67 +1,69 @@
-'use client';
+import { prisma } from "@/lib/prisma";
+import ProductClient from "./ProductClient";
 
-import { useState } from "react";
-
-interface ProductClientProps {
-  product: any;
-  recommendedProducts: any[];
+interface PageProps {
+  params: Promise<{ slug: string }>;
 }
 
-export default function ProductClient({ product, recommendedProducts }: ProductClientProps) {
-  const [loading, setLoading] = useState(false);
+export default async function ProductPage({ params }: PageProps) {
+  // ✅ FIX: await params
+  const { slug } = await params;
 
-  // 1. Null check for product
-  if (!product) return <div>Product not found</div>;
+  // ❌ invalid slug
+  if (!slug) {
+    return (
+      <div className="text-center py-20 text-red-500">
+        Invalid product URL
+      </div>
+    );
+  }
 
-  // 2. Parse images safely
-  const images: string[] = (() => {
+  // ✅ fetch product
+  const product = await prisma.product.findUnique({
+    where: { slug },
+    include: {
+      variations: true,
+      brand: true,
+    },
+  });
+
+  if (!product) {
+    return (
+      <div className="text-center py-20 text-gray-500">
+        Product not found
+      </div>
+    );
+  }
+
+  // ✅ recommended
+  const recommendedProducts = await prisma.product.findMany({
+    where: {
+      id: { not: product.id },
+    },
+    take: 8,
+  });
+
+  // ✅ normalize images safely
+  const normalizeImages = (p: any) => {
     try {
-      return JSON.parse(product.images || "[]");
+      if (Array.isArray(p.images)) return p.images;
+      if (typeof p.images === "string") return JSON.parse(p.images);
+      return [];
     } catch {
       return [];
-    }
-  })();
-
-  // 3. Corrected addToCart function
-  const addToCart = async (slug: string, quantity = 1) => {
-    setLoading(true);
-    try {
-      // Replace this with your actual cart logic, e.g., API call
-      console.log(`Adding ${quantity} of ${slug} to cart`);
-      await new Promise((resolve) => setTimeout(resolve, 500)); // mock async delay
-    } catch (error) {
-      console.error("Failed to add to cart:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h1>{product.name}</h1>
-      <p>{product.description}</p>
-      {images[0] && (
-        <img
-          src={images[0]}
-          alt={product.name}
-          style={{ width: 150, height: 150 }}
-        />
-      )}
-
-      <div>
-        <button onClick={() => addToCart(product.slug)} disabled={loading}>
-          {loading ? "Adding..." : "Buy"}
-        </button>
-      </div>
-
-      <h2>Recommended Products</h2>
-      <div style={{ display: "flex", gap: "10px" }}>
-        {recommendedProducts.map((p: any) => (
-          <div key={p.id || p.slug}>
-            <p>{p.name || "Unnamed Product"}</p>
-          </div>
-        ))}
-      </div>
-    </div>
+    <ProductClient
+      product={{
+        ...product,
+        images: normalizeImages(product),
+      }}
+      recommendedProducts={recommendedProducts.map((p) => ({
+        ...p,
+        images: normalizeImages(p),
+      }))}
+    />
   );
 }

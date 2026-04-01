@@ -1,5 +1,3 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,22 +10,22 @@ datasource db {
 model Product {
   id            String  @id @default(cuid())
   name          String
-  slug          String? @unique
+  slug          String  @unique
   description   String?
   price         Float
   originalPrice Float?
   stock         Int     @default(0)
-  rating        Float?  @default(0)
+  rating        Float   @default(0)
   category      String
   isNew         Boolean @default(false)
   bestSeller    Boolean @default(false)
-  images        String // JSON string of image URLs
+  images        String  // JSON string
 
   brandId String
-  brand   Brand  @relation(fields: [brandId], references: [id])
+  brand   Brand @relation(fields: [brandId], references: [id])
 
   variations Variation[]
-  cartItems  CartItem[] // <-- opposite relation added
+  cartItems  CartItem[]
 
   seoTitle       String?
   seoDescription String?
@@ -38,8 +36,8 @@ model Product {
 }
 
 model Brand {
-  id   String  @id @default(cuid())
-  name String  @unique
+  id   String @id @default(cuid())
+  name String @unique
   logo String?
 
   products Product[]
@@ -47,9 +45,9 @@ model Brand {
 
 model Variation {
   id     String @id @default(cuid())
-  colors String // JSON string
-  sizes  String // JSON string
-  specs  String // JSON string
+  colors String
+  sizes  String
+  specs  String
 
   productId String
   product   Product @relation(fields: [productId], references: [id])
@@ -61,7 +59,10 @@ model CartItem {
   productId String
   quantity  Int    @default(1)
 
-  product   Product  @relation(fields: [productId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId]) // ✅ IMPORTANT FIX
 }

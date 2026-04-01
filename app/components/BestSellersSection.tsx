@@ -47,12 +47,13 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
     return img.startsWith("/") ? img : `/${img}`;
   };
 
-  // Fetch products
+  // ------------------ FIXED FETCH PRODUCTS ------------------
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const res = await fetch("/api/products");
-        const data: Product[] = await res.json();
+        const json = await res.json(); // <-- was missing extraction
+        const data: Product[] = json.products || []; // <-- extract array properly
 
         const normalized = data.map((p) => {
           let imgs: string[] = [];
@@ -85,6 +86,7 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
 
     fetchProducts();
   }, []);
+  // ------------------------------------------------------------
 
   // Update visible products
   useEffect(() => {

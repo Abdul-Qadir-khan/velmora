@@ -1,14 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
+// app/api/products/route.ts
+
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+// ✅ slug generator
+function generateSlug(name: string) {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
+/**
+ * GET /api/products
+ */
 export async function GET() {
   try {
     const products = await prisma.product.findMany({
-      include: { brand: true, variations: true },
+      include: {
+        brand: true,
+        variations: true,
+      },
+      orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json(products);
-  } catch (error) {
-    console.error("GET /api/products error:", error);
+
+    return NextResponse.json({ products });
+  } catch (err) {
+    console.error("GET /api/products error:", err);
     return NextResponse.json(
       { error: "Failed to fetch products" },
       { status: 500 }
@@ -16,84 +36,91 @@ export async function GET() {
   }
 }
 
-export async function POST(req: NextRequest) {
+/**
+ * POST /api/products
+ */
+export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    // ---------- VALIDATIONS ----------
-    if (!body.name || !body.name.trim()) {
+    const {
+      name,
+      description,
+      price,
+      originalPrice,
+      stock,
+      rating,
+      category,
+      isNew,
+      bestSeller,
+      images,
+      brand,
+      variations,
+      seo,
+    } = body;
+
+    // ✅ validation
+    if (!name || !price) {
       return NextResponse.json(
-        { error: "Product name is required" },
+        { error: "Name and price are required" },
         { status: 400 }
       );
     }
-    if (!body.brand || !body.brand.name || !body.brand.name.trim()) {
-      return NextResponse.json(
-        { error: "Brand name is required" },
-        { status: 400 }
-      );
-    }
 
-    const name = body.name.trim();
-    const description = body.description || "";
-    const price = Number(body.price) || 0;
-    const originalPrice = Number(body.originalPrice) || 0;
-    const stock = Number(body.stock) || 0;
-    const rating = Number(body.rating) || 0;
-    const category = body.category || "";
-    const isNew = Boolean(body.isNew);
-    const bestSeller = Boolean(body.bestSeller);
-    const images = JSON.stringify(Array.isArray(body.images) ? body.images : []);
-    const seoTitle = body.seo?.title || "";
-    const seoDescription = body.seo?.description || "";
-    const seoKeywords = body.seo?.keywords || "";
+    // ✅ generate slug HERE (correct place)
+    const baseSlug = generateSlug(name);
+    const slug = `${baseSlug}-${Date.now()}`;
 
-    // Normalize variations
-    const variationsArray = Array.isArray(body.variations)
-      ? body.variations
-      : body.variations
-      ? [body.variations]
-      : [];
-
-    // ---------- CREATE PRODUCT ----------
+    // ✅ create product
     const product = await prisma.product.create({
       data: {
         name,
-        description,
-        price,
-        originalPrice,
-        stock,
-        rating,
-        category,
-        isNew,
-        bestSeller,
-        images,
-        seoTitle,
-        seoDescription,
-        seoKeywords,
+        slug,
+
+        description: description || "",
+        price: Number(price),
+        originalPrice: Number(originalPrice) || 0,
+        stock: Number(stock) || 0,
+        rating: Number(rating) || 0,
+        category: category || "T-Shirt",
+        isNew: Boolean(isNew),
+        bestSeller: Boolean(bestSeller),
+
+        images: JSON.stringify(images || []),
+
+        seoTitle: seo?.title || "",
+        seoDescription: seo?.description || "",
+        seoKeywords: seo?.keywords || "",
+
         brand: {
           connectOrCreate: {
-            where: { name: body.brand.name.trim() }, // requires Brand.name @unique
+            where: { name: brand?.name || "No Brand" },
             create: {
-              name: body.brand.name.trim(),
-              logo: body.brand.logo || "",
+              name: brand?.name || "No Brand",
+              logo: brand?.logo || "",
             },
           },
         },
+
         variations: {
-          create: variationsArray.map((v: any) => ({
-            colors: JSON.stringify(Array.isArray(v.colors) ? v.colors : []),
-            sizes: JSON.stringify(Array.isArray(v.sizes) ? v.sizes : []),
-            specs: JSON.stringify(v.specs || {}),
-          })),
+          create: [
+            {
+              colors: JSON.stringify(variations?.colors || []),
+              sizes: JSON.stringify(variations?.sizes || []),
+              specs: JSON.stringify(variations?.specs || {}),
+            },
+          ],
         },
       },
-      include: { brand: true, variations: true },
+      include: {
+        brand: true,
+        variations: true,
+      },
     });
 
-    return NextResponse.json(product);
-  } catch (error) {
-    console.error("POST /api/products error:", error);
+    return NextResponse.json({ product });
+  } catch (err) {
+    console.error("POST /api/products error:", err);
     return NextResponse.json(
       { error: "Failed to create product" },
       { status: 500 }
