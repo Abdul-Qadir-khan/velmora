@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { Product } from "../../data/product";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { Heart, SlidersHorizontal, ShoppingCart } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useCart } from "../context/CartContext";
 
-export default function ShopSection({ products }: { products: Product[] }) {
+export default function ShopSection() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { addToCart } = useCart();
@@ -17,16 +17,76 @@ export default function ShopSection({ products }: { products: Product[] }) {
   const [brand, setBrand] = useState<string[]>([]);
   const [size, setSize] = useState<string[]>([]);
   const [color, setColor] = useState<string[]>([]);
-  const [price, setPrice] = useState(1000);
+  const [price, setPrice] = useState(10000);
   const [showFilters, setShowFilters] = useState(false);
   const [wishlist, setWishlist] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Slug fallback generator
+  const generateSlug = useCallback((name: string) =>
+    name?.toLowerCase().replace(/\s+/g, "-"), []);
+
+  // Normalize image URLs
+  const getValidImage = useCallback((img?: string) => {
+    if (!img) return "/placeholder.png";
+    if (img.startsWith("http://") || img.startsWith("https://")) return img;
+    return img.startsWith("/") ? img : `/${img}`;
+  }, []);
+
+  // ------------------ FETCH PRODUCTS FROM API ------------------
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setIsLoading(true);
+        const res = await fetch("/api/products");
+        const json = await res.json();
+        const data: Product[] = json.products || [];
+
+        const normalized = data.map((p) => {
+          let imgs: string[] = [];
+          try {
+            imgs = Array.isArray(p.images)
+              ? p.images
+              : p.images
+                ? typeof p.images === 'string' ? JSON.parse(p.images) : [String(p.images)]
+                : [];
+          } catch {
+            imgs = [];
+          }
+
+          imgs = imgs.map(getValidImage).filter(Boolean);
+
+          return {
+            ...p,
+            // ✅ Keep ID as number for CartItem compatibility, add stringId for UI
+            id: Number(p.id), // Changed back to Number for CartItem
+            stringId: String(p.id), // Add string version for UI/links
+            slug: p.slug || generateSlug(p.name),
+            images: imgs.length ? imgs : ["/placeholder.png"],
+            price: Number(p.price) || 0,
+          } as Product;
+        });
+
+        setAllProducts(normalized);
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [generateSlug, getValidImage]);
+  // ------------------------------------------------------------
+
+  // Sync filters with URL params
   useEffect(() => {
     const cat = searchParams.get("category")?.split(",") || [];
     const br = searchParams.get("brand")?.split(",") || [];
     const sz = searchParams.get("size")?.split(",") || [];
     const col = searchParams.get("color")?.split(",") || [];
-    const pr = Number(searchParams.get("price")) || 1000;
+    const pr = Number(searchParams.get("price")) || 10000;
 
     setCategory(cat);
     setBrand(br);
@@ -35,12 +95,21 @@ export default function ShopSection({ products }: { products: Product[] }) {
     setPrice(pr);
   }, [searchParams]);
 
+  // Load wishlist from localStorage
+  // useEffect(() => {
+  //   const stored = localStorage.getItem("wishlist");
+  //   if (stored) setWishlist(JSON.parse(stored));
+  // }, []);
   useEffect(() => {
-    const stored = localStorage.getItem("wishlist");
-    if (stored) setWishlist(JSON.parse(stored));
+    try {
+      const stored = localStorage.getItem("wishlist");
+      if (stored) setWishlist(JSON.parse(stored));
+    } catch {
+      setWishlist([]);
+    }
   }, []);
 
-  const updateURL = (
+  const updateURL = useCallback((
     newCategory = category,
     newBrand = brand,
     newSize = size,
@@ -52,11 +121,11 @@ export default function ShopSection({ products }: { products: Product[] }) {
     if (newBrand.length) params.set("brand", newBrand.join(","));
     if (newSize.length) params.set("size", newSize.join(","));
     if (newColor.length) params.set("color", newColor.join(","));
-    if (newPrice !== 1000) params.set("price", String(newPrice));
+    if (newPrice !== 10000) params.set("price", String(newPrice));
     router.push(`?${params.toString()}`);
-  };
+  }, [category, brand, size, color, price, router]);
 
-  const toggle = (
+  const toggle = useCallback((
     value: string,
     state: string[],
     setter: React.Dispatch<React.SetStateAction<string[]>>
@@ -71,58 +140,111 @@ export default function ShopSection({ products }: { products: Product[] }) {
     else if (setter === setBrand) updateURL(category, newState, size, color, price);
     else if (setter === setSize) updateURL(category, brand, newState, color, price);
     else if (setter === setColor) updateURL(category, brand, size, newState, price);
-  };
+  }, [category, brand, size, color, price, updateURL]);
 
-  const categories = [...new Set(products.map((p) => p.category))];
-  const brands = [...new Set(products.map((p) => p.brand.name))];
-  const sizes = [...new Set(products.flatMap((p) => p.variations.sizes))];
-  const colors = [...new Set(products.flatMap((p) => p.variations.colors))];
+  // Derive filter options from all products
+  const categories = useMemo(() =>
+    [...new Set(allProducts.map((p) => p.category))], [allProducts]);
+
+  const brands = useMemo(() =>
+    [...new Set(allProducts.map((p) => p.brand?.name || ''))], [allProducts]);
+
+  const sizes = useMemo(() =>
+    [...new Set(allProducts.flatMap((p) => p.variations?.sizes || []))], [allProducts]);
+
+  const colors = useMemo(() =>
+    [...new Set(allProducts.flatMap((p) => p.variations?.colors || []))], [allProducts]);
 
   const filteredProducts = useMemo(() => {
-    let data = products;
+    if (isLoading) return [];
+
+    let data = allProducts;
     if (category.length) data = data.filter((p) => category.includes(p.category));
-    if (brand.length) data = data.filter((p) => brand.includes(p.brand.name));
+    if (brand.length) data = data.filter((p) => brand.includes(p.brand?.name || ''));
     if (size.length)
-      data = data.filter((p) => p.variations.sizes.some((s) => size.includes(s)));
+      data = data.filter((p) => p.variations?.sizes?.some((s: string) => size.includes(s)));
     if (color.length)
-      data = data.filter((p) => p.variations.colors.some((c) => color.includes(c)));
-    data = data.filter((p) => p.price <= price);
+      data = data.filter((p) => p.variations?.colors?.some((c: string) => color.includes(c)));
+    data = data.filter((p) => (p.price || 0) <= price);
 
-    if (sort === "low") data.sort((a, b) => a.price - b.price);
-    if (sort === "high") data.sort((a, b) => b.price - a.price);
-    if (sort === "latest") data.sort((a, b) => b.id - a.id);
-
-    return data;
-  }, [products, category, brand, size, color, price, sort]);
-
-  const toggleWishlist = (product: Product) => {
-    let updated: Product[];
-    if (wishlist.find((p) => p.id === product.id)) {
-      updated = wishlist.filter((p) => p.id !== product.id);
-    } else {
-      updated = [...wishlist, product];
-    }
-    setWishlist(updated);
-    localStorage.setItem("wishlist", JSON.stringify(updated));
-  };
-
-  const handleAddToCart = (product: Product) => {
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      qty: 1,
-      images: product.images,
+    if (sort === "low") data.sort((a, b) => (a.price || 0) - (b.price || 0));
+    if (sort === "high") data.sort((a, b) => (b.price || 0) - (a.price || 0));
+    // ✅ FIXED
+    if (sort === "latest") data.sort((a, b) => {
+      const aId = a.id ? parseInt(String(a.id)) : 0;
+      const bId = b.id ? parseInt(String(b.id)) : 0;
+      return bId - aId;
     });
 
-    if (wishlist.find((p) => p.id === product.id)) {
-      const updated = wishlist.filter((p) => p.id !== product.id);
-      setWishlist(updated);
-      localStorage.setItem("wishlist", JSON.stringify(updated));
-    }
+    return data;
+  }, [allProducts, category, brand, size, color, price, sort, isLoading]);
 
-    alert(`${product.name} added to cart`);
-  };
+  const toggleWishlist = useCallback((product: Product) => {
+    setWishlist((prev) => {
+      const exists = prev.some((p) => p.id === product.id);
+
+      const updated = exists
+        ? prev.filter((p) => p.id !== product.id)
+        : [...prev, product];
+
+      localStorage.setItem("wishlist", JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
+  const handleAddToCart = useCallback((product: Product) => {
+  addToCart({
+    id: typeof product.id === 'string' ? parseInt(product.id) : product.id,
+    name: product.name || "Unknown Product",
+    price: typeof product.price === 'string' ? parseFloat(String(product.price)) : Number(product.price),
+    qty: 1,
+    images: Array.isArray(product.images) && product.images.length > 0
+      ? product.images
+      : ["/placeholder.png"],
+    // ✅ REQUIRED FIELDS
+    selectedSize: product.size || "M",        // Default size
+    selectedColor: product.color || "#000000", // Default color
+  });
+
+  // Safe wishlist removal
+  setWishlist((prev) => {
+    const updated = prev.filter((p) => {
+      const currentId = typeof p.id === 'string' ? parseInt(p.id) : p.id;
+      const productId = typeof product.id === 'string' ? parseInt(product.id) : product.id;
+      return currentId !== productId;
+    });
+    localStorage.setItem("wishlist", JSON.stringify(updated));
+    return updated;
+  });
+
+  toast.success(`${product.name} added to cart! 🛒`);
+}, [addToCart, setWishlist]);
+
+
+  const handleResetFilters = useCallback(() => {
+    setCategory([]);
+    setBrand([]);
+    setSize([]);
+    setColor([]);
+    setPrice(10000);
+    updateURL([], [], [], [], 10000);
+  }, [updateURL]);
+
+  if (isLoading) {
+    return (
+      <section>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6 px-4">
+          <div className="lg:col-span-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+              {[...Array(12)].map((_, i) => (
+                <div key={i} className="h-80 bg-gray-200 animate-pulse rounded-xl" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section>
@@ -137,9 +259,8 @@ export default function ShopSection({ products }: { products: Product[] }) {
 
         {/* FILTER SIDEBAR */}
         <div
-          className={`bg-white border rounded-2xl p-6 space-y-6 h-fit ${
-            showFilters ? "block" : "hidden"
-          } lg:block`}
+          className={`bg-white border rounded-2xl p-6 space-y-6 h-fit ${showFilters ? "block" : "hidden"
+            } lg:block`}
         >
           <h3 className="font-semibold text-lg">Filters</h3>
 
@@ -149,9 +270,8 @@ export default function ShopSection({ products }: { products: Product[] }) {
               <button
                 key={c}
                 onClick={() => toggle(c, category, setCategory)}
-                className={`block text-sm ${
-                  category.includes(c) ? "text-black font-medium" : "text-gray-500"
-                }`}
+                className={`block text-sm py-1 w-full text-left hover:bg-gray-50 px-2 rounded ${category.includes(c) ? "text-black font-medium bg-gray-100" : "text-gray-500"
+                  }`}
               >
                 {c}
               </button>
@@ -166,9 +286,8 @@ export default function ShopSection({ products }: { products: Product[] }) {
               <button
                 key={b}
                 onClick={() => toggle(b, brand, setBrand)}
-                className={`block text-sm ${
-                  brand.includes(b) ? "text-black font-medium" : "text-gray-500"
-                }`}
+                className={`block text-sm py-1 w-full text-left hover:bg-gray-50 px-2 rounded ${brand.includes(b) ? "text-black font-medium bg-gray-100" : "text-gray-500"
+                  }`}
               >
                 {b}
               </button>
@@ -182,10 +301,13 @@ export default function ShopSection({ products }: { products: Product[] }) {
             <input
               type="range"
               min={0}
-              max={1000}
+              max={10000}
               value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
-              className="w-full accent-black"
+              onChange={(e) => {
+                setPrice(Number(e.target.value));
+                updateURL(category, brand, size, color, Number(e.target.value));
+              }}
+              className="w-full accent-black h-2 bg-gray-200 rounded-lg"
             />
           </div>
 
@@ -198,9 +320,10 @@ export default function ShopSection({ products }: { products: Product[] }) {
                 <button
                   key={c}
                   onClick={() => toggle(c, color, setColor)}
-                  className={`px-3 py-1 text-xs border rounded-full ${
-                    color.includes(c) ? "bg-black text-white" : ""
-                  }`}
+                  className={`px-3 py-1 text-xs border rounded-full transition-all ${color.includes(c)
+                    ? "bg-black text-white shadow-md"
+                    : "hover:bg-gray-100 hover:shadow-sm"
+                    }`}
                 >
                   {c}
                 </button>
@@ -217,11 +340,10 @@ export default function ShopSection({ products }: { products: Product[] }) {
                 <button
                   key={s}
                   onClick={() => toggle(s, size, setSize)}
-                  className={`px-3 py-1 border rounded-full text-sm ${
-                    size.includes(s)
-                      ? "bg-black text-white"
-                      : "hover:bg-black hover:text-white transition-colors"
-                  }`}
+                  className={`px-3 py-1 border rounded-full text-sm transition-all ${size.includes(s)
+                    ? "bg-black text-white shadow-md"
+                    : "hover:bg-gray-100 hover:shadow-sm hover:text-black"
+                    }`}
                 >
                   {s}
                 </button>
@@ -230,15 +352,8 @@ export default function ShopSection({ products }: { products: Product[] }) {
           </div>
 
           <button
-            onClick={() => {
-              setCategory([]);
-              setBrand([]);
-              setSize([]);
-              setColor([]);
-              setPrice(1000);
-              updateURL([], [], [], [], 1000);
-            }}
-            className="w-full bg-black text-white py-2 rounded-full"
+            onClick={handleResetFilters}
+            className="w-full bg-black text-white py-2 rounded-full hover:bg-gray-800 transition-colors font-medium"
           >
             Reset Filters
           </button>
@@ -248,13 +363,13 @@ export default function ShopSection({ products }: { products: Product[] }) {
         <div className="lg:col-span-3">
           <div className="flex flex-wrap gap-3 justify-between items-center mb-6">
             <p className="text-sm text-gray-500">
-              Showing {filteredProducts.length} products
+              Showing {filteredProducts.length} of {allProducts.length} products
             </p>
 
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value)}
-              className="text-sm bg-transparent outline-none"
+              className="text-sm bg-transparent outline-none border rounded-full px-3 py-1 hover:bg-gray-50"
             >
               <option value="popular">Most Popular</option>
               <option value="latest">Latest</option>
@@ -263,80 +378,91 @@ export default function ShopSection({ products }: { products: Product[] }) {
             </select>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-            {filteredProducts.map((product) => {
-              const isWishlisted = wishlist.some((p) => p.id === product.id);
+          {filteredProducts.length === 0 ? (
+            <div className="text-center py-20 text-gray-500 col-span-full">
+              No products found matching your filters. Try adjusting your search criteria.
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+              {filteredProducts.map((product) => {
+                const isWishlisted = wishlist.some(
+                  (p) => String(p.id) === String(product.id)
+                );
 
-              return (
-                <div
-                  key={product.id}
-                  className="group relative bg-white rounded-xl overflow-hidden shadow transition-transform duration-500 hover:scale-[1.03] hover:shadow-lg"
-                >
-                  <button
-                    onClick={() => toggleWishlist(product)}
-                    className="absolute top-3 left-3 bg-white p-2 rounded-full shadow z-10 opacity-70 group-hover:opacity-100 transition-all duration-300"
+                return (
+                  <div
+                    key={product.id}
+                    className="group relative bg-white rounded-xl overflow-hidden shadow transition-transform duration-500 hover:scale-[1.03] hover:shadow-lg"
                   >
-                    <Heart
-                      size={16}
-                      className={isWishlisted ? "text-red-500 fill-red-500" : "text-gray-400"}
-                    />
-                  </button>
-
-                  <div className="relative h-56 sm:h-72 flex items-center justify-center overflow-hidden">
-                    <img
-                      src={product.images[0]}
-                      className="absolute h-full object-contain transition-all duration-500 ease-in-out transform group-hover:scale-105 group-hover:opacity-0"
-                    />
-                    <img
-                      src={product.images[1] || product.images[0]}
-                      className="absolute h-full object-contain opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:scale-105"
-                    />
-                  </div>
-
-                  <div className="absolute bottom-0 w-full translate-y-full group-hover:translate-y-0 transition-transform duration-500">
                     <button
-                      onClick={() => handleAddToCart(product)}
-                      className="w-full bg-black text-white py-2 sm:py-3 text-sm flex items-center justify-center gap-1 hover:bg-gray-800 transition-colors"
+                      onClick={() => toggleWishlist(product)}
+                      className="absolute top-3 left-3 bg-white p-2 rounded-full shadow z-10 opacity-70 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
                     >
-                      <ShoppingCart size={16} /> Add to Cart
+                      <Heart
+                        size={16}
+                        className={isWishlisted ? "text-red-500 fill-red-500" : "text-gray-400"}
+                      />
                     </button>
-                  </div>
 
-                  <div className="p-4">
-                    <Link href={`/products/${product.slug}`}>
-                      <h3 className="font-medium text-sm sm:text-base line-clamp-1 hover:text-black transition-colors">
-                        {product.name}
-                      </h3>
-                    </Link>
-
-                    <div className="flex items-center gap-0.5 mt-1">
-                      {Array.from({ length: 5 }, (_, i) => (
-                        <svg
-                          key={i}
-                          className={`w-3 h-3 sm:w-4 sm:h-4 transition-all duration-300 ${
-                            i < Math.round(product.rating)
-                              ? "fill-yellow-400"
-                              : "fill-gray-300"
-                          }`}
-                          viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M10 15l-5.878 3.09 1.123-6.545L.49 6.91l6.564-.955L10 0l2.946 5.955 6.564.955-4.755 4.635 1.123 6.545z" />
-                        </svg>
-                      ))}
+                    <div className="relative h-56 sm:h-72 flex items-center justify-center overflow-hidden">
+                      <img
+                        src={product.images[0]}
+                        alt={product.name}
+                        className="absolute h-full w-auto max-w-full object-contain transition-all duration-500 ease-in-out transform group-hover:scale-105 group-hover:opacity-0"
+                      />
+                      <img
+                        src={product.images[1] || product.images[0]}
+                        alt={product.name}
+                        className="absolute h-full w-auto max-w-full object-contain opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out transform group-hover:scale-105"
+                      />
                     </div>
 
-                    <div className="flex gap-2 text-sm mt-1">
-                      {product.originalPrice && (
-                        <span className="line-through text-gray-400">₹{product.originalPrice}</span>
-                      )}
-                      <span className="font-semibold text-black">₹{product.price}</span>
+                    <div className="absolute bottom-0 w-full translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-gradient-to-t from-black/90 to-transparent">
+                      <button
+                        onClick={() => handleAddToCart(product)}
+                        className="w-full bg-black text-white py-2 sm:py-3 text-sm flex items-center justify-center gap-1 hover:bg-gray-800 transition-colors backdrop-blur-sm"
+                      >
+                        <ShoppingCart size={16} /> Add to Cart
+                      </button>
+                    </div>
+
+                    <div className="p-4">
+                      {/* <Link href={`/shop/${product.slug}`}> */}
+                      <Link href={`/shop/${product.slug || generateSlug(product.name)}`}>
+                        <h3 className="font-medium text-sm sm:text-base line-clamp-1 hover:text-black transition-colors group-hover:underline">
+                          {product.name}
+                        </h3>
+                      </Link>
+
+                      <div className="flex items-center gap-0.5 mt-1">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <svg
+                            key={i}
+                            className={`w-3 h-3 sm:w-4 sm:h-4 transition-all duration-300 ${i < Math.round(product.rating || 0)
+                              ? "fill-yellow-400 stroke-yellow-500"
+                              : "fill-gray-300 stroke-gray-400"
+                              }`}
+                            viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg"
+                            strokeWidth="1"
+                          >
+                            <path d="M10 15l-5.878 3.09 1.123-6.545L.49 6.91l6.564-.955L10 0l2.946 5.955 6.564.955-4.755 4.635 1.123 6.545z" />
+                          </svg>
+                        ))}
+                      </div>
+
+                      <div className="flex gap-2 text-sm mt-1">
+                        {product.originalPrice && (
+                          <span className="line-through text-gray-400">₹{product.originalPrice}</span>
+                        )}
+                        <span className="font-semibold text-black">₹{product.price}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </section>

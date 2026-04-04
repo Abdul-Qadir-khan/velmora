@@ -215,28 +215,62 @@ export default function CheckoutPage() {
   };
 
   const handlePlaceOrder = async () => {
-    if (!validateStep2()) {
-      setStep(2);
-      return;
+  if (!validateStep2()) {
+    setStep(2);
+    return;
+  }
+  if (cart.length === 0) {
+    alert("Cart is empty");
+    return;
+  }
+  
+  setPlacingOrder(true);
+  try {
+    const orderId = `VEL${Math.floor(100000 + Math.random() * 900000)}`;
+    
+    // ✅ FIXED: Send order data to your email API
+    const orderData = {
+      orderId,
+      name: form.name,
+      email: form.email,
+      phone: form.phone,
+      address: `${form.address}, ${form.city}, ${form.pincode}`,
+      total,
+      items: cart.map(item => ({
+        name: item.name,
+        price: item.price,
+        qty: item.qty,
+        size: item.size,
+        color: item.color,
+        image: item.image
+      }))
+    };
+
+    console.log("📤 Sending order to API:", orderData);
+
+    // Call your email API
+    const response = await fetch('/api/send-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderData),
+    });
+
+    const result = await response.json();
+    
+    if (result.success) {
+      console.log("✅ Email sent successfully!");
+      localStorage.removeItem("cart");
+      router.push(`/order-success?orderId=${orderId}`);
+    } else {
+      throw new Error(result.error || 'Order failed');
     }
-    if (cart.length === 0) {
-      alert("Cart is empty");
-      return;
-    }
-    setPlacingOrder(true);
-    try {
-      const orderId = `VEL${Math.floor(100000 + Math.random() * 900000)}`;
-      // Simulate API call
-      setTimeout(() => {
-        localStorage.removeItem("cart"); // clear cart
-        router.push(`/order-success?orderId=${orderId}`);
-      }, 1000);
-    } catch (err: any) {
-      alert(err.message || "Order failed");
-    } finally {
-      setPlacingOrder(false);
-    }
-  };
+  } catch (err: any) {
+    console.error("❌ Order failed:", err);
+    alert(`Order failed: ${err.message}`);
+  } finally {
+    setPlacingOrder(false);
+  }
+};
 
   if (loadingCart) return <p>Loading cart...</p>;
 
