@@ -5,15 +5,14 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { FaFacebook, FaInstagram, FaPinterest } from "react-icons/fa";
 
-/* Accordion Component (Mobile) */
 function FooterAccordion({ title, links }: any) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="border-b border-gray-800 pb-4">
+    <div className="border-b border-gray-800 pb-3 last:border-b-0">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex justify-between items-center text-gray-400 uppercase tracking-[0.3em] text-[10px]"
+        className="w-full flex justify-between items-center py-2 text-gray-400 uppercase tracking-[0.3em] text-[10px]"
       >
         {title}
         <span className="text-white text-sm">{open ? "−" : "+"}</span>
@@ -21,14 +20,14 @@ function FooterAccordion({ title, links }: any) {
 
       <div
         className={`overflow-hidden transition-all duration-300 ${
-          open ? "max-h-40 mt-4" : "max-h-0"
+          open ? "max-h-32 mt-3" : "max-h-0"
         }`}
       >
-        <ul className="space-y-3">
-          {links.map((link: string, i: number) => (
+        <ul className="space-y-2">
+          {links.map((link: any, i: number) => (
             <li key={i}>
-              <Link href="#" className="text-gray-500 hover:text-white text-xs">
-                {link}
+              <Link href={link.href} className="block py-1 text-gray-500 hover:text-white text-xs">
+                {link.label}
               </Link>
             </li>
           ))}
@@ -38,7 +37,7 @@ function FooterAccordion({ title, links }: any) {
   );
 }
 
-export default function VelmoraFooter() {
+export default function LycoonWearFooter() {
   const footerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -61,55 +60,52 @@ export default function VelmoraFooter() {
   const footerLinks = [
     {
       title: "Collections",
-      links: ["Men", "Women", "New Arrivals", "Essentials", "Sale"],
+      links: [
+        { label: "Men", href: "/shop" },
+        { label: "Women", href: "/shop" },
+        { label: "New Arrivals", href: "/shop" },
+        { label: "Sale", href: "/shop" },
+      ],
     },
     {
       title: "Experience",
       links: [
-        "Contact",
-        "Shipping & Delivery",
-        "Returns",
-        "FAQs",
-        "Track Order",
+        { label: "Contact", href: "/contact" },
+        { label: "Shipping & Delivery", href: "/shipping-delivery" },
+        { label: "Returns", href: "/returns" },
+        { label: "FAQs", href: "/faqs" },
       ],
-    },
-    {
-      title: "Maison Velmora",
-      links: ["Our Story", "Craftsmanship", "Sustainability", "Careers"],
     },
   ];
 
   return (
     <footer
       ref={footerRef}
-      className="bg-[#050505] text-gray-400 text-xs md:text-sm tracking-wide opacity-0 translate-y-10 transition-all duration-1000"
+      className="bg-[#050505] text-gray-400 text-xs md:text-sm tracking-wide opacity-0 translate-y-8 transition-all duration-1000"
     >
       {/* Main */}
-      <div className="max-w-7xl mx-auto px-6 md:px-20 py-12 md:py-20">
-        {/* Top Section */}
-        <div className="flex flex-col gap-10 md:grid md:grid-cols-4 md:gap-16">
+      <div className="max-w-7xl mx-auto px-6 md:px-20 py-10 md:py-14">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12 items-start">
           
           {/* Brand */}
-          <div className="space-y-5">
+          <div className="space-y-4">
             <Image
-              src="/images/velmora-gdd.png"
-              alt="Velmora"
-              width={120}
+              src="/images/lycoonwear.png"
+              alt="Lycoon Wear"
+              width={70}
               height={30}
-              className="md:w-[150px]"
+              className="invert"
             />
 
-            <p className="text-gray-500 leading-relaxed max-w-xs">
-              A study in refined elegance. Velmora blends timeless silhouettes
+            <p className="text-gray-500 leading-relaxed max-w-xs text-[13px]">
+              A study in refined elegance. Lycoon Wearblends timeless silhouettes
               with modern expression for those who embody quiet luxury.
             </p>
 
-            {/* Newsletter */}
             <div>
               <h3 className="text-white text-[10px] uppercase tracking-[0.3em] mb-3">
-                Join Velmora
+                Join Lycoon Wear
               </h3>
-
               <div className="flex border-b border-gray-700">
                 <input
                   type="email"
@@ -124,7 +120,7 @@ export default function VelmoraFooter() {
           </div>
 
           {/* Mobile Accordion */}
-          <div className="md:hidden space-y-6">
+          <div className="md:hidden col-span-1 space-y-4">
             {footerLinks.map((col, i) => (
               <FooterAccordion key={i} {...col} />
             ))}
@@ -133,18 +129,17 @@ export default function VelmoraFooter() {
           {/* Desktop Grid */}
           {footerLinks.map((col, i) => (
             <div key={i} className="hidden md:block">
-              <h3 className="text-gray-500 uppercase tracking-[0.35em] text-[10px] mb-6">
+              <h3 className="text-gray-500 uppercase tracking-[0.35em] text-[10px] mb-4">
                 {col.title}
               </h3>
-
-              <ul className="space-y-3">
-                {col.links.map((link, idx) => (
+              <ul className="space-y-2">
+                {col.links.map((link: any, idx: number) => (
                   <li key={idx}>
                     <Link
-                      href="#"
-                      className="relative inline-block hover:text-white transition group"
+                      href={link.href}
+                      className="relative inline-block hover:text-white transition group text-sm"
                     >
-                      {link}
+                      {link.label}
                       <span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full"></span>
                     </Link>
                   </li>
@@ -154,11 +149,14 @@ export default function VelmoraFooter() {
           ))}
 
           {/* Contact */}
-          <div className="flex flex-col justify-end mt-6 md:mt-0">
-            <p className="text-white text-base md:text-lg tracking-wide">
+          <div className="flex flex-col md:justify-end space-y-2">
+            <a 
+              href="tel:+917817835909"
+              className="text-white text-base md:text-lg tracking-wide hover:opacity-80 transition"
+            >
               +91 781 7835 909
-            </p>
-            <p className="text-gray-600 text-xs mt-1">
+            </a>
+            <p className="text-gray-600 text-xs">
               Mon – Sat / 10:00 – 19:00
             </p>
           </div>
@@ -167,35 +165,39 @@ export default function VelmoraFooter() {
 
       {/* Bottom */}
       <div className="border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-6 md:px-20 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-[10px] md:text-[11px] text-gray-600">
+        <div className="max-w-7xl mx-auto px-6 md:px-20 py-3 flex flex-col lg:flex-row items-center justify-between gap-4 text-[10px] md:text-[11px] text-gray-600">
           
-          <span>
-            © {new Date().getFullYear()} Velmora. All rights reserved.
+          <span className="order-3 lg:order-1">
+            © {new Date().getFullYear()} Lycoon Wear. All rights reserved.
           </span>
 
-          {/* Policies */}
-          <div className="flex gap-4 md:gap-6">
-            {["Privacy", "Terms", "Cookies"].map((item) => (
+          {/* Policies - Right Side */}
+          <div className="flex gap-4 order-2 lg:order-2">
+            {[
+              { label: "Privacy", href: "/privacy" },
+              { label: "Terms", href: "/terms" },
+              { label: "Cookies", href: "/cookies" }
+            ].map((item) => (
               <Link
-                key={item}
-                href="#"
+                key={item.label}
+                href={item.href}
                 className="relative group hover:text-white transition"
               >
-                {item}
+                {item.label}
                 <span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full"></span>
               </Link>
             ))}
           </div>
 
-          {/* Social Icons */}
-          <div className="flex gap-4 md:gap-5 text-sm">
-            <Link href="#" className="hover:opacity-70 transition">
+          {/* Social Icons - Left on Mobile, Right on Desktop */}
+          <div className="flex gap-4 text-sm order-1 lg:order-3">
+            <Link href="https://instagram.com/velmora" className="hover:opacity-70 transition">
               <FaInstagram />
             </Link>
-            <Link href="#" className="hover:opacity-70 transition">
+            <Link href="https://pinterest.com/velmora" className="hover:opacity-70 transition">
               <FaPinterest />
             </Link>
-            <Link href="#" className="hover:opacity-70 transition">
+            <Link href="https://facebook.com/velmora" className="hover:opacity-70 transition">
               <FaFacebook />
             </Link>
           </div>

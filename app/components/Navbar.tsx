@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { Menu, X, Search, ShoppingCart, User, Heart } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
+import { FaCartPlus, FaNotesMedical, FaShopify, FaShoppingBag, FaUserAlt } from "react-icons/fa";
 
 // const { wishlistCount } useWishlist();
 
@@ -60,119 +61,24 @@ export default function Header() {
           </button>
 
           {/* LEFT NAV (DESKTOP) */}
-          <nav className="hidden md:flex gap-10 text-sm tracking-wide">
+          <nav className="hidden md:flex gap-10 text-lg font-light tracking-wide">
 
-            {/* MEN */}
-            <div className="group">
-              <span className="cursor-pointer relative">
-                Men
-                <span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-current transition-all duration-300 group-hover:w-full"></span>
-              </span>
-
-              {/* MEGA MENU */}
-              <div className="absolute left-0 top-full w-full bg-white border-t-1 border-gray-300 text-black opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all duration-500 shadow-xl">
-                <div className="max-w-7xl mx-auto px-20 py-12 grid grid-cols-4 gap-10">
-
-                  {/* LINKS */}
-                  <div>
-                    <h4 className="text-xs uppercase text-gray-500 mb-4">Clothing</h4>
-                    <ul className="space-y-2">
-                      <li><Link href="/shop">T-Shirts</Link></li>
-                      <li><Link href="/shop">Shirts</Link></li>
-                      <li><Link href="/shop">Jeans</Link></li>
-                      <li><Link href="/shop">Jackets</Link></li>
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h4 className="text-xs uppercase text-gray-500 mb-4">Collections</h4>
-                    <ul className="space-y-2">
-                      <li><Link href="/shop">New Arrivals</Link></li>
-                      <li><Link href="/shop">Essentials</Link></li>
-                      <li><Link href="/shop">Best Sellers</Link></li>
-                    </ul>
-                  </div>
-
-                  {/* IMAGE 1 */}
-                  <div className="group cursor-pointer">
-                    <img
-                      src="/images/categories/mens-wear.avif"
-                      className="w-full h-[250px] object-cover transition duration-500 group-hover:scale-105"
-                    />
-                    <p className="mt-3 text-sm">Summer Edit</p>
-                  </div>
-
-                  {/* IMAGE 2 */}
-                  <div className="group cursor-pointer">
-                    <img
-                      src="/images/categories/womens-wear.avif"
-                      className="w-full h-[250px] object-cover transition duration-500 group-hover:scale-105"
-                    />
-                    <p className="mt-3 text-sm">Minimal Fits</p>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-
-            {/* WOMEN */}
-            <div className="group">
-              <span className="cursor-pointer relative">
-                Women
-                <span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-current transition-all duration-300 group-hover:w-full"></span>
-              </span>
-
-              <div className="absolute left-0 top-full w-full bg-white border-t-1 border-gray-300 text-black opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all duration-500 shadow-xl">
-                <div className="max-w-7xl mx-auto px-20 py-12 grid grid-cols-4 gap-10">
-
-                  <div>
-                    <h4 className="text-xs uppercase text-gray-500 mb-4">Clothing</h4>
-                    <ul className="space-y-2">
-                      <li><Link href="/shop">Dresses</Link></li>
-                      <li><Link href="/shop">Tops</Link></li>
-                      <li><Link href="/shop">Denim</Link></li>
-                      <li><Link href="/shop">Outerwear</Link></li>
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h4 className="text-xs uppercase text-gray-500 mb-4">Collections</h4>
-                    <ul className="space-y-2">
-                      <li><Link href="/shop">New Arrivals</Link></li>
-                      <li><Link href="/shop">Essentials</Link></li>
-                      <li><Link href="/shop">Trending</Link></li>
-                    </ul>
-                  </div>
-
-                  <div>
-                    <img
-                      src="/images/categories/night-wear.avif"
-                      className="w-full h-[250px] object-cover transition duration-500 hover:scale-105"
-                    />
-                    <p className="mt-3 text-sm">New Season</p>
-                  </div>
-
-                  <div>
-                    <img
-                      src="/images/categories/kids-wear.avif"
-                      className="w-full h-[250px] object-cover transition duration-500 hover:scale-105"
-                    />
-                    <p className="mt-3 text-sm">Evening Wear</p>
-                  </div>
-
-                </div>
-              </div>
-            </div>
 
             {/* SIMPLE LINKS */}
-            <Link href="/new" className="relative group">
-              New
-              <span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-current transition-all duration-300 group-hover:w-full"></span>
+            <Link href="/shop" className="relative group flex items-center gap-2">
+              {/* <FaShoppingBag/> */}
+              Shop
+              <span className="absolute left-0 -bottom-1 w-0 h-px bg-current transition-all duration-300 group-hover:w-full"></span>
             </Link>
-
-            <Link href="/sale" className="relative group">
-              Sale
-              <span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-current transition-all duration-300 group-hover:w-full"></span>
+            <Link href="/about" className="relative group flex items-center gap-2">
+              {/* <FaNotesMedical/> */}
+              About
+              <span className="absolute left-0 -bottom-1 w-0 h-px bg-current transition-all duration-300 group-hover:w-full"></span>
+            </Link>
+            <Link href="/contact" className="relative group flex items-center gap-2">
+              {/* <FaUserAlt/> */}
+              Contact Us
+              <span className="absolute left-0 -bottom-1 w-0 h-px bg-current transition-all duration-300 group-hover:w-full"></span>
             </Link>
 
           </nav>
@@ -180,15 +86,16 @@ export default function Header() {
           {/* LOGO */}
           <Link href="/" className="absolute left-1/2 -translate-x-1/2">
             <Image
-              src={
-                isScrolled
-                  ? "/images/velmora-d.png"
-                  : "/images/velmora-white.png"
-              }
-              alt="Velmora"
-              width={isScrolled ? 100 : 120}
-              height={30}
-              className="transition-all duration-500"
+              src="/images/lycoonwear.png"
+              alt="Lycoonwear"
+              width={isScrolled ? 70 : 90}
+              height={32}
+              className={`
+    transition-all duration-500 
+    hover:scale-105 
+    ${isScrolled ? '' : 'invert'}
+  `}
+              priority
             />
           </Link>
 
@@ -201,10 +108,12 @@ export default function Header() {
             </button>
 
             {/* USER */}
-            <User className="hover:opacity-70 transition cursor-pointer hidden md:block" />
+            <Link href="/payment" className="hidden md:block relative">
+              <User className="hover:opacity-70 transition cursor-pointer hidden md:block" />
+            </Link>
 
             {/* Wishlist */}
-            <Link href="/wishlist" className="relative">
+            <Link href="/wishlist" className="hidden md:block relative">
               <Heart className="hover:opacity-70 transition" />
               {isClient && wishlistCount > 0 && (
                 <span className="absolute -top-2 -right-2 text-xs bg-black text-white w-5 h-5 flex items-center justify-center rounded-full">
@@ -214,7 +123,7 @@ export default function Header() {
             </Link>
 
             {/* Cart */}
-            <Link href="/checkout" className="relative">
+            <Link href="/checkout" className="hidden md:block relative">
               <ShoppingCart className="hover:opacity-70 transition" />
               {isClient && cartCount > 0 && (
                 <span className="absolute -top-2 -right-2 text-xs bg-black text-white w-5 h-5 flex items-center justify-center rounded-full">
@@ -233,7 +142,7 @@ export default function Header() {
             <input
               autoFocus
               type="text"
-              placeholder="Search Velmora..."
+              placeholder="Search Lycoon Wear..."
               className="w-full bg-transparent border-b border-gray-600 text-white text-2xl py-3 outline-none"
             />
           </div>
@@ -269,9 +178,9 @@ export default function Header() {
             <span className="text-lg tracking-[0.3em]">
               <Link href="/">
                 <Image
-                  src="/images/velmora-d.png"
-                  alt="Velmora"
-                  width={120}
+                  src="/images/lycoonwear.png"
+                  alt="Lycoon Wear"
+                  width={70}
                   height={30}
                   className="transition-all duration-500"
                 />
@@ -285,67 +194,29 @@ export default function Header() {
           {/* NAV LINKS */}
           <nav className="flex flex-col space-y-6 text-xl font-light">
 
-            {/* MEN */}
-            <div>
-              <button
-                onClick={() => toggleMenu("men")}
-                className="w-full flex justify-between items-center border-b pb-3"
-              >
-                Men
-                <span className="text-lg">{openMenu === "men" ? "−" : "+"}</span>
-              </button>
-
-              <div
-                className={`overflow-hidden transition-all duration-500 ${openMenu === "men" ? "max-h-60 mt-4" : "max-h-0"
-                  }`}
-              >
-                <ul className="space-y-3 text-base text-gray-600 pl-2">
-                  <li><Link href="/shop">T-Shirts</Link></li>
-                  <li><Link href="/shop">Shirts</Link></li>
-                  <li><Link href="/shop">Jeans</Link></li>
-                  <li><Link href="/shop">Jackets</Link></li>
-                </ul>
-              </div>
-            </div>
-
-            {/* WOMEN */}
-            <div>
-              <button
-                onClick={() => toggleMenu("women")}
-                className="w-full flex justify-between items-center border-b pb-3"
-              >
-                Women
-                <span className="text-lg">{openMenu === "women" ? "−" : "+"}</span>
-              </button>
-
-              <div
-                className={`overflow-hidden transition-all duration-500 ${openMenu === "women" ? "max-h-60 mt-4" : "max-h-0"
-                  }`}
-              >
-                <ul className="space-y-3 text-base text-gray-600 pl-2">
-                  <li><Link href="/shop">Dresses</Link></li>
-                  <li><Link href="/shop">Tops</Link></li>
-                  <li><Link href="/shop">Denim</Link></li>
-                  <li><Link href="/shop">Outerwear</Link></li>
-                </ul>
-              </div>
-            </div>
 
             {/* SIMPLE LINKS */}
             <Link
-              href="/new"
+              href="/shop"
               onClick={() => setMobileOpen(false)}
               className="border-b pb-3"
             >
-              New
+              Shop
             </Link>
 
             <Link
-              href="/sale"
+              href="/about"
               onClick={() => setMobileOpen(false)}
               className="border-b pb-3"
             >
-              Sale
+              About
+            </Link>
+            <Link
+              href="/contact"
+              onClick={() => setMobileOpen(false)}
+              className="border-b pb-3"
+            >
+              Contact Us
             </Link>
 
           </nav>

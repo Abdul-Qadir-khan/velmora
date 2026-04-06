@@ -2,7 +2,7 @@
 import { MetadataRoute } from "next";
 
 // Replace with your actual domain
-const BASE_URL = "https://velmora.com";
+const BASE_URL = "https://lycoonwear.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();

@@ -145,9 +145,9 @@ export async function POST(req: NextRequest) {
     `;
 
     const customerMail = {
-      from: `"Velmora Store" <${process.env.EMAIL_USER}>`,
+      from: `"Lycoon WearStore" <${process.env.EMAIL_USER}>`,
       to: data.email,
-      subject: `Order Confirmed #${data.orderId} - Velmora Store`,
+      subject: `Order Confirmed #${data.orderId} - Lycoon WearStore`,
       html: customerHTML,
     };
 
@@ -190,7 +190,7 @@ export async function POST(req: NextRequest) {
     `;
 
     const adminMail = {
-      from: `"Velmora Store" <${process.env.EMAIL_USER}>`,
+      from: `"Lycoon WearStore" <${process.env.EMAIL_USER}>`,
       to: process.env.ADMIN_EMAIL,
       subject: `🆕 New Order #${data.orderId} - ₹${data.total}`,
       html: adminHTML,

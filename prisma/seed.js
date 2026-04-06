@@ -15,7 +15,7 @@ async function main() {
         price: 19.99,
         originalPrice: 25.99,
         category: 'T-shirt',
-        brand: 'Velmora',
+        brand: 'Lycoon Wear',
         stock: 50,
         rating: 4.5,
         isNew: true,
