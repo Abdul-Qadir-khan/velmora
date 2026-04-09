@@ -209,7 +209,7 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
                 return (
                   <div
                     key={uniqueKey} // ✅ FIXED: Always unique string key
-                    className="relative group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:ring-4 hover:ring-primary/10 hover:bg-white/90 backdrop-blur-sm border border-gray-100"
+                    className="relative group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:ring-4 hover:ring-primary/10 hover:bg-white/90 backdrop-blur-sm border border-gray-100 flex flex-col"
                   >
                     {/* Popular Badge - ENHANCED */}
                     {product.bestSeller && (
@@ -267,7 +267,7 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
 
                     {/* Image - ENHANCED */}
                     <div
-                      className="relative w-full h-64 md:h-72 bg-gradient-to-t from-gray-50 to-white overflow-hidden pt-14 px-3"
+                      className="relative w-full h-64 md:h-72 bg-gradient-to-t from-gray-50 to-white overflow-hidden pt-14 px-3 rounded-xl"
                       onClick={() => goToProduct(product)}
                     >
                       <Image
@@ -275,7 +275,7 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
                         alt={product.name}
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        className="object-contain transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110 group-hover:rotate-1 shadow-lg rounded-xl -mt-2"
+                        className="object-cover transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110 group-hover:rotate-1 shadow-lg rounded-xl"
                       />
                     </div>
 

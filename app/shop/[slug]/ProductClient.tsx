@@ -151,7 +151,7 @@ export default function ProductClient({
           >
             <img
               src={images[selectedImage] || "/placeholder.png"}
-              className="w-full h-100  md:h-150 object-contain transition-transform duration-300 group-hover:scale-105"
+              className="w-full h-100  md:h-150 object-cover transition-transform duration-300 group-hover:scale-105"
             />
             {discount && (
               <span className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold">

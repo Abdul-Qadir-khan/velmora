@@ -56,8 +56,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* globals.css */
 main {
-  padding-top: 96px; /* Adjust to your header height */
+  /* padding-top: 96px; */
 }
 @media (min-width: 768px) {
-  main { padding-top: 80px; }
+  /* main { padding-top: 80px; } */
 }

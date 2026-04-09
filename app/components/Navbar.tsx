@@ -6,27 +6,23 @@ import { useState, useEffect } from "react";
 import { Menu, X, Search, ShoppingCart, User, Heart } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
-import { FaCartPlus, FaNotesMedical, FaShopify, FaShoppingBag, FaUserAlt } from "react-icons/fa";
-
-// const { wishlistCount } useWishlist();
 
 export default function Header() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false); // Add client detection
+  const [isClient, setIsClient] = useState(false);
 
   const toggleMenu = (menu: string) => {
     setOpenMenu(openMenu === menu ? null : menu);
   };
 
+  // 🔥 FIXED: Real-time counts from context (YOUR DESIGN)
   const { cartCount } = useCart();
-  // const [wishlistCount, setWishlistCount] = useState(0);
-  const { wishlistCount } = useWishlist(); // ✅ get wishlistCount from context
+  const { wishlistCount } = useWishlist();
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
-  // Detect client-side rendering
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -46,7 +42,7 @@ export default function Header() {
 
   return (
     <>
-      {/* HEADER */}
+      {/* YOUR EXACT HEADER DESIGN */}
       <header
         className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled
           ? "bg-white py-4 text-black"
@@ -55,64 +51,55 @@ export default function Header() {
       >
         <div className="max-w-7xl mx-auto px-5 md:px-0 flex items-center justify-between">
 
-          {/* MOBILE MENU BUTTON */}
+          {/* YOUR MOBILE MENU BUTTON */}
           <button onClick={() => setMobileOpen(true)} className="md:hidden">
             <Menu size={26} />
           </button>
 
-          {/* LEFT NAV (DESKTOP) */}
+          {/* YOUR LEFT NAV (DESKTOP) */}
           <nav className="hidden md:flex gap-10 text-lg font-light tracking-wide">
-
-
-            {/* SIMPLE LINKS */}
             <Link href="/shop" className="relative group flex items-center gap-2">
-              {/* <FaShoppingBag/> */}
               Shop
               <span className="absolute left-0 -bottom-1 w-0 h-px bg-current transition-all duration-300 group-hover:w-full"></span>
             </Link>
             <Link href="/about" className="relative group flex items-center gap-2">
-              {/* <FaNotesMedical/> */}
               About
               <span className="absolute left-0 -bottom-1 w-0 h-px bg-current transition-all duration-300 group-hover:w-full"></span>
             </Link>
             <Link href="/contact" className="relative group flex items-center gap-2">
-              {/* <FaUserAlt/> */}
               Contact Us
               <span className="absolute left-0 -bottom-1 w-0 h-px bg-current transition-all duration-300 group-hover:w-full"></span>
             </Link>
-
           </nav>
 
-          {/* LOGO */}
+          {/* YOUR LOGO */}
           <Link href="/" className="absolute left-1/2 -translate-x-1/2">
             <Image
-              src="/images/lycoonwear.png"
+              src="/images/lw-logo.png"
               alt="Lycoonwear"
               width={isScrolled ? 70 : 90}
               height={32}
               className={`
-    transition-all duration-500 
-    hover:scale-105 
-    ${isScrolled ? '' : 'invert'}
-  `}
+                transition-all duration-500 
+                ${isScrolled ? '' : 'invert'}
+              `}
               priority
             />
           </Link>
 
-          {/* RIGHT */}
+          {/* YOUR RIGHT ICONS - FIXED COUNTS */}
           <div className="flex items-center gap-4 md:gap-6">
-
-            {/* SEARCH */}
+            {/* YOUR SEARCH */}
             <button onClick={() => setSearchOpen(true)}>
               <Search className="hover:opacity-70 transition" />
             </button>
 
-            {/* USER */}
+            {/* YOUR USER */}
             <Link href="/payment" className="hidden md:block relative">
               <User className="hover:opacity-70 transition cursor-pointer hidden md:block" />
             </Link>
 
-            {/* Wishlist */}
+            {/* 🔥 YOUR WISHLIST - NOW REAL-TIME */}
             <Link href="/wishlist" className="hidden md:block relative">
               <Heart className="hover:opacity-70 transition" />
               {isClient && wishlistCount > 0 && (
@@ -122,7 +109,7 @@ export default function Header() {
               )}
             </Link>
 
-            {/* Cart */}
+            {/* 🔥 YOUR CART - NOW REAL-TIME */}
             <Link href="/checkout" className="hidden md:block relative">
               <ShoppingCart className="hover:opacity-70 transition" />
               {isClient && cartCount > 0 && (
@@ -135,7 +122,7 @@ export default function Header() {
         </div>
       </header>
 
-      {/* SEARCH OVERLAY */}
+      {/* YOUR EXACT SEARCH OVERLAY */}
       {searchOpen && (
         <div className="fixed inset-0 bg-black z-[999] flex items-center justify-center">
           <div className="w-full max-w-xl px-6">
@@ -156,24 +143,24 @@ export default function Header() {
         </div>
       )}
 
-      {/* MOBILE MENU */}
+      {/* YOUR EXACT MOBILE MENU */}
       <div
         className={`fixed inset-0 z-[998] transition ${mobileOpen ? "visible" : "invisible"
           }`}
       >
-        {/* OVERLAY */}
+        {/* YOUR OVERLAY */}
         <div
           className={`absolute inset-0 bg-black/50 transition-opacity ${mobileOpen ? "opacity-100" : "opacity-0"
             }`}
           onClick={() => setMobileOpen(false)}
         />
 
-        {/* MENU PANEL */}
+        {/* YOUR MENU PANEL */}
         <div
           className={`absolute left-0 top-0 h-full w-full bg-white text-black p-8 transform transition duration-500 ${mobileOpen ? "translate-x-0" : "-translate-x-full"
             }`}
         >
-          {/* TOP BAR */}
+          {/* YOUR TOP BAR */}
           <div className="flex justify-between mb-10">
             <span className="text-lg tracking-[0.3em]">
               <Link href="/">
@@ -191,11 +178,8 @@ export default function Header() {
             </button>
           </div>
 
-          {/* NAV LINKS */}
+          {/* YOUR NAV LINKS */}
           <nav className="flex flex-col space-y-6 text-xl font-light">
-
-
-            {/* SIMPLE LINKS */}
             <Link
               href="/shop"
               onClick={() => setMobileOpen(false)}
@@ -203,7 +187,6 @@ export default function Header() {
             >
               Shop
             </Link>
-
             <Link
               href="/about"
               onClick={() => setMobileOpen(false)}
@@ -218,10 +201,9 @@ export default function Header() {
             >
               Contact Us
             </Link>
-
           </nav>
 
-          {/* BOTTOM ACTIONS */}
+          {/* YOUR BOTTOM ACTIONS - NOW REAL-TIME COUNTS */}
           <div className="absolute bottom-10 left-8 right-8 flex justify-between text-sm">
             <div className="flex items-center gap-2">
               <ShoppingCart size={18} />

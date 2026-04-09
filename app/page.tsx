@@ -11,6 +11,7 @@ import CustomerReviewsSection from "./components/Testimonials";
 import WhyChoose from "./components/WhyChoose";
 import BrandsSlider from "./components/BrandsSlider";
 import { products, Product } from "../data/product"; // Assuming the `products` and `Product` are imported from your data
+import NewsletterPopup from "./components/Popup";
 
 export default function Home() {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -29,6 +30,9 @@ export default function Home() {
 
   return (
     <div>
+
+      {/* poup */}
+      {/* <NewsletterPopup/> */}
       {/* Hero Section */}
       <Hero />
 
@@ -36,9 +40,7 @@ export default function Home() {
       <BrandsSlider />
 
       {/* Categories Section */}
-      <Suspense fallback={<div>Loading categories...</div>}>
-        <CategoriesSection filterProducts={filterProducts} />
-      </Suspense>
+       {/* <CategoriesSection /> */}
       <hr className="border-gray-300" />
       {/* Best Sellers Section */}
       <BestSellerSection />
@@ -50,7 +52,7 @@ export default function Home() {
       <DiscountsSection />
 
       {/* Customer Reviews Section */}
-      <CustomerReviewsSection />
+      {/* <CustomerReviewsSection /> */}
 
       {/* Why Choose Us Section */}
       <WhyChoose />

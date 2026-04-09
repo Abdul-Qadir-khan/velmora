@@ -79,7 +79,7 @@ export default function About() {
             <div className="order-1 lg:order-2 relative">
               <div className="aspect-[4/5] sm:aspect-[3/4] w-full h-64 sm:h-80 md:h-96 lg:h-auto">
                 <Image
-                  src="/images/about-model.jpg"
+                  src="/images/product1.jpg"
                   alt="Fashion model wearing our signature collection"
                   fill
                   className="rounded-2xl sm:rounded-3xl shadow-2xl object-cover hover:scale-105 transition-transform duration-500 w-full h-full"

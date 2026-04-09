@@ -1,56 +1,43 @@
-"use client";
-
-import { useState, Suspense } from "react";
-import ProductSection from "../components/Product";
+import ClientProductGrid from "../components/ClientProductGrid";
 import CategoriesSection from "../components/Categories";
-import { products } from "../../data/product";
+import { getProducts } from "../lib/api/product";
+import { Suspense } from "react";
 
-export const dynamic = "force-dynamic";
+interface ShopPageProps {
+  searchParams: Promise<{ category?: string }>; // ✅ Next.js 16 fix
+}
 
-export default function ShopPage() {
-  const [filteredProducts, setFilteredProducts] = useState(products);
-
-  const filterProducts = (category: string) => {
-    const filtered =
-      category === "all"
-        ? products
-        : products.filter((product) => product.category === category);
-
-    setFilteredProducts(filtered);
-  };
+export default async function ShopPage({ searchParams }: ShopPageProps) {
+  const params = await searchParams; // ✅ Await searchParams
+  const products = await getProducts({ category: params.category });
 
   return (
-    <div>
-      {/* Banner */}
-      <section
-        className="relative w-full h-80 bg-cover bg-center"
-        style={{ backgroundImage: 'url("/images/category-banner.jpg")' }}
-      >
-        <div className="absolute inset-0 bg-black/50"></div>
-        <div className="absolute inset-0 flex justify-center items-center text-white">
-          <h2 className="text-4xl font-bold">Explore Our Categories</h2>
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      <section className="pt-24 pb-20 bg-gradient-to-r from-blue-600/10 via-purple-600/5 to-indigo-600/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-slate-900 via-gray-800 to-slate-900 bg-clip-text text-transparent mb-6">
+            Our Collection
+          </h1>
+          <p className="text-xl md:text-2xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            Discover premium quality products curated just for you
+          </p>
         </div>
       </section>
 
-      {/* ✅ Wrap Categories */}
-      <Suspense fallback={<div className="p-6">Loading categories...</div>}>
-        <CategoriesSection filterProducts={filterProducts} />
-      </Suspense>
-
-      {/* Products */}
-      <div className="py-16 px-6 md:px-12 bg-gray-50">
+      <CategoriesSection />
+      
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-semibold mb-6">
-            Shop Our Collection
-          </h2>
-
-          {/* ✅ Wrap ProductSection */}
-          <Suspense fallback={<div>Loading products...</div>}>
-            <ProductSection products={filteredProducts} />
+          <Suspense fallback={
+            <div className="text-center py-20">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-lg text-slate-600">Loading products...</p>
+            </div>
+          }>
+            <ClientProductGrid initialProducts={products} searchParams={params} />
           </Suspense>
-
         </div>
-      </div>
+      </section>
     </div>
   );
 }

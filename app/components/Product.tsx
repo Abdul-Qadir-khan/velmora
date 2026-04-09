@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Product } from "../../data/product";
-import { useMemo, useState, useEffect, useCallback } from "react";
+import { Product } from "../../types/product"; // ✅ Fixed path (no @/)
+import { useMemo, useState, useEffect, useCallback, useTransition } from "react";
 import { Heart, SlidersHorizontal, ShoppingCart } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useCart } from "../context/CartContext";
+import { toast } from "react-hot-toast"; // ✅ Missing import
 
 export default function ShopSection() {
   const searchParams = useSearchParams();
@@ -22,6 +23,7 @@ export default function ShopSection() {
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPending, startTransition] = useTransition(); // ✅ Added
 
   // Slug fallback generator
   const generateSlug = useCallback((name: string) =>
@@ -34,7 +36,7 @@ export default function ShopSection() {
     return img.startsWith("/") ? img : `/${img}`;
   }, []);
 
-  // ------------------ FETCH PRODUCTS FROM API ------------------
+  // FETCH PRODUCTS
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -43,7 +45,7 @@ export default function ShopSection() {
         const json = await res.json();
         const data: Product[] = json.products || [];
 
-        const normalized = data.map((p) => {
+        const normalized = data.map((p: any) => { // ✅ any for API data
           let imgs: string[] = [];
           try {
             imgs = Array.isArray(p.images)
@@ -59,9 +61,8 @@ export default function ShopSection() {
 
           return {
             ...p,
-            // ✅ Keep ID as number for CartItem compatibility, add stringId for UI
-            id: Number(p.id), // Changed back to Number for CartItem
-            stringId: String(p.id), // Add string version for UI/links
+            id: Number(p.id),
+            stringId: String(p.id),
             slug: p.slug || generateSlug(p.name),
             images: imgs.length ? imgs : ["/placeholder.png"],
             price: Number(p.price) || 0,
@@ -78,7 +79,6 @@ export default function ShopSection() {
 
     fetchProducts();
   }, [generateSlug, getValidImage]);
-  // ------------------------------------------------------------
 
   // Sync filters with URL params
   useEffect(() => {
@@ -95,11 +95,7 @@ export default function ShopSection() {
     setPrice(pr);
   }, [searchParams]);
 
-  // Load wishlist from localStorage
-  // useEffect(() => {
-  //   const stored = localStorage.getItem("wishlist");
-  //   if (stored) setWishlist(JSON.parse(stored));
-  // }, []);
+  // Load wishlist
   useEffect(() => {
     try {
       const stored = localStorage.getItem("wishlist");
@@ -116,13 +112,15 @@ export default function ShopSection() {
     newColor = color,
     newPrice = price
   ) => {
-    const params = new URLSearchParams();
-    if (newCategory.length) params.set("category", newCategory.join(","));
-    if (newBrand.length) params.set("brand", newBrand.join(","));
-    if (newSize.length) params.set("size", newSize.join(","));
-    if (newColor.length) params.set("color", newColor.join(","));
-    if (newPrice !== 10000) params.set("price", String(newPrice));
-    router.push(`?${params.toString()}`);
+    startTransition(() => { // ✅ Smooth transitions
+      const params = new URLSearchParams();
+      if (newCategory.length) params.set("category", newCategory.join(","));
+      if (newBrand.length) params.set("brand", newBrand.join(","));
+      if (newSize.length) params.set("size", newSize.join(","));
+      if (newColor.length) params.set("color", newColor.join(","));
+      if (newPrice !== 10000) params.set("price", String(newPrice));
+      router.push(`?${params.toString()}`);
+    });
   }, [category, brand, size, color, price, router]);
 
   const toggle = useCallback((
@@ -139,21 +137,39 @@ export default function ShopSection() {
     if (setter === setCategory) updateURL(newState, brand, size, color, price);
     else if (setter === setBrand) updateURL(category, newState, size, color, price);
     else if (setter === setSize) updateURL(category, brand, newState, color, price);
-    else if (setter === setColor) updateURL(category, brand, size, newState, price);
+    else updateURL(category, brand, size, newState, price);
   }, [category, brand, size, color, price, updateURL]);
 
-  // Derive filter options from all products
+  // ✅ FIXED sizes/colors (type-safe)
   const categories = useMemo(() =>
     [...new Set(allProducts.map((p) => p.category))], [allProducts]);
 
   const brands = useMemo(() =>
     [...new Set(allProducts.map((p) => p.brand?.name || ''))], [allProducts]);
 
-  const sizes = useMemo(() =>
-    [...new Set(allProducts.flatMap((p) => p.variations?.sizes || []))], [allProducts]);
+  const sizes = useMemo(() => {
+    const allSizes: string[] = [];
+    allProducts.forEach(p => {
+      if (p.variations && Array.isArray(p.variations)) {
+        p.variations.forEach((v: any) => {
+          if (Array.isArray(v.sizes)) allSizes.push(...v.sizes);
+        });
+      }
+    });
+    return [...new Set(allSizes)];
+  }, [allProducts]);
 
-  const colors = useMemo(() =>
-    [...new Set(allProducts.flatMap((p) => p.variations?.colors || []))], [allProducts]);
+  const colors = useMemo(() => {
+    const allColors: string[] = [];
+    allProducts.forEach(p => {
+      if (p.variations && Array.isArray(p.variations)) {
+        p.variations.forEach((v: any) => {
+          if (Array.isArray(v.colors)) allColors.push(...v.colors);
+        });
+      }
+    });
+    return [...new Set(allColors)];
+  }, [allProducts]);
 
   const filteredProducts = useMemo(() => {
     if (isLoading) return [];
@@ -162,17 +178,22 @@ export default function ShopSection() {
     if (category.length) data = data.filter((p) => category.includes(p.category));
     if (brand.length) data = data.filter((p) => brand.includes(p.brand?.name || ''));
     if (size.length)
-      data = data.filter((p) => p.variations?.sizes?.some((s: string) => size.includes(s)));
+      data = data.filter((p) => {
+        if (!p.variations) return false;
+        return p.variations.some((v: any) => v.sizes?.some((s: string) => size.includes(s)));
+      });
     if (color.length)
-      data = data.filter((p) => p.variations?.colors?.some((c: string) => color.includes(c)));
+      data = data.filter((p) => {
+        if (!p.variations) return false;
+        return p.variations.some((v: any) => v.colors?.some((c: string) => color.includes(c)));
+      });
     data = data.filter((p) => (p.price || 0) <= price);
 
     if (sort === "low") data.sort((a, b) => (a.price || 0) - (b.price || 0));
     if (sort === "high") data.sort((a, b) => (b.price || 0) - (a.price || 0));
-    // ✅ FIXED
     if (sort === "latest") data.sort((a, b) => {
-      const aId = a.id ? parseInt(String(a.id)) : 0;
-      const bId = b.id ? parseInt(String(b.id)) : 0;
+      const aId = Number(a.id);
+      const bId = Number(b.id);
       return bId - aId;
     });
 
@@ -182,7 +203,6 @@ export default function ShopSection() {
   const toggleWishlist = useCallback((product: Product) => {
     setWishlist((prev) => {
       const exists = prev.some((p) => p.id === product.id);
-
       const updated = exists
         ? prev.filter((p) => p.id !== product.id)
         : [...prev, product];
@@ -193,33 +213,20 @@ export default function ShopSection() {
   }, []);
 
   const handleAddToCart = useCallback((product: Product) => {
-  addToCart({
-    id: typeof product.id === 'string' ? parseInt(product.id) : product.id,
-    name: product.name || "Unknown Product",
-    price: typeof product.price === 'string' ? parseFloat(String(product.price)) : Number(product.price),
-    qty: 1,
-    images: Array.isArray(product.images) && product.images.length > 0
-      ? product.images
-      : ["/placeholder.png"],
-    // ✅ REQUIRED FIELDS
-    selectedSize: product.size || "M",        // Default size
-    selectedColor: product.color || "#000000", // Default color
-  });
-
-  // Safe wishlist removal
-  setWishlist((prev) => {
-    const updated = prev.filter((p) => {
-      const currentId = typeof p.id === 'string' ? parseInt(p.id) : p.id;
-      const productId = typeof product.id === 'string' ? parseInt(product.id) : product.id;
-      return currentId !== productId;
+    addToCart({
+      id: Number(product.id),
+      name: product.name || "Unknown Product",
+      price: Number(product.price),
+      qty: 1,
+      images: Array.isArray(product.images) && product.images.length > 0
+        ? product.images
+        : ["/placeholder.png"],
+      selectedSize: product.size || "M",
+      selectedColor: product.color || "#000000",
     });
-    localStorage.setItem("wishlist", JSON.stringify(updated));
-    return updated;
-  });
 
-  toast.success(`${product.name} added to cart! 🛒`);
-}, [addToCart, setWishlist]);
-
+    toast.success(`${product.name} added to cart! 🛒`);
+  }, [addToCart]);
 
   const handleResetFilters = useCallback(() => {
     setCategory([]);
@@ -230,7 +237,7 @@ export default function ShopSection() {
     updateURL([], [], [], [], 10000);
   }, [updateURL]);
 
-  if (isLoading) {
+  if (isLoading || isPending) {
     return (
       <section>
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6 px-4">

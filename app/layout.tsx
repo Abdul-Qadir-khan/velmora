@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter, DM_Sans } from "next/font/google";
+import { Saira, Inter, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -7,7 +7,7 @@ import { CartProvider } from "./context/CartContext";
 import { WishlistProvider } from "./context/WishlistContext";
 
 /* ================= FONTS ================= */
-const playfair = Playfair_Display({
+const saira = Saira({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-heading",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://lycoonwear.com"), // change later
 
   title: {
-    default: "Lycoon Wear| Premium Fashion & Streetwear",
+    default: "Lycoon Wear | Premium Fashion & Streetwear",
     template: "%s | Lycoon Wear",
   },
 
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
-    title: "Lycoon Wear| Premium Fashion Brand",
+    title: "Lycoon Wear | Premium Fashion Brand",
     description:
       "Shop modern streetwear, denim, and essentials with Lycoon Wear.",
     url: "https://lycoonwear.com",
@@ -99,7 +99,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${playfair.variable} ${inter.variable} ${dmSans.variable} antialiased bg-white text-slate-900`}>
+      <body className={`${saira.variable} ${inter.variable} ${dmSans.variable} antialiased bg-white text-slate-900`}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
