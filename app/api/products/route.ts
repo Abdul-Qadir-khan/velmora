@@ -1,90 +1,179 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
-function generateSlug(name: string) {
+function generateSlug(name: string): string {
   return name
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
+    .replace(/[^\w\s-]/g, "")  // ✅ Better regex
+    .replace(/[\s_-]+/g, "-")  // ✅ Handle multiple spaces/hyphens
+    .replace(/^-+|-+$/g, "");  // ✅ Remove leading/trailing hyphens
 }
 
-export async function GET(request: Request) {
+// ✅ Zod Validation Schema
+const createProductSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().optional(),
+  price: z.coerce.number().positive("Price must be positive"),
+  originalPrice: z.coerce.number().optional(),
+  stock: z.coerce.number().min(0, "Stock cannot be negative"),
+  rating: z.coerce.number().min(0).max(5, "Rating must be 0-5"),
+  category: z.enum([
+    "mens", "womens", "kids", "t-shirts", "shirts", 
+    "jeans", "jackets", "hoodies", "accessories"
+  ]),
+  isNew: z.boolean().optional(),
+  bestSeller: z.boolean().optional(),
+  images: z.array(z.string()).optional().default([]),
+  brand: z.object({
+    name: z.string().min(1, "Brand name required"),
+    logo: z.string().optional()
+  }),
+  variations: z.object({
+    colors: z.array(z.string()).optional().default([]),
+    sizes: z.array(z.string()).optional().default([]),
+    specs: z.object({
+      material: z.string().optional(),
+      fit: z.string().optional(),
+      sleeve: z.string().optional(),
+      pattern: z.string().optional(),
+      washing: z.string().optional()
+    }).optional().default({})
+  }),
+  seo: z.object({
+    title: z.string().optional(),
+    description: z.string().optional(),
+    keywords: z.string().optional()
+  }).optional()
+});
+
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
+    const search = searchParams.get("search") || "";
+    const limit = searchParams.get("limit") ? parseInt(searchParams.get("limit")!) : 20;
+    const page = searchParams.get("page") ? parseInt(searchParams.get("page")!) : 1;
 
-    // ✅ FIXED: Add category filtering
-    const whereClause = category && category !== "all" 
-      ? { category: { equals: category } }
-      : {};
+    // ✅ Enhanced filtering
+    const whereClause: any = {
+      ...(category && category !== "all" && { category }),
+      OR: search
+        ? [
+            { name: { contains: search, mode: "insensitive" } },
+            { description: { contains: search, mode: "insensitive" } },
+            { brand: { name: { contains: search, mode: "insensitive" } } }
+          ]
+        : {}
+    };
 
-    console.log(`🔍 API Filter: category="${category || 'all'}"`);
+    console.log(`🔍 API Filter: category="${category || 'all'}", search="${search}"`);
 
-    const products = await prisma.product.findMany({
-      where: whereClause,
-      include: {
-        brand: true,
-        variations: true,
-      },
-      orderBy: { createdAt: "desc" },
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where: whereClause,
+        include: {
+          brand: true,
+          variations: true,
+        },
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        skip: (page - 1) * limit,
+      }),
+      prisma.product.count({ where: whereClause })
+    ]);
+
+    console.log(`✅ Found ${products.length}/${total} products (page ${page})`);
+
+    return NextResponse.json({ 
+      products, 
+      pagination: { 
+        total, 
+        page, 
+        limit, 
+        pages: Math.ceil(total / limit) 
+      }
     });
-
-    console.log(`✅ Found ${products.length} products`);
-
-    return NextResponse.json({ products });
   } catch (err) {
-    console.error("GET /api/products error:", err);
+    console.error("❌ GET /api/products error:", err);
     return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
   }
 }
 
-// POST unchanged
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const body = await req.json();
-    const {
-      name, description, price, originalPrice, stock, rating, category,
-      isNew, bestSeller, images, brand, variations, seo,
-    } = body;
-
-    if (!name || !price) {
-      return NextResponse.json({ error: "Name and price are required" }, { status: 400 });
+    const body = await request.json();
+    
+    // ✅ Full validation
+    const validated = createProductSchema.parse(body);
+    
+    // ✅ Unique slug check + timestamp
+    const baseSlug = generateSlug(validated.name);
+    let slug = baseSlug;
+    let counter = 1;
+    
+    // Check for existing slug
+    while (await prisma.product.findUnique({ where: { slug } })) {
+      slug = `${baseSlug}-${counter++}`;
     }
 
-    const baseSlug = generateSlug(name);
-    const slug = `${baseSlug}-${Date.now()}`;
+    console.log(`➕ Creating product: "${validated.name}" (slug: ${slug})`);
 
     const product = await prisma.product.create({
       data: {
-        name, slug, description: description || "",
-        price: Number(price), originalPrice: Number(originalPrice) || 0,
-        stock: Number(stock) || 0, rating: Number(rating) || 0,
-        category: category || "T-Shirt", isNew: Boolean(isNew),
-        bestSeller: Boolean(bestSeller), images: JSON.stringify(images || []),
-        seoTitle: seo?.title || "", seoDescription: seo?.description || "",
-        seoKeywords: seo?.keywords || "",
+        name: validated.name,
+        slug,
+        description: validated.description || "",
+        price: validated.price,
+        originalPrice: validated.originalPrice || 0,
+        stock: validated.stock || 0,
+        rating: validated.rating || 0,
+        category: validated.category,
+        isNew: validated.isNew ?? false,
+        bestSeller: validated.bestSeller ?? false,
+        images: validated.images,
+        seoTitle: validated.seo?.title || "",
+        seoDescription: validated.seo?.description || "",
+        seoKeywords: validated.seo?.keywords || "",
         brand: {
           connectOrCreate: {
-            where: { name: brand?.name || "No Brand" },
-            create: { name: brand?.name || "No Brand", logo: brand?.logo || "" },
+            where: { name: validated.brand.name },
+            create: { 
+              name: validated.brand.name, 
+              logo: validated.brand.logo || null 
+            },
           },
         },
         variations: {
           create: [{
-            colors: JSON.stringify(variations?.colors || []),
-            sizes: JSON.stringify(variations?.sizes || []),
-            specs: JSON.stringify(variations?.specs || {}),
+            colors: validated.variations.colors,
+            sizes: validated.variations.sizes,
+            specs: validated.variations.specs,
           }],
         },
       },
-      include: { brand: true, variations: true },
+      include: { 
+        brand: true, 
+        variations: true 
+      },
     });
 
-    return NextResponse.json({ product });
-  } catch (err) {
-    console.error("POST /api/products error:", err);
-    return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
+    console.log(`✅ Product created: ${product.id}`);
+    return NextResponse.json({ product }, { status: 201 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error("❌ Validation error:", error.errors);
+      return NextResponse.json(
+        { error: "Validation failed", details: error.errors }, 
+        { status: 400 }
+      );
+    }
+    
+    console.error("❌ POST /api/products error:", error);
+    return NextResponse.json(
+      { error: "Failed to create product" }, 
+      { status: 500 }
+    );
   }
 }

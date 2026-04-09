@@ -1,3 +1,4 @@
+// This file is maintained by Prisma Migrate
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,25 +8,28 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+// ==============================
+//  PRODUCT MODEL (ENHANCED)
+// ==============================
 model Product {
-  id            String  @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String
-  slug          String  @unique
+  slug          String    @unique
   description   String?
   price         Float
   originalPrice Float?
-  stock         Int     @default(0)
-  rating        Float   @default(0)
+  stock         Int       @default(0)
+  rating        Float     @default(0)
   category      String
-  isNew         Boolean @default(false)
-  bestSeller    Boolean @default(false)
-  images        String  // JSON string
+  isNew         Boolean   @default(false)
+  bestSeller    Boolean   @default(false)
+  images        Json?     // ✅ Fixed: Use Json instead of String
 
-  brandId String
-  brand   Brand @relation(fields: [brandId], references: [id])
+  brandId       String
+  brand         Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
 
-  variations Variation[]
-  cartItems  CartItem[]
+  variations    Variation[]
+  cartItems     CartItem[]
 
   seoTitle       String?
   seoDescription String?
@@ -35,34 +39,45 @@ model Product {
   updatedAt DateTime @updatedAt
 }
 
+// ==============================
+//  BRAND MODEL
+// ==============================
 model Brand {
-  id   String @id @default(cuid())
-  name String @unique
-  logo String?
+  id    String   @id @default(cuid())
+  name  String   @unique
+  logo  String?
 
   products Product[]
 }
 
+// ==============================
+//  VARIATION MODEL (IMPROVED)
+// ==============================
 model Variation {
   id     String @id @default(cuid())
-  colors String
-  sizes  String
-  specs  String
+  colors Json   // ✅ CHANGED: String → Json
+  sizes  Json   // ✅ CHANGED: String → Json
+  specs  Json   // ✅ CHANGED: String → Json
 
   productId String
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId])
 }
 
+// ==============================
+//  CART ITEM
+// ==============================
 model CartItem {
-  id        String @id @default(cuid())
+  id        String   @id @default(cuid())
   userId    String
   productId String
-  quantity  Int    @default(1)
+  quantity  Int      @default(1)
 
-  product Product @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, productId]) // ✅ IMPORTANT FIX
+  @@unique([userId, productId])
 }
