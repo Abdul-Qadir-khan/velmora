@@ -57,7 +57,7 @@ export default function Header() {
           </button>
 
           {/* YOUR LEFT NAV (DESKTOP) */}
-          <nav className="hidden md:flex gap-10 text-lg font-light tracking-wide">
+          <nav className="hidden md:flex gap-10 text-md font-light tracking-wide">
             <Link href="/shop" className="relative group flex items-center gap-2">
               Shop
               <span className="absolute left-0 -bottom-1 w-0 h-px bg-current transition-all duration-300 group-hover:w-full"></span>
@@ -75,7 +75,7 @@ export default function Header() {
           {/* YOUR LOGO */}
           <Link href="/" className="absolute left-1/2 -translate-x-1/2">
             <Image
-              src="/images/lw-logo.png"
+              src="/images/lycoonwear-logo.png"
               alt="Lycoonwear"
               width={isScrolled ? 70 : 90}
               height={32}
