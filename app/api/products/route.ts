@@ -11,7 +11,7 @@ function generateSlug(name: string): string {
     .replace(/^-+|-+$/g, "");  // ✅ Remove leading/trailing hyphens
 }
 
-// ✅ Zod Validation Schema
+// ✅ Zod Validation Schema (SQLite compatible)
 const createProductSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
@@ -56,17 +56,19 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get("limit") ? parseInt(searchParams.get("limit")!) : 20;
     const page = searchParams.get("page") ? parseInt(searchParams.get("page")!) : 1;
 
-    // ✅ Enhanced filtering
+    // ✅ FIXED: Proper whereClause construction
     const whereClause: any = {
       ...(category && category !== "all" && { category }),
-      OR: search
-        ? [
-            { name: { contains: search, mode: "insensitive" } },
-            { description: { contains: search, mode: "insensitive" } },
-            { brand: { name: { contains: search, mode: "insensitive" } } }
-          ]
-        : {}
     };
+
+    // ✅ FIXED: OR clause only when search exists (always array)
+    if (search) {
+      whereClause.OR = [
+        { name: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+        { brand: { name: { contains: search, mode: "insensitive" } } }
+      ];
+    }
 
     console.log(`🔍 API Filter: category="${category || 'all'}", search="${search}"`);
 
@@ -132,7 +134,8 @@ export async function POST(request: NextRequest) {
         category: validated.category,
         isNew: validated.isNew ?? false,
         bestSeller: validated.bestSeller ?? false,
-        images: validated.images,
+        // ✅ FIXED: Convert JSON arrays/objects to strings for SQLite
+        images: validated.images ? JSON.stringify(validated.images) : null,
         seoTitle: validated.seo?.title || "",
         seoDescription: validated.seo?.description || "",
         seoKeywords: validated.seo?.keywords || "",
@@ -147,9 +150,10 @@ export async function POST(request: NextRequest) {
         },
         variations: {
           create: [{
-            colors: validated.variations.colors,
-            sizes: validated.variations.sizes,
-            specs: validated.variations.specs,
+            // ✅ FIXED: Convert JSON to strings for SQLite
+            colors: validated.variations.colors ? JSON.stringify(validated.variations.colors) : "[]",
+            sizes: validated.variations.sizes ? JSON.stringify(validated.variations.sizes) : "[]",
+            specs: validated.variations.specs ? JSON.stringify(validated.variations.specs) : "{}",
           }],
         },
       },
@@ -162,18 +166,22 @@ export async function POST(request: NextRequest) {
     console.log(`✅ Product created: ${product.id}`);
     return NextResponse.json({ product }, { status: 201 });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      console.error("❌ Validation error:", error.errors);
-      return NextResponse.json(
-        { error: "Validation failed", details: error.errors }, 
-        { status: 400 }
-      );
-    }
-    
-    console.error("❌ POST /api/products error:", error);
+  if (error instanceof z.ZodError) {
+    // ✅ FIXED: Proper ZodError typing
+    console.error("❌ Validation error:", error.issues);
     return NextResponse.json(
-      { error: "Failed to create product" }, 
-      { status: 500 }
+      { 
+        error: "Validation failed", 
+        details: error.issues 
+      }, 
+      { status: 400 }
     );
   }
+  
+  console.error("❌ POST /api/products error:", error);
+  return NextResponse.json(
+    { error: "Failed to create product" }, 
+    { status: 500 }
+  );
+}
 }

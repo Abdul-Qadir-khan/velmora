@@ -213,16 +213,25 @@ export default function ShopSection() {
   }, []);
 
   const handleAddToCart = useCallback((product: Product) => {
+    const firstVariation = product.variations[0];
+
+    // ✅ FORCE cast to string before parsing
+    const sizesRaw = (firstVariation?.sizes as any) as string;
+    const colorsRaw = (firstVariation?.colors as any) as string;
+
+    const sizes = sizesRaw ? JSON.parse(sizesRaw) as string[] : [];
+    const colors = colorsRaw ? JSON.parse(colorsRaw) as string[] : [];
+
     addToCart({
       id: Number(product.id),
       name: product.name || "Unknown Product",
       price: Number(product.price),
       qty: 1,
-      images: Array.isArray(product.images) && product.images.length > 0
+      images: Array.isArray(product.images)
         ? product.images
-        : ["/placeholder.png"],
-      selectedSize: product.size || "M",
-      selectedColor: product.color || "#000000",
+        : JSON.parse((product.images as any) || '[]'),
+      selectedSize: sizes[0] || "M",
+      selectedColor: colors[0] || "#000000",
     });
 
     toast.success(`${product.name} added to cart! 🛒`);

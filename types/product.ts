@@ -1,29 +1,37 @@
+// ✅ UPDATED types/product.ts
 export interface Product {
-  id: number;
+  id: string;  // Prisma uses String @id
   name: string;
   slug: string;
   description?: string;
   price: number;
   originalPrice?: number;
   stock: number;
-  rating?: number;
+  rating: number;
   category: string;
-  images: string | string[];
-  brand?: {
-    id: number;
+  isNew: boolean;
+  bestSeller: boolean;
+  images: string[];  // Always array
+  brand: {
+    id: string;
     name: string;
+    logo?: string;
   };
-  
-  // ✅ FIX: Proper variations type
-  variations?: {
-    sizes?: string[];
-    colors?: string[];
-    [key: string]: any;
+  variations: {
+    id: string;
+    colors: string[];
+    sizes: string[];
+    specs: {
+      material?: string;
+      fit?: string;
+      sleeve?: string;
+      pattern?: string;
+      washing?: string;
+    };
   }[];
-  
-  size?: string;
-  color?: string;
-  isNew?: boolean;
-  bestSeller?: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
   createdAt?: string;
+  updatedAt?: string;
 }

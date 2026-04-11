@@ -13,12 +13,12 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      <section className="pt-24 pb-20 bg-gradient-to-r from-blue-600/10 via-purple-600/5 to-indigo-600/10">
+      <section className="pt-24 pb-20 bg-gradient-to-r from-slate-800 via-gray-800 to-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-slate-900 via-gray-800 to-slate-900 bg-clip-text text-transparent mb-6">
+          <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-slate-100 via-gray-100 to-slate-300 bg-clip-text text-transparent mb-2">
             Our Collection
           </h1>
-          <p className="text-xl md:text-2xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
             Discover premium quality products curated just for you
           </p>
         </div>

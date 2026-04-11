@@ -12,24 +12,24 @@ datasource db {
 //  PRODUCT MODEL (ENHANCED)
 // ==============================
 model Product {
-  id            String    @id @default(cuid())
+  id            String  @id @default(cuid())
   name          String
-  slug          String    @unique
+  slug          String  @unique
   description   String?
   price         Float
   originalPrice Float?
-  stock         Int       @default(0)
-  rating        Float     @default(0)
+  stock         Int     @default(0)
+  rating        Float   @default(0)
   category      String
-  isNew         Boolean   @default(false)
-  bestSeller    Boolean   @default(false)
-  images        Json?     // ✅ Fixed: Use Json instead of String
+  isNew         Boolean @default(false)
+  bestSeller    Boolean @default(false)
+  images        String? // ✅ FIXED: Json → String (SQLite compatible)
 
-  brandId       String
-  brand         Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  brandId String
+  brand   Brand  @relation(fields: [brandId], references: [id], onDelete: Cascade)
 
-  variations    Variation[]
-  cartItems     CartItem[]
+  variations Variation[]
+  cartItems  CartItem[]
 
   seoTitle       String?
   seoDescription String?
@@ -43,9 +43,9 @@ model Product {
 //  BRAND MODEL
 // ==============================
 model Brand {
-  id    String   @id @default(cuid())
-  name  String   @unique
-  logo  String?
+  id   String  @id @default(cuid())
+  name String  @unique
+  logo String?
 
   products Product[]
 }
@@ -55,9 +55,9 @@ model Brand {
 // ==============================
 model Variation {
   id     String @id @default(cuid())
-  colors Json   // ✅ CHANGED: String → Json
-  sizes  Json   // ✅ CHANGED: String → Json
-  specs  Json   // ✅ CHANGED: String → Json
+  colors String // ✅ FIXED: Json → String (SQLite compatible)
+  sizes  String // ✅ FIXED: Json → String (SQLite compatible)
+  specs  String // ✅ FIXED: Json → String (SQLite compatible)
 
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -69,12 +69,12 @@ model Variation {
 //  CART ITEM
 // ==============================
 model CartItem {
-  id        String   @id @default(cuid())
+  id        String @id @default(cuid())
   userId    String
   productId String
-  quantity  Int      @default(1)
+  quantity  Int    @default(1)
 
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

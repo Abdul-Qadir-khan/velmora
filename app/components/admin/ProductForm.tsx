@@ -37,50 +37,50 @@ export default function ProductForm({ initialData }: ProductFormProps) {
 
   const initialFormData = initialData
     ? {
-        ...initialData,
-        slug: initialData.slug || "",
-        images: initialData.images ? JSON.parse(initialData.images) : [],
-        variations: {
-          colors: initialData.variations?.[0]?.colors ? JSON.parse(initialData.variations[0].colors) : [],
-          sizes: initialData.variations?.[0]?.sizes ? JSON.parse(initialData.variations[0].sizes) : [],
-          specs: initialData.variations?.[0]?.specs 
-            ? JSON.parse(initialData.variations[0].specs)
-            : { material: "", fit: "", sleeve: "", pattern: "", washing: "" },
-        },
-        brand: initialData.brand || { name: "", logo: "" },
-        seo: {
-          title: initialData.seoTitle || "",
-          description: initialData.seoDescription || "",
-          keywords: initialData.seoKeywords || "",
-        },
-      }
+      ...initialData,
+      slug: initialData.slug || "",
+      images: initialData.images ? JSON.parse(initialData.images) : [],
+      variations: {
+        colors: initialData.variations?.[0]?.colors ? JSON.parse(initialData.variations[0].colors) : [],
+        sizes: initialData.variations?.[0]?.sizes ? JSON.parse(initialData.variations[0].sizes) : [],
+        specs: initialData.variations?.[0]?.specs
+          ? JSON.parse(initialData.variations[0].specs)
+          : { material: "", fit: "", sleeve: "", pattern: "", washing: "" },
+      },
+      brand: initialData.brand || { name: "", logo: "" },
+      seo: {
+        title: initialData.seoTitle || "",
+        description: initialData.seoDescription || "",
+        keywords: initialData.seoKeywords || "",
+      },
+    }
     : {
-        name: "",
-        slug: "",
-        description: "",
-        price: 0,
-        originalPrice: 0,
-        stock: 0,
-        rating: 0,
-        category: "t-shirts",
-        isNew: false,
-        bestSeller: false,
-        images: [],
-        brand: { name: "", logo: "" },
-        variations: {
-          colors: [],
-          sizes: [],
-          specs: { material: "", fit: "", sleeve: "", pattern: "", washing: "" },
-        },
-        seo: { title: "", description: "", keywords: "" },
-      };
+      name: "",
+      slug: "",
+      description: "",
+      price: 0,
+      originalPrice: 0,
+      stock: 0,
+      rating: 0,
+      category: "t-shirts",
+      isNew: false,
+      bestSeller: false,
+      images: [],
+      brand: { name: "", logo: "" },
+      variations: {
+        colors: [],
+        sizes: [],
+        specs: { material: "", fit: "", sleeve: "", pattern: "", washing: "" },
+      },
+      seo: { title: "", description: "", keywords: "" },
+    };
 
   const [form, setForm] = useState(initialFormData);
   const [imageFiles, setImageFiles] = useState<ImageFile[]>([]);
   const [brandLogoFile, setBrandLogoFile] = useState<File | null>(null);
   const [brandLogoPreview, setBrandLogoPreview] = useState<string>("");
 
-  // Auto-generate slug from name
+  // ✅ FIXED: Type 'prev' parameter
   useEffect(() => {
     if (form.name && !initialData) {
       const slug = form.name
@@ -89,7 +89,8 @@ export default function ProductForm({ initialData }: ProductFormProps) {
         .replace(/[^\w\s-]/g, '')
         .replace(/[\s_-]+/g, '-')
         .replace(/^-+|-+$/g, '');
-      setForm(prev => ({ ...prev, slug }));
+
+      setForm((prev: typeof form) => ({ ...prev, slug }));
     }
   }, [form.name, initialData]);
 
@@ -165,7 +166,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     if (e.dataTransfer.files) {
       const files = Array.from(e.dataTransfer.files).slice(0, 5 - imageFiles.length);
       files.forEach(file => {
@@ -205,15 +206,23 @@ export default function ProductForm({ initialData }: ProductFormProps) {
     });
   };
 
-  // Handle brand logo
+  // ✅ FIXED: Explicitly type 'prev'
   const handleBrandLogoDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    const file = e.dataTransfer.files[0];
+    const file = e.dataTransfer!.files[0];
     if (file && file.type.startsWith('image/') && file.size < 2 * 1024 * 1024) {
       setBrandLogoFile(file);
       const preview = URL.createObjectURL(file);
       setBrandLogoPreview(preview);
-      setForm(prev => ({ ...prev, brand: { ...prev.brand, logo: '' } }));
+
+      // ✅ FIXED: Type 'prev' parameter
+      setForm((prev: typeof form) => ({
+        ...prev,
+        brand: {
+          ...prev.brand,
+          logo: preview  // Store preview URL as string
+        }
+      }));
     }
   };
 
@@ -223,8 +232,18 @@ export default function ProductForm({ initialData }: ProductFormProps) {
       setBrandLogoFile(file);
       const preview = URL.createObjectURL(file);
       setBrandLogoPreview(preview);
-      setForm(prev => ({ ...prev, brand: { ...prev.brand, logo: '' } }));
+
+      // ✅ FIXED: Type 'prev' parameter
+      setForm((prev: typeof form) => ({
+        ...prev,
+        brand: {
+          ...prev.brand,
+          logo: preview  // Better: store preview URL
+        }
+      }));
     }
+
+    // ✅ Reset input
     e.target.value = '';
   };
 
@@ -240,20 +259,29 @@ export default function ProductForm({ initialData }: ProductFormProps) {
     }
   };
 
+  // ✅ Option 1: Full type-safe version (Recommended)
   const handleNestedChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, 
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     path: (keyof typeof form | string)[]
   ) => {
     const value = e.target.value;
     setError("");
-    setForm(prev => {
-      const updated = { ...prev } as any;
-      let obj: any = updated;
+
+    setForm((prev: typeof form) => {
+      // ✅ Type-safe deep update
+      const updated = { ...prev };
+      let current: any = updated;
+
+      // Navigate to nested object
       for (let i = 0; i < path.length - 1; i++) {
-        obj = obj[path[i]];
+        current[path[i]] = { ...current[path[i]] };
+        current = current[path[i]];
       }
-      obj[path[path.length - 1]] = value;
-      return updated;
+
+      // Update leaf value
+      current[path[path.length - 1]] = value;
+
+      return updated as typeof form;
     });
   };
 
@@ -286,7 +314,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
         return;
       }
 
-      let allImageUrls: string[] = form.images.filter((url: string) => 
+      let allImageUrls: string[] = form.images.filter((url: string) =>
         typeof url === 'string' && url && !url.startsWith('blob:')
       );
 
@@ -335,7 +363,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
 
       const res = await fetch(url, {
         method,
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
@@ -437,57 +465,57 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Price ($)</label>
-                    <input 
-                      name="price" 
-                      type="number" 
+                    <input
+                      name="price"
+                      type="number"
                       min="0.01"
                       step="0.01"
-                      value={form.price} 
-                      onChange={handleChange} 
-                      className="w-full p-4 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all bg-white/50" 
+                      value={form.price}
+                      onChange={handleChange}
+                      className="w-full p-4 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all bg-white/50"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Original Price ($)</label>
-                    <input 
-                      name="originalPrice" 
-                      type="number" 
+                    <input
+                      name="originalPrice"
+                      type="number"
                       min="0.01"
                       step="0.01"
-                      value={form.originalPrice} 
-                      onChange={handleChange} 
+                      value={form.originalPrice}
+                      onChange={handleChange}
                       placeholder="0"
-                      className="w-full p-4 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-orange-100 focus:border-orange-400 transition-all bg-white/50" 
+                      className="w-full p-4 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-orange-100 focus:border-orange-400 transition-all bg-white/50"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Stock</label>
-                    <input 
-                      name="stock" 
-                      type="number" 
+                    <input
+                      name="stock"
+                      type="number"
                       min="0"
-                      value={form.stock} 
-                      onChange={handleChange} 
-                      className="w-full p-4 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all bg-white/50" 
+                      value={form.stock}
+                      onChange={handleChange}
+                      className="w-full p-4 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all bg-white/50"
                     />
                   </div>
                   <div className="md:col-span-2 lg:col-span-1">
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Rating</label>
-                    <input 
-                      name="rating" 
-                      type="number" 
+                    <input
+                      name="rating"
+                      type="number"
                       step="0.1"
                       min="0"
                       max="5"
                       placeholder="4.5"
-                      value={form.rating} 
-                      onChange={handleChange} 
-                      className="w-full p-4 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-yellow-100 focus:border-yellow-400 transition-all bg-white/50" 
+                      value={form.rating}
+                      onChange={handleChange}
+                      className="w-full p-4 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-yellow-100 focus:border-yellow-400 transition-all bg-white/50"
                     />
                   </div>
                 </div>
 
-                                {/* Flags */}
+                {/* Flags */}
                 <div className="flex gap-6 p-4 bg-blue-50 rounded-2xl">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" name="isNew" checked={form.isNew} onChange={handleChange} className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500" />
@@ -520,11 +548,10 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                     Product Images ({imageFiles.length}/5)
                   </label>
                   <div
-                    className={`relative border-3 border-dashed rounded-3xl p-8 text-center transition-all duration-300 cursor-pointer hover:shadow-xl ${
-                      dragActive
-                        ? "border-blue-400 bg-blue-50 shadow-2xl"
-                        : "border-gray-300 hover:border-gray-400 bg-white/50"
-                    }`}
+                    className={`relative border-3 border-dashed rounded-3xl p-8 text-center transition-all duration-300 cursor-pointer hover:shadow-xl ${dragActive
+                      ? "border-blue-400 bg-blue-50 shadow-2xl"
+                      : "border-gray-300 hover:border-gray-400 bg-white/50"
+                      }`}
                     onDragEnter={handleDrag}
                     onDragLeave={handleDrag}
                     onDragOver={handleDrag}
@@ -577,14 +604,14 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                 {/* Brand Section */}
                 <div className="space-y-4 p-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-3xl border-2 border-emerald-100">
                   <h3 className="text-lg font-bold text-emerald-900 flex items-center gap-2">🏷️ Brand</h3>
-                  
+
                   <input
                     placeholder="Brand Name (e.g. Nike, Adidas)"
                     value={form.brand.name}
                     onChange={(e) => handleNestedChange(e, ["brand", "name"])}
                     className="w-full p-4 border border-emerald-200 rounded-2xl focus:ring-4 focus:ring-emerald-100 focus:border-emerald-400 transition-all bg-white/70"
                   />
-                  
+
                   <div
                     className="relative border-2 border-dashed border-emerald-300 rounded-2xl p-6 text-center hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white/50"
                     onClick={() => brandLogoInputRef.current?.click()}
@@ -627,7 +654,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
               {/* Variations */}
               <div className="space-y-4 p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-3xl border-2 border-purple-100">
                 <h3 className="text-lg font-bold text-purple-900 flex items-center gap-2">🎨 Variations</h3>
-                
+
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-semibold text-purple-800 mb-3">Colors</h4>
@@ -729,7 +756,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                   <span className="text-sm font-medium text-blue-900">{uploadProgress}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div 
+                  <div
                     className="bg-gradient-to-r from-blue-600 to-purple-600 h-3 rounded-full transition-all duration-300 shadow-lg"
                     style={{ width: `${uploadProgress}%` }}
                   />
