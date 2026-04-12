@@ -61,3 +61,32 @@ main {
 @media (min-width: 768px) {
   /* main { padding-top: 80px; } */
 }
+
+/* Perfect Hidden Scrollbar - Fixed Syntax */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome Safari */
+}
+
+/* Subtle hover scrollbar */
+.scrollbar-hide:hover::-webkit-scrollbar {
+  display: block !important;
+  width: 4px;
+}
+
+.scrollbar-hide:hover::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-hide:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.scrollbar-hide:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}

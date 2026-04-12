@@ -121,7 +121,7 @@ export default function RootLayout({
         <CartProvider>
           <WishlistProvider>
             {/* ✅ FIXED: Added proper flex + bg + no gaps */}
-            <div className="flex flex-col min-h-dvh bg-white">
+            <div className="flex flex-col min-h-dvh bg-black">
               <Navbar />
               {/* ✅ FIXED: Proper main flex + full height */}
               <main className="flex-1 flex flex-col min-h-[calc(100dvh-140px)]">

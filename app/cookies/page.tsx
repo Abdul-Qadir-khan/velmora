@@ -1,50 +1,48 @@
 "use client";
 
 import Link from "next/link";
-import { 
+import {
   // CookieIcon,
   ShieldCheckIcon,
   ChartBarIcon,
   HeartIcon,
   Cog8ToothIcon,
   ArrowRightIcon,
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  InformationCircleIcon
+  CheckCircleIcon
 } from "@heroicons/react/24/outline";
 
 export default function CookiesPolicy() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800">
-      
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 pb-12">
+
       {/* Hero Section - Dark Black Banner */}
       <section className="relative overflow-hidden bg-gradient-to-br from-black via-slate-900 to-gray-900 text-white pt-32 pb-28 px-6 lg:px-8">
         {/* Subtle background pattern */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-800/30 via-transparent to-transparent"></div>
-        
+
         <div className="relative max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/20 mb-8">
             {/* <CookieIcon className="w-7 h-7" /> */}
             <span className="font-semibold text-lg">Cookie Policy</span>
           </div>
-          
+
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent mb-6 leading-tight">
             Cookie Policy
           </h1>
-          
+
           <p className="text-xl md:text-2xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
             Transparent information about how we use cookies to enhance your experience
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
+            <Link
               href="#manage"
               className="px-8 py-4 bg-white text-slate-900 font-bold rounded-2xl shadow-2xl hover:shadow-white/50 hover:bg-slate-100 transition-all duration-300 flex items-center gap-2"
             >
               <Cog8ToothIcon className="w-5 h-5" />
               Manage Cookies
             </Link>
-            <Link 
+            <Link
               href="#types"
               className="px-8 py-4 border-2 border-white/30 backdrop-blur-sm font-semibold rounded-2xl hover:bg-white/20 transition-all duration-300"
             >
@@ -57,37 +55,59 @@ export default function CookiesPolicy() {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-6 lg:px-8 -mt-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          
-          {/* Slim Navigation */}
-          <div className="lg:col-span-1 lg:sticky lg:top-32 lg:h-[calc(100vh-8rem)] lg:overflow-y-auto">
-            <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl">
-              <h3 className="text-xl font-bold text-white mb-6">Quick Navigation</h3>
-              <nav className="space-y-2">
-                {[
-                  { href: "#intro", title: "What are Cookies?" },
-                  { href: "#types", title: "Cookie Types" },
-                  { href: "#essential", title: "Essential" },
-                  { href: "#analytics", title: "Analytics" },
-                  { href: "#marketing", title: "Marketing" },
-                  { href: "#manage", title: "Manage Preferences" },
-                  { href: "#faq", title: "FAQ" }
-                ].map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="group flex items-center gap-3 p-3 rounded-xl text-slate-300 hover:bg-white/10 hover:text-white font-medium transition-all duration-200"
-                  >
-                    <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full scale-0 group-hover:scale-100 transition-transform"></div>
-                    <span>{item.title}</span>
-                  </Link>
-                ))}
-              </nav>
+
+          {/* Perfect Slim Cookie Navigation */}
+          <div className="lg:col-span-1 lg:sticky lg:top-32 lg:h-fit lg:overflow-hidden">
+            <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-xl hover:shadow-blue-500/10 transition-all h-full flex flex-col relative group">
+
+              {/* Minimal Header */}
+              <h3 className="text-lg font-bold text-white mb-6 tracking-tight flex items-center gap-2 flex-shrink-0">
+                <span className="w-6 h-6 bg-gradient-to-r from-blue-400 to-purple-400 rounded-lg flex items-center justify-center text-xs font-bold shadow-md">🍪</span>
+                Quick Navigation
+              </h3>
+
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto scrollbar-hide pr-1">
+                <nav className="space-y-2 pb-4">
+                  {[
+                    { href: "#intro", title: "What are Cookies?" },
+                    { href: "#types", title: "Cookie Types" },
+                    { href: "#essential", title: "Essential" },
+                    { href: "#analytics", title: "Analytics" },
+                    { href: "#marketing", title: "Marketing" },
+                    { href: "#manage", title: "Manage Preferences" },
+                    { href: "#faq", title: "FAQ" }
+                  ].map((item, index) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="group flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300 hover:bg-white/10 hover:text-white font-medium transition-all duration-200 hover:-translate-x-1 border-r-4 border-transparent hover:border-blue-400 pr-4"
+                    >
+                      {/* Animated Dot */}
+                      <div className="w-2 h-2 bg-slate-400 rounded-full scale-75 group-hover:scale-100 group-hover:bg-blue-400 transition-all"></div>
+
+                      {/* Number Badge */}
+                      <span className="w-5 h-5 bg-slate-800/50 text-xs font-bold rounded-full flex items-center justify-center group-hover:bg-blue-500/80 group-hover:text-white transition-all opacity-70 group-hover:opacity-100 ml-1 flex-shrink-0">
+                        {index + 1}
+                      </span>
+
+                      {/* Title */}
+                      <span className="flex-1 min-w-0 truncate">{item.title}</span>
+
+                      {/* Arrow */}
+                      <svg className="w-4 h-4 text-slate-500 opacity-0 group-hover:opacity-100 transition-all ml-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  ))}
+                </nav>
+              </div>
             </div>
           </div>
 
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-12">
-            
+
             {/* Intro */}
             <section id="intro" className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl">
               <div className="flex items-start gap-4 mb-6">
@@ -98,7 +118,7 @@ export default function CookiesPolicy() {
                 </div>
               </div>
               <p className="text-lg text-slate-300 leading-relaxed max-w-2xl">
-                Cookies are small text files stored on your device. They help us remember your preferences, 
+                Cookies are small text files stored on your device. They help us remember your preferences,
                 keep you logged in, and analyze how you use our site to improve your experience.
               </p>
             </section>
@@ -186,7 +206,7 @@ export default function CookiesPolicy() {
                       <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                     </label>
                   </div>
-                  
+
                   <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
                     <div>
                       <h4 className="font-semibold text-white">Marketing Cookies</h4>
@@ -197,9 +217,9 @@ export default function CookiesPolicy() {
                       <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
                     </label>
                   </div>
-                  
+
                   <div className="pt-6 border-t border-white/10">
-                    <Link 
+                    <Link
                       href="#"
                       className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-2xl hover:bg-blue-700 transition-all duration-200"
                     >
@@ -235,7 +255,7 @@ export default function CookiesPolicy() {
                 <p className="text-slate-400 mb-8 max-w-md mx-auto">
                   Contact our support team for any cookie-related questions
                 </p>
-                <Link 
+                <Link
                   href="/contact"
                   className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
                 >

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { 
+import {
   DocumentTextIcon,
   ShieldCheckIcon,
   ScaleIcon,
@@ -16,42 +16,42 @@ import {
 
 export default function TermsOfService() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800">
-      
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 pb-12">
+
       {/* Hero Section - Dark Black Banner */}
       <section className="relative overflow-hidden bg-gradient-to-br from-black via-slate-900 to-gray-900 text-white pt-32 pb-28 px-6 lg:px-8">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-800/30 via-transparent to-transparent"></div>
-        
+
         <div className="relative max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm px-6 py-3 rounded-2xl border border-white/20 mb-8">
             <DocumentTextIcon className="w-7 h-7" />
             <span className="font-semibold text-lg">Terms of Service</span>
           </div>
-          
+
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent mb-6 leading-tight">
             Terms of Service
           </h1>
-          
+
           <p className="text-xl md:text-2xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
             Please read these terms carefully before using our services
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
+            <Link
               href="#acceptance"
               className="px-8 py-4 bg-white text-slate-900 font-bold rounded-2xl shadow-2xl hover:shadow-white/50 hover:bg-slate-100 transition-all duration-300 flex items-center gap-2"
             >
               <CheckCircleIcon className="w-5 h-5" />
               I Accept
             </Link>
-            <Link 
+            <Link
               href="#overview"
               className="px-8 py-4 border-2 border-white/30 backdrop-blur-sm font-semibold rounded-2xl hover:bg-white/20 transition-all duration-300"
             >
               Read Terms
             </Link>
           </div>
-          
+
           <p className="text-sm text-slate-500 mt-8">
             Last updated: December 2024
           </p>
@@ -61,41 +61,63 @@ export default function TermsOfService() {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-6 lg:px-8 -mt-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          
-          {/* Slim Navigation */}
-          <div className="lg:col-span-1 lg:sticky lg:top-32 lg:h-[calc(100vh-8rem)] lg:overflow-y-auto">
-            <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl">
-              <h3 className="text-xl font-bold text-white mb-6">Table of Contents</h3>
-              <nav className="space-y-2">
-                {[
-                  { href: "#overview", title: "Overview" },
-                  { href: "#acceptance", title: "Acceptance of Terms" },
-                  { href: "#user-account", title: "User Accounts" },
-                  { href: "#services", title: "Our Services" },
-                  { href: "#payments", title: "Payments & Billing" },
-                  { href: "#content", title: "User Content" },
-                  { href: "#prohibited", title: "Prohibited Activities" },
-                  { href: "#termination", title: "Termination" },
-                  { href: "#liability", title: "Limitation of Liability" },
-                  { href: "#governing", title: "Governing Law" },
-                  { href: "#contact", title: "Contact Us" }
-                ].map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="group flex items-center gap-3 p-3 rounded-xl text-slate-300 hover:bg-white/10 hover:text-white font-medium transition-all duration-200"
-                  >
-                    <div className="w-2 h-2 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full scale-0 group-hover:scale-100 transition-transform"></div>
-                    <span>{item.title}</span>
-                  </Link>
-                ))}
-              </nav>
+
+          {/* Perfect Slim TOC Navigation */}
+          <div className="lg:col-span-1 lg:sticky lg:top-32 lg:h-[calc(100vh-8rem)] lg:overflow-hidden">
+            <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-xl hover:shadow-emerald-500/10 transition-all h-full flex flex-col relative group">
+
+              {/* Minimal Header */}
+              <h3 className="text-lg font-bold text-white mb-6 tracking-tight flex items-center gap-2 flex-shrink-0">
+                <span className="w-6 h-6 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-lg flex items-center justify-center text-xs font-bold shadow-md">T</span>
+                Table of Contents
+              </h3>
+
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto scrollbar-hide pr-1">
+                <nav className="space-y-2 pb-4">
+                  {[
+                    { href: "#overview", title: "Overview" },
+                    { href: "#acceptance", title: "Acceptance of Terms" },
+                    { href: "#user-account", title: "User Accounts" },
+                    { href: "#services", title: "Our Services" },
+                    { href: "#payments", title: "Payments & Billing" },
+                    { href: "#content", title: "User Content" },
+                    { href: "#prohibited", title: "Prohibited Activities" },
+                    { href: "#termination", title: "Termination" },
+                    { href: "#liability", title: "Limitation of Liability" },
+                    { href: "#governing", title: "Governing Law" },
+                    { href: "#contact", title: "Contact Us" }
+                  ].map((item, index) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="group flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300 hover:bg-white/10 hover:text-white font-medium transition-all duration-200 hover:-translate-x-1 border-r-4 border-transparent hover:border-emerald-400 pr-4"
+                    >
+                      {/* Animated Dot */}
+                      <div className="w-2 h-2 bg-slate-400 rounded-full scale-75 group-hover:scale-100 group-hover:bg-emerald-400 transition-all"></div>
+
+                      {/* Number Badge */}
+                      <span className="w-5 h-5 bg-slate-800/50 text-xs font-bold rounded-full flex items-center justify-center group-hover:bg-emerald-500/80 group-hover:text-white transition-all opacity-70 group-hover:opacity-100 ml-1 flex-shrink-0">
+                        {index + 1}
+                      </span>
+
+                      {/* Title */}
+                      <span className="flex-1 min-w-0 truncate">{item.title}</span>
+
+                      {/* Arrow */}
+                      <svg className="w-4 h-4 text-slate-500 opacity-0 group-hover:opacity-100 transition-all ml-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  ))}
+                </nav>
+              </div>
             </div>
           </div>
 
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-12 prose prose-invert max-w-none">
-            
+
             {/* Overview */}
             <section id="overview" className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl">
               <div className="flex items-start gap-4 mb-6">
@@ -107,8 +129,8 @@ export default function TermsOfService() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-lg text-slate-300 leading-relaxed">
                 <div>
                   <p className="mb-6">
-                    Welcome to our platform. These Terms of Service ("Terms") govern your access to and use 
-                    of our website and services ("Services"). By accessing or using our Services, you agree 
+                    Welcome to our platform. These Terms of Service ("Terms") govern your access to and use
+                    of our website and services ("Services"). By accessing or using our Services, you agree
                     to be bound by these Terms.
                   </p>
                   <p>
@@ -153,7 +175,7 @@ export default function TermsOfService() {
                   <div className="bg-white/10 p-6 rounded-2xl border border-white/20">
                     <h4 className="font-bold text-white mb-4">Changes to Terms</h4>
                     <p className="text-slate-400 mb-4">
-                      We may update these Terms from time to time. Continued use after changes 
+                      We may update these Terms from time to time. Continued use after changes
                       constitutes acceptance of the revised Terms.
                     </p>
                     <Link href="#contact" className="text-blue-400 hover:text-blue-300 font-semibold">
@@ -180,7 +202,7 @@ export default function TermsOfService() {
                 <div className="bg-white/5 backdrop-blur-md rounded-2xl p-8 border border-white/10">
                   <h3 className="text-xl font-bold text-white mb-4">Account Security</h3>
                   <p className="text-slate-300 mb-4">
-                    You are responsible for maintaining the confidentiality of your account 
+                    You are responsible for maintaining the confidentiality of your account
                     and password. Notify us immediately of any unauthorized use.
                   </p>
                   <div className="flex gap-2">
@@ -196,7 +218,7 @@ export default function TermsOfService() {
               <h2 className="text-3xl font-bold text-white mb-6">4. Our Services</h2>
               <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
                 <p className="text-lg text-slate-300 mb-8">
-                  We provide an online platform for purchasing goods. Services are provided "as is" 
+                  We provide an online platform for purchasing goods. Services are provided "as is"
                   without warranties of any kind, express or implied.
                 </p>
                 <div className="grid md:grid-cols-3 gap-6">
@@ -228,12 +250,12 @@ export default function TermsOfService() {
                   <h3 className="text-2xl font-bold text-white">Important Legal Notice</h3>
                 </div>
                 <p className="text-lg text-slate-200 mb-6 leading-relaxed">
-                  To the maximum extent permitted by law, we shall not be liable for any indirect, 
+                  To the maximum extent permitted by law, we shall not be liable for any indirect,
                   incidental, special, consequential or punitive damages, including loss of profits.
                 </p>
                 <div className="bg-white/10 p-6 rounded-xl border border-white/20">
                   <p className="text-slate-300 text-sm">
-                    <strong>Our total liability</strong> shall not exceed the amount you paid us in the 
+                    <strong>Our total liability</strong> shall not exceed the amount you paid us in the
                     twelve (12) months preceding the claim.
                   </p>
                 </div>
@@ -247,14 +269,14 @@ export default function TermsOfService() {
                 <div>
                   <h3 className="text-xl font-bold text-white mb-4">Jurisdiction</h3>
                   <p className="text-slate-300">
-                    These Terms are governed by the laws of the State of Delaware, USA, without regard 
+                    These Terms are governed by the laws of the State of Delaware, USA, without regard
                     to conflict of law principles.
                   </p>
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white mb-4">Dispute Resolution</h3>
                   <p className="text-slate-300">
-                    Any disputes shall be resolved exclusively in the state or federal courts located 
+                    Any disputes shall be resolved exclusively in the state or federal courts located
                     in Delaware. You consent to the personal jurisdiction of these courts.
                   </p>
                 </div>
@@ -268,7 +290,7 @@ export default function TermsOfService() {
                 <p className="text-xl text-slate-300 mb-10 max-w-2xl mx-auto leading-relaxed">
                   Our support team is ready to answer any questions you may have about our Terms of Service.
                 </p>
-                <Link 
+                <Link
                   href="/contact"
                   className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xl rounded-2xl shadow-2xl hover:shadow-emerald-500/50 hover:scale-105 transition-all duration-300"
                 >

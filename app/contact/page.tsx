@@ -323,7 +323,7 @@ export default function Contact() {
                   <div className="flex-1 min-w-0">
                     <h4 className="text-xl font-bold text-gray-900 mb-1">Visit Our Store</h4>
                     <p className="text-gray-600 leading-relaxed">
-                      C-302/2, Kalyan-Jafrabad<br className="sm:hidden" />
+                      C-302/2, Kalyan-Jafrabad <br className="sm:hidden" />
                       New Delhi, India
                     </p>
                   </div>

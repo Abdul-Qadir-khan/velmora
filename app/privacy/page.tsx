@@ -16,7 +16,7 @@ import {
 
 export default function PrivacyPolicy() {
   return (
-    <div className="bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800">
+    <div className="bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 pb-12">
       
       {/* Hero Section - Dark Black Banner */}
       <section className="relative overflow-hidden bg-gradient-to-br from-black via-slate-900 to-gray-900 text-white pt-32 pb-28 px-6 lg:px-8">
@@ -62,36 +62,51 @@ export default function PrivacyPolicy() {
       <div className="max-w-6xl mx-auto px-6 lg:px-8 -mt-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
-          {/* Slim Navigation */}
-          <div className="lg:col-span-1 lg:sticky lg:top-32 lg:h-[calc(100vh-8rem)] lg:overflow-y-auto">
-            <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl">
-              <h3 className="text-xl font-bold text-white mb-6">Privacy Sections</h3>
-              <nav className="space-y-2">
-                {[
-                  { href: "#overview", title: "Information We Collect" },
-                  { href: "#data-collection", title: "How We Collect Data" },
-                  { href: "#data-use", title: "How We Use Data" },
-                  { href: "#data-sharing", title: "Data Sharing" },
-                  { href: "#cookies", title: "Cookies & Tracking" },
-                  { href: "#your-rights", title: "Your Privacy Rights" },
-                  { href: "#security", title: "Data Security" },
-                  { href: "#children", title: "Children's Privacy" },
-                  { href: "#international", title: "International Transfers" },
-                  { href: "#changes", title: "Policy Changes" },
-                  { href: "#contact", title: "Contact Privacy Team" }
-                ].map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="group flex items-center gap-3 p-3 rounded-xl text-slate-300 hover:bg-white/10 hover:text-white font-medium transition-all duration-200"
-                  >
-                    <div className="w-2 h-2 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full scale-0 group-hover:scale-100 transition-transform"></div>
-                    <span>{item.title}</span>
-                  </Link>
-                ))}
-              </nav>
-            </div>
-          </div>
+          {/* Perfect Slim Navigation - Fixed */}
+<div className="lg:col-span-1 lg:sticky lg:top-32 lg:h-[calc(100vh-8rem)] lg:overflow-hidden">
+  <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-xl hover:shadow-emerald-500/10 transition-all h-full flex flex-col relative group">
+    
+    {/* Header */}
+    <h3 className="text-lg font-bold text-white mb-6 tracking-tight flex items-center gap-2 flex-shrink-0">
+      <span className="w-6 h-6 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-lg flex items-center justify-center text-xs font-bold shadow-md">P</span>
+      Privacy Sections
+    </h3>
+
+    {/* Scrollable Content */}
+    <div className="flex-1 overflow-y-auto scrollbar-hide pr-1">
+      <nav className="space-y-2 pb-4">
+        {[
+          { href: "#overview", title: "Information We Collect" },
+          { href: "#data-collection", title: "How We Collect Data" },
+          { href: "#data-use", title: "How We Use Data" },
+          { href: "#data-sharing", title: "Data Sharing" },
+          { href: "#cookies", title: "Cookies & Tracking" },
+          { href: "#your-rights", title: "Your Privacy Rights" },
+          { href: "#security", title: "Data Security" },
+          { href: "#children", title: "Children's Privacy" },
+          { href: "#international", title: "International Transfers" },
+          { href: "#changes", title: "Policy Changes" },
+          { href: "#contact", title: "Contact Privacy Team" }
+        ].map((item, index) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="group flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300 hover:bg-white/10 hover:text-white font-medium transition-all duration-200 hover:-translate-x-1 border-r-4 border-transparent hover:border-emerald-400 pr-4"
+          >
+            <div className="w-2 h-2 bg-slate-400 rounded-full scale-75 group-hover:scale-100 group-hover:bg-emerald-400 transition-all"></div>
+            <span className="w-5 h-5 bg-slate-800/50 text-xs font-bold rounded-full flex items-center justify-center group-hover:bg-emerald-500/80 group-hover:text-white transition-all opacity-70 group-hover:opacity-100 ml-1 flex-shrink-0">
+              {index + 1}
+            </span>
+            <span className="flex-1 min-w-0 truncate">{item.title}</span>
+            <svg className="w-4 h-4 text-slate-500 opacity-0 group-hover:opacity-100 transition-all ml-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        ))}
+      </nav>
+    </div>
+  </div>
+</div>
 
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-12">
