@@ -71,7 +71,7 @@ export const metadata: Metadata = {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Lycoon WearFashion Collection",
+        alt: "Lycoonwear Fashion Collection",
       },
     ],
     locale: "en_US",
@@ -80,7 +80,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Lycoon WearFashion",
+    title: "Lycoonwear Fashion",
     description: "Premium streetwear & modern fashion essentials.",
     images: ["/og-image.jpg"],
   },

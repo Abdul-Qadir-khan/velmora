@@ -172,19 +172,19 @@ export default function About() {
             <div className="group p-6 sm:p-8 bg-white rounded-2xl sm:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:-translate-y-2 flex flex-col items-center text-center">
               <MapPinIcon className="w-10 h-10 sm:w-12 sm:h-12 text-indigo-600 mb-4 group-hover:scale-110 transition-transform" />
               <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Visit Us</h4>
-              <p className="text-gray-600 text-sm sm:text-base">123 Fashion St<br className="sm:hidden"/> Downtown, NYC</p>
+              <p className="text-gray-600 text-sm sm:text-base">C-302/2, Kalyan-Jafrabad<br className="sm:hidden"/> New Delhi, India</p>
             </div>
             
             <div className="group p-6 sm:p-8 bg-white rounded-2xl sm:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:-translate-y-2 flex flex-col items-center text-center">
               <PhoneIcon className="w-10 h-10 sm:w-12 sm:h-12 text-purple-600 mb-4 group-hover:scale-110 transition-transform" />
               <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Call Us</h4>
-              <p className="text-gray-600 text-sm sm:text-base">+1 (555) 123-4567</p>
+              <Link href="tel:7817835909" className="text-gray-600 text-sm sm:text-base">+91 781 7835 909</Link>
             </div>
             
             <div className="group p-6 sm:p-8 bg-white rounded-2xl sm:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:-translate-y-2 flex flex-col items-center text-center">
               <EnvelopeIcon className="w-10 h-10 sm:w-12 sm:h-12 text-pink-600 mb-4 group-hover:scale-110 transition-transform" />
               <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Email Us</h4>
-              <p className="text-gray-600 text-sm sm:text-base">hello@fashionstore.com</p>
+              <Link href="mailto:support@lycoonwear.com"  className="text-gray-600 text-sm sm:text-base">support@lycoonwear.com</Link>
             </div>
           </div>
 

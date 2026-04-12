@@ -12,7 +12,7 @@ import {
 
 export default function ShippingDelivery() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
@@ -22,7 +22,7 @@ export default function ShippingDelivery() {
       
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-20">
+        {/* <div className="text-center mb-20">
           <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full mb-8 border border-white/30 shadow-2xl">
             <TruckIcon className="w-6 h-6 text-blue-300" />
             <span className="text-lg font-semibold text-white/90">Free Shipping on Orders Above ₹999</span>
@@ -33,7 +33,7 @@ export default function ShippingDelivery() {
           <p className="text-xl md:text-2xl text-slate-200/90 max-w-3xl mx-auto leading-relaxed drop-shadow-lg">
             Reliable delivery from our local store in Noida. We ship across India.
           </p>
-        </div>
+        </div> */}
 
         <div className="grid lg:grid-cols-2 gap-12 mb-20">
           {/* Shipping Options */}
@@ -124,7 +124,7 @@ export default function ShippingDelivery() {
         </div>
 
         {/* Support Section */}
-        <section className="mb-24" aria-labelledby="support-heading">
+        {/* <section className="mb-24" aria-labelledby="support-heading">
           <div className="text-center mb-16">
             <h2 
               id="support-heading"
@@ -137,7 +137,7 @@ export default function ShippingDelivery() {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 text-center gap-8 max-w-6xl mx-auto">
             {[
               {
                 id: "whatsapp",
@@ -151,8 +151,8 @@ export default function ShippingDelivery() {
               {
                 id: "email",
                 title: "Email",
-                number: "khanabdulqadir781@gmail.com",
-                href: "mailto:khanabdulqadir781@gmail.com",
+                number: "support@lycoonwear.com",
+                href: "mailto:support@lycoonwear.com",
                 color: "from-blue-500/90 to-blue-600/90",
                 icon: EnvelopeIcon,
                 desc: "Reply within 24 hours",
@@ -193,7 +193,7 @@ export default function ShippingDelivery() {
               </div>
             ))}
           </div>
-        </section>
+        </section> */}
 
         {/* Final Note */}
         <div className="text-center p-12 bg-white/10 backdrop-blur-xl rounded-4xl shadow-3xl border border-white/20 max-w-4xl mx-auto">
@@ -222,7 +222,7 @@ export default function ShippingDelivery() {
         </div>
       </div>
 
-      <style jsx>{`
+      {/* <style jsx>{`
         @keyframes blob {
           0% {
             transform: translate(0px, 0px) scale(1);
@@ -246,7 +246,7 @@ export default function ShippingDelivery() {
         .animation-delay-4000 {
           animation-delay: 4s;
         }
-      `}</style>
+      `}</style> */}
     </div>
   );
 }

@@ -160,7 +160,6 @@ export default function ProductClient({
             )}
           </div>
 
-
         </div>
 
         {/* RIGHT: PRODUCT INFO */}
@@ -356,7 +355,7 @@ export default function ProductClient({
               className="flex gap-4 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory"
             >
               {normalizedRecommended.map((p) => (
-                <Link key={p.id} href={`/products/${p.slug}`}>
+                <Link key={p.id} href={`/shop/${p.slug}`}>
                   <div className="flex-shrink-0 w-40 md:w-48 bg-gray-50 p-4 rounded-xl text-center hover:shadow-lg hover:scale-105 transition snap-start cursor-pointer">
                     <img
                       src={p.images[0] || "/placeholder.png"}

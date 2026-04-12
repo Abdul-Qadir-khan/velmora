@@ -1,4 +1,5 @@
 "use client";
+import Link from 'next/link'
 
 import { useState, FormEvent, ChangeEvent } from "react";
 import {
@@ -299,7 +300,7 @@ export default function Contact() {
                     <XCircleIcon className="w-8 h-8 text-red-600 flex-shrink-0 mt-0.5" />
                     <div>
                       <h4 className="font-bold text-lg text-red-800 mb-1">Something went wrong!</h4>
-                      <p className="text-red-700">Please try again or email us directly at hello@fashionstore.com</p>
+                      <p className="text-red-700">Please try again or email us directly at support@lycoonwear.com</p>
                     </div>
                   </div>
                 </div>
@@ -322,8 +323,8 @@ export default function Contact() {
                   <div className="flex-1 min-w-0">
                     <h4 className="text-xl font-bold text-gray-900 mb-1">Visit Our Store</h4>
                     <p className="text-gray-600 leading-relaxed">
-                      123 Fashion Street<br className="sm:hidden" />
-                      Downtown, NYC 10001
+                      C-302/2, Kalyan-Jafrabad<br className="sm:hidden" />
+                      New Delhi, India
                     </p>
                   </div>
                 </div>
@@ -337,13 +338,13 @@ export default function Contact() {
                   <div className="flex-1 min-w-0">
                     <h4 className="text-xl font-bold text-gray-900 mb-1">Call Anytime</h4>
                     <p className="text-gray-600">
-                      <a
-                        href="tel:+15551234567"
+                      <Link
+                        href="tel:78178835909"
                         className="hover:text-indigo-600 transition-all duration-200 font-semibold hover:underline"
                         aria-label="Call us at +1 (555) 123-4567"
                       >
-                        +1 (555) 123-4567
-                      </a>
+                        +91 781 7835 909
+                      </Link>
                     </p>
                     <p className="text-sm text-gray-500 mt-1">Mon-Sat 9AM-8PM</p>
                   </div>
@@ -359,11 +360,11 @@ export default function Contact() {
                     <h4 className="text-xl font-bold text-gray-900 mb-1">Email Us</h4>
                     <p className="text-gray-600">
                       <a
-                        href="mailto:hello@fashionstore.com"
+                        href="mailto:support@lycoonwear.com"
                         className="hover:text-indigo-600 transition-all duration-200 font-semibold hover:underline break-all"
-                        aria-label="Email hello@fashionstore.com"
+                        aria-label="Email support@lycoonwear.com"
                       >
-                        hello@fashionstore.com
+                        support@lycoonwear.com
                       </a>
                     </p>
                   </div>
