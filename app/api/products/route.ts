@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
         isNew: validated.isNew ?? false,
         bestSeller: validated.bestSeller ?? false,
         // ✅ FIXED: Convert JSON arrays/objects to strings for SQLite
-        images: validated.images ? JSON.stringify(validated.images) : null,
+        images: validated.images ? JSON.stringify(validated.images) : "",
         seoTitle: validated.seo?.title || "",
         seoDescription: validated.seo?.description || "",
         seoKeywords: validated.seo?.keywords || "",
