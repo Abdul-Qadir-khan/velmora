@@ -6,7 +6,7 @@ export async function getProducts({ category }: { category?: string } = {}) {
     }
 
     // ✅ FIXED: Use your API route
-    const res = await fetch(`http://localhost:3000/api/products?${params.toString()}`, {
+    const res = await fetch(`/api/products?${params.toString()}`, {
       next: { revalidate: 3600 },
       cache: "force-cache",
     });
