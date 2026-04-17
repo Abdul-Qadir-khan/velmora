@@ -169,7 +169,7 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
   };
 
   return (
-    <section className="py-16 px-4 md:px-12 bg-gradient-to-t from-primary/5 to-transparent relative">
+    <section className="py-16 px-4 md:px-12 relative bg-white">
       <div className="max-w-7xl mx-auto w-full">
         {/* Header - UNCHANGED */}
         <div className="text-center mb-10 md:mb-16">
