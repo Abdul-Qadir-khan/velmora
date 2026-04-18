@@ -84,7 +84,7 @@ export default function LycoonWearFooter() {
       className="bg-[#050505] text-gray-400 text-xs md:text-sm tracking-wide opacity-0 translate-y-8 transition-all duration-1000"
     >
       {/* Main */}
-      <div className="max-w-7xl mx-auto px-6 md:px-20 pb-10 md:pb-14">
+      <div className="max-w-7xl mx-auto px-6 md:px-20 py-10 md:py-14">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12 items-start">
           
           {/* Brand */}
