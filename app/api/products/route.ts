@@ -103,10 +103,17 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil(total / limit) 
       }
     });
-  } catch (err) {
-    console.error("❌ GET /api/products error:", err);
-    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
-  }
+  } catch (err: any) {
+  console.error("❌ REAL ERROR:", err);
+
+  return NextResponse.json(
+    { 
+      error: err.message || "Unknown error",
+      stack: err.stack || null
+    },
+    { status: 500 }
+  );
+}
 }
 
 export async function POST(request: NextRequest) {
