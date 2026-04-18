@@ -63,12 +63,18 @@ export async function GET(request: NextRequest) {
 
     // ✅ FIXED: OR clause only when search exists (always array)
     if (search) {
-      whereClause.OR = [
-        { name: { contains: search, mode: "insensitive" } },
-        { description: { contains: search, mode: "insensitive" } },
-        { brand: { name: { contains: search, mode: "insensitive" } } }
-      ];
+  whereClause.OR = [
+    { name: { contains: search, mode: "insensitive" } },
+    { description: { contains: search, mode: "insensitive" } },
+    {
+      brand: {
+        is: {
+          name: { contains: search, mode: "insensitive" }
+        }
+      }
     }
+  ];
+}
 
     console.log(`🔍 API Filter: category="${category || 'all'}", search="${search}"`);
 
