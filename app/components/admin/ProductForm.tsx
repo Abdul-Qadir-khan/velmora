@@ -39,14 +39,30 @@ export default function ProductForm({ initialData }: ProductFormProps) {
     ? {
       ...initialData,
       slug: initialData.slug || "",
-      images: initialData.images ? JSON.parse(initialData.images) : [],
-      variations: {
-        colors: initialData.variations?.[0]?.colors ? JSON.parse(initialData.variations[0].colors) : [],
-        sizes: initialData.variations?.[0]?.sizes ? JSON.parse(initialData.variations[0].sizes) : [],
-        specs: initialData.variations?.[0]?.specs
-          ? JSON.parse(initialData.variations[0].specs)
-          : { material: "", fit: "", sleeve: "", pattern: "", washing: "" },
-      },
+      images: Array.isArray(initialData.images)
+  ? initialData.images
+  : initialData.images
+  ? JSON.parse(initialData.images)
+  : [],
+     variations: {
+  colors: Array.isArray(initialData.variations?.[0]?.colors)
+    ? initialData.variations[0].colors
+    : initialData.variations?.[0]?.colors
+    ? JSON.parse(initialData.variations[0].colors)
+    : [],
+
+  sizes: Array.isArray(initialData.variations?.[0]?.sizes)
+    ? initialData.variations[0].sizes
+    : initialData.variations?.[0]?.sizes
+    ? JSON.parse(initialData.variations[0].sizes)
+    : [],
+
+  specs: typeof initialData.variations?.[0]?.specs === "object"
+    ? initialData.variations[0].specs
+    : initialData.variations?.[0]?.specs
+    ? JSON.parse(initialData.variations[0].specs)
+    : { material: "", fit: "", sleeve: "", pattern: "", washing: "" },
+},
       brand: initialData.brand || { name: "", logo: "" },
       seo: {
         title: initialData.seoTitle || "",
@@ -111,34 +127,43 @@ export default function ProductForm({ initialData }: ProductFormProps) {
     return null;
   };
 
-  // Upload images to your API
+  // Upload images
   const uploadImages = async (files: File[]): Promise<string[]> => {
     if (files.length === 0) return [];
 
-    const formData = new FormData();
-    files.forEach((file) => {
-      formData.append('images', file);
-    });
+    const urls: string[] = [];
 
-    const res = await fetch('/api/upload', {
-      method: 'POST',
-      body: formData,
-    });
+    for (const file of files) {
+      const formData = new FormData();
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error(`Upload failed: ${res.status} ${errorText}`);
+      // ✅ FIX HERE
+      formData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Upload failed: ${res.status} ${errorText}`);
+      }
+
+      const data = await res.json();
+      urls.push(data.url);
     }
 
-    return res.json();
+    return urls;
   };
 
   // Upload brand logo
   const uploadBrandLogo = async (file: File): Promise<string> => {
     const formData = new FormData();
-    formData.append('logo', file);
 
-    const res = await fetch('/api/upload/logo', {
+    // ✅ FIX HERE
+    formData.append('file', file);
+
+    const res = await fetch('/api/upload', {
       method: 'POST',
       body: formData,
     });
@@ -148,7 +173,8 @@ export default function ProductForm({ initialData }: ProductFormProps) {
       throw new Error(`Logo upload failed: ${res.status} ${errorText}`);
     }
 
-    return res.json();
+    const data = await res.json();
+    return data.url;
   };
 
   // Handle drag & drop for product images
@@ -334,22 +360,30 @@ export default function ProductForm({ initialData }: ProductFormProps) {
 
       const payload = {
         ...form,
-        images: JSON.stringify(allImageUrls),
+
+        // ✅ KEEP AS ARRAY (NO stringify)
+        images: allImageUrls,
+
         brand: {
           ...form.brand,
           logo: finalBrandLogo
         },
+
         variations: {
-          ...form.variations,
-          colors: JSON.stringify(form.variations.colors),
-          sizes: JSON.stringify(form.variations.sizes),
-          specs: JSON.stringify(form.variations.specs)
+          // ✅ KEEP AS ARRAY
+          colors: form.variations.colors,
+          sizes: form.variations.sizes,
+
+          // ✅ KEEP AS OBJECT
+          specs: form.variations.specs
         },
+
         seo: {
           title: form.seo?.title || '',
           description: form.seo?.description || '',
           keywords: form.seo?.keywords || ''
         },
+
         price: Number(form.price),
         originalPrice: Number(form.originalPrice),
         stock: Number(form.stock),
