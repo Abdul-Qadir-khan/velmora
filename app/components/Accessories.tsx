@@ -14,14 +14,38 @@ const products = [
   {
     name: "Slim Fit Jeans",
     category: "Pants",
-    image: "/images/categories/womens-wear.avif",
+    image: "/images/categories/jeans.jpg",
     price: "₹1,499",
   },
   {
     name: "Casual Hoodie",
     category: "Hoodies",
-    image: "/images/categories/kids-wear.avif",
+    image: "/images/categories/casual-hoodie.jpg",
     price: "₹1,199",
+  },
+  {
+    name: "Premium Attar",
+    category: "Fragrance",
+    image: "/images/categories/attar.jpg",
+    price: "₹899",
+  },
+  {
+    name: "Classic Watch",
+    category: "Watches",
+    image: "/images/categories/watches.jpg",
+    price: "₹4,999",
+  },
+  {
+    name: "Leather Wallet",
+    category: "Accessories",
+    image: "/images/categories/wallet.jpg",
+    price: "₹1,299",
+  },
+  {
+    name: "Sunglasses",
+    category: "Eyewear",
+    image: "/images/categories/sunglasses.jpg",
+    price: "₹1,799",
   },
 ];
 
@@ -101,34 +125,34 @@ export default function ClothingProductsSection() {
             </AnimatePresence>
           </div>
 
-          {/* SELECTOR */}
-          <div className="flex flex-col divide-y divide-gray-300">
+          {/* SELECTOR WITH SCROLL */}
+          <div className="flex flex-col divide-y divide-gray-300 max-h-[520px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent pr-2">
             {products.map((product, idx) => (
               <div
                 key={idx}
                 onClick={() => setActive(idx)}
-                className="group py-5 cursor-pointer flex justify-between items-center transition"
+                className="group py-5 cursor-pointer flex justify-between items-center transition hover:bg-gray-50 px-2 rounded-lg"
               >
                 <div>
                   <h4
-                    className={`text-lg md:text-xl transition ${
+                    className={`text-lg md:text-xl font-medium transition ${
                       active === idx
                         ? "text-black"
-                        : "text-gray-400 group-hover:text-black"
+                        : "text-gray-600 group-hover:text-black"
                     }`}
                   >
                     {product.name}
                   </h4>
 
-                  <p className="text-xs text-gray-400 tracking-wide">
+                  <p className="text-xs text-gray-400 tracking-wide mt-1">
                     {product.category}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-4">
                   <span
-                    className={`text-sm ${
-                      active === idx ? "text-black" : "text-gray-400"
+                    className={`text-sm font-medium ${
+                      active === idx ? "text-black" : "text-gray-500"
                     }`}
                   >
                     {product.price}
@@ -137,8 +161,11 @@ export default function ClothingProductsSection() {
                   {/* Animated line */}
                   <motion.span
                     layout
-                    className={`h-[1px] ${
-                      active === idx ? "bg-black w-10" : "bg-gray-300 w-6"
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    className={`h-[2px] rounded-full transition-all duration-300 ${
+                      active === idx 
+                        ? "bg-black w-12 shadow-sm" 
+                        : "bg-gray-300 w-6 group-hover:w-8"
                     }`}
                   />
                 </div>
@@ -147,6 +174,21 @@ export default function ClothingProductsSection() {
           </div>
 
         </div>
+
+        {/* Navigation Dots - Mobile */}
+        <div className="lg:hidden flex justify-center gap-2 mt-8">
+          {products.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setActive(idx)}
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                active === idx ? "bg-black scale-125" : "bg-gray-300 hover:bg-gray-400"
+              }`}
+              aria-label={`Go to product ${idx + 1}`}
+            />
+          ))}
+        </div>
+
       </div>
     </section>
   );

@@ -1,81 +1,85 @@
 @import "tailwindcss";
 
+/* ================= FONT VARIABLES ================= */
 :root {
   --font-heading: 'Montserrat', sans-serif;
   --font-body: 'Roboto', sans-serif;
   --font-hero: 'Bruno Ace', cursive;
 }
 
-body {margin: 0;padding: 0;
+/* ================= GLOBAL STYLES ================= */
+body {
+  margin: 0;
+  padding: 0;
   font-family: var(--font-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin: 0 0 0.5em 0;
 }
 
 .hero-title {
   font-family: var(--font-hero);
+  font-weight: 400;
+  line-height: 1.2;
+  text-align: center;
 }
 
-button {
+/* ================= BUTTONS & INTERACTION ================= */
+button, .btn {
+  font-family: var(--font-body);
+  font-weight: 500;
+  padding: 0.5em 1em;
+  border-radius: 6px;
+  border: none;
   cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading), serif;
-  letter-spacing: 0.5px;
+button:hover, .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.bg-primary {
-  background-color: var(--color-primary);
-}
-
-.text-primary {
-  color: var(--color-primary);
-}
-
-.bg-accent {
-  background-color: var(--color-accent);
-}
-
-.text-accent {
-  color: var(--color-accent);
-}
-
+/* ================= ANIMATIONS ================= */
 @keyframes dropdown {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-dropdown {
   animation: dropdown 0.25s ease forwards;
 }
 
-/* globals.css */
+/* ================= MAIN LAYOUT ================= */
 main {
+  /* optional padding if needed */
   /* padding-top: 96px; */
 }
+
 @media (min-width: 768px) {
   /* main { padding-top: 80px; } */
 }
 
-/* Perfect Hidden Scrollbar - Fixed Syntax */
+/* ================= SCROLLBAR STYLING ================= */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Chrome Safari */
+  display: none;  /* Chrome/Safari */
 }
 
-/* Subtle hover scrollbar */
 .scrollbar-hide:hover::-webkit-scrollbar {
   display: block !important;
-  width: 4px;
+  width: 6px;
 }
 
 .scrollbar-hide:hover::-webkit-scrollbar-track {
@@ -83,10 +87,20 @@ main {
 }
 
 .scrollbar-hide:hover::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
 }
 
 .scrollbar-hide:hover::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+
+/* hero */
+@keyframes fadeInSlide {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeInSlide {
+  animation: fadeInSlide 0.8s ease forwards;
 }

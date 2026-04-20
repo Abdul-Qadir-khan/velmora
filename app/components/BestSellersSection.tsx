@@ -73,8 +73,8 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
             imgs = Array.isArray(p.images)
               ? p.images
               : p.images
-              ? JSON.parse(p.images as string)
-              : [];
+                ? JSON.parse(p.images as string)
+                : [];
           } catch {
             imgs = [];
           }
@@ -214,7 +214,7 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
                     {/* Popular Badge - ENHANCED */}
                     {product.bestSeller && (
                       <motion.div
-                        className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold uppercase px-3 py-1.5 rounded-full shadow-lg z-20"
+                        className="absolute top-3 left-3 bg-linear-to-r from-red-500 to-pink-500 text-white text-xs font-bold uppercase px-3 py-1.5 rounded-full shadow-lg z-20"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         whileHover={{ scale: 1.05 }}
@@ -226,7 +226,7 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
                     {/* Discount Badge - ENHANCED */}
                     {hasDiscount && (
                       <motion.div
-                        className="absolute top-3 right-3 bg-gradient-to-r from-amber-400 to-orange-400 text-black text-xs font-bold px-3 py-1.5 rounded-full shadow-lg z-20"
+                        className="absolute top-3 right-3 bg-linear-to-r from-amber-400 to-orange-400 text-black text-xs font-bold px-3 py-1.5 rounded-full shadow-lg z-20"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         whileHover={{ scale: 1.05 }}
@@ -253,11 +253,10 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
                           e.stopPropagation();
                           handleWishlist(product);
                         }}
-                        className={`w-11 h-11 bg-white/95 hover:bg-white backdrop-blur-sm rounded-2xl shadow-xl border flex items-center justify-center transition-all duration-200 hover:scale-110 hover:shadow-2xl ${
-                          isWishlisted 
-                            ? 'border-red-400 text-red-500 hover:bg-red-50/80' 
+                        className={`w-11 h-11 bg-white/95 hover:bg-white backdrop-blur-sm rounded-2xl shadow-xl border flex items-center justify-center transition-all duration-200 hover:scale-110 hover:shadow-2xl ${isWishlisted
+                            ? 'border-red-400 text-red-500 hover:bg-red-50/80'
                             : 'hover:border-gray-300'
-                        }`}
+                          }`}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -267,7 +266,7 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
 
                     {/* Image - ENHANCED */}
                     <div
-                      className="relative w-full h-64 md:h-72 bg-gradient-to-t from-gray-50 to-white overflow-hidden pt-14 px-3 rounded-xl"
+                      className="relative w-full h-64 md:h-72 bg-linear-to-t from-gray-50 to-white overflow-hidden pt-14 px-3 rounded-xl"
                       onClick={() => goToProduct(product)}
                     >
                       <Image
@@ -280,7 +279,7 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
                     </div>
 
                     {/* Info - ENHANCED */}
-                    <div className="p-5 pb-7" onClick={() => goToProduct(product)}>
+                    <div className="p-5 pb-3" onClick={() => goToProduct(product)}>
                       <h3 className="text-base md:text-lg font-bold text-gray-900 leading-tight line-clamp-2 group-hover:text-primary transition-all duration-300">
                         {product.name}
                       </h3>
@@ -288,9 +287,8 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
                         {[...Array(5)].map((_, i) => (
                           <FaStar
                             key={`star-${i}-${uniqueKey}`} // ✅ Unique star keys too
-                            className={`w-4 h-4 transition-colors ${
-                              i < product.rating ? "text-amber-400 fill-amber-400" : "text-gray-300"
-                            }`}
+                            className={`w-4 h-4 transition-colors ${i < product.rating ? "text-amber-400 fill-amber-400" : "text-gray-300"
+                              }`}
                           />
                         ))}
                         <span className="ml-2 text-sm text-gray-500 font-medium">
@@ -298,11 +296,11 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
                         </span>
                       </div>
                       <div className="flex items-center gap-3 pt-1">
-                        <p className="text-xl md:text-2xl font-black bg-gradient-to-r from-gray-900 via-gray-800 to-primary bg-clip-text text-transparent">
+                        <p className="text-xl md:text-2xl font-black text-gray-900 drop-shadow-sm">
                           ${product.price.toLocaleString()}
                         </p>
                         {hasDiscount && (
-                          <p className="text-sm font-medium text-gray-500 line-through">
+                          <p className="text-sm font-medium text-gray-400 line-through">
                             ${originalPrice?.toLocaleString()}
                           </p>
                         )}

@@ -5,8 +5,12 @@ export async function getProducts({ category }: { category?: string } = {}) {
       params.append("category", category);
     }
 
-    // ✅ FIXED: Use your API route
-    const res = await fetch(`/api/products?${params.toString()}`, {
+    // ✅ FIXED: Use absolute URL for SSR
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const queryString = params.toString();
+    const url = `${baseUrl}/api/products${queryString ? `?${queryString}` : ''}`;
+    
+    const res = await fetch(url, {
       next: { revalidate: 3600 },
       cache: "force-cache",
     });
