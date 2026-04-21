@@ -16,10 +16,10 @@ import {
 
 export default function TermsOfService() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 pb-12">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-gray-900 to-slate-800 pb-12">
 
       {/* Hero Section - Dark Black Banner */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-black via-slate-900 to-gray-900 text-white pt-32 pb-28 px-6 lg:px-8">
+      <section className="relative overflow-hidden bg-linear-to-br from-black via-slate-900 to-gray-900 text-white pt-32 pb-28 px-6 lg:px-8">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-800/30 via-transparent to-transparent"></div>
 
         <div className="relative max-w-4xl mx-auto text-center">
@@ -28,7 +28,7 @@ export default function TermsOfService() {
             <span className="font-semibold text-lg">Terms of Service</span>
           </div>
 
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent mb-6 leading-tight">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-linear-to-r from-white to-slate-200 bg-clip-text text-transparent mb-6 leading-tight">
             Terms of Service
           </h1>
 
@@ -67,8 +67,8 @@ export default function TermsOfService() {
             <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-xl hover:shadow-emerald-500/10 transition-all h-full flex flex-col relative group">
 
               {/* Minimal Header */}
-              <h3 className="text-lg font-bold text-white mb-6 tracking-tight flex items-center gap-2 flex-shrink-0">
-                <span className="w-6 h-6 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-lg flex items-center justify-center text-xs font-bold shadow-md">T</span>
+              <h3 className="text-lg font-bold text-white mb-6 tracking-tight flex items-center gap-2 shrink-0">
+                <span className="w-6 h-6 bg-linear-to-r from-emerald-400 to-teal-400 rounded-lg flex items-center justify-center text-xs font-bold shadow-md">T</span>
                 Table of Contents
               </h3>
 
@@ -97,7 +97,7 @@ export default function TermsOfService() {
                       <div className="w-2 h-2 bg-slate-400 rounded-full scale-75 group-hover:scale-100 group-hover:bg-emerald-400 transition-all"></div>
 
                       {/* Number Badge */}
-                      <span className="w-5 h-5 bg-slate-800/50 text-xs font-bold rounded-full flex items-center justify-center group-hover:bg-emerald-500/80 group-hover:text-white transition-all opacity-70 group-hover:opacity-100 ml-1 flex-shrink-0">
+                      <span className="w-5 h-5 bg-slate-800/50 text-xs font-bold rounded-full flex items-center justify-center group-hover:bg-emerald-500/80 group-hover:text-white transition-all opacity-70 group-hover:opacity-100 ml-1 shrink-0">
                         {index + 1}
                       </span>
 
@@ -105,7 +105,7 @@ export default function TermsOfService() {
                       <span className="flex-1 min-w-0 truncate">{item.title}</span>
 
                       {/* Arrow */}
-                      <svg className="w-4 h-4 text-slate-500 opacity-0 group-hover:opacity-100 transition-all ml-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-slate-500 opacity-0 group-hover:opacity-100 transition-all ml-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </Link>
@@ -121,7 +121,7 @@ export default function TermsOfService() {
             {/* Overview */}
             <section id="overview" className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl">
               <div className="flex items-start gap-4 mb-6">
-                <InformationCircleIcon className="w-12 h-12 text-blue-400 mt-1 flex-shrink-0" />
+                <InformationCircleIcon className="w-12 h-12 text-blue-400 mt-1 shrink-0" />
                 <div>
                   <h2 className="text-3xl font-bold text-white mb-2">1. Overview</h2>
                 </div>
@@ -139,11 +139,11 @@ export default function TermsOfService() {
                 </div>
                 <div className="space-y-4 pt-4 md:pt-0 md:border-l border-slate-700 pl-0 md:pl-8">
                   <div className="flex items-center gap-3 p-4 bg-white/5 rounded-xl">
-                    <ClockIcon className="w-6 h-6 text-emerald-400 flex-shrink-0" />
+                    <ClockIcon className="w-6 h-6 text-emerald-400 shrink-0" />
                     <span className="font-semibold text-emerald-300">Effective Date: December 1, 2024</span>
                   </div>
                   <div className="flex items-center gap-3 p-4 bg-white/5 rounded-xl">
-                    <ScaleIcon className="w-6 h-6 text-blue-400 flex-shrink-0" />
+                    <ScaleIcon className="w-6 h-6 text-blue-400 shrink-0" />
                     <span className="font-semibold text-blue-300">Governed by US Law</span>
                   </div>
                 </div>
@@ -159,15 +159,15 @@ export default function TermsOfService() {
                     <h3 className="text-xl font-bold text-white mb-4">By using our Services, you agree to:</h3>
                     <ul className="space-y-3 text-slate-300">
                       <li className="flex items-start gap-3">
-                        <ShieldCheckIcon className="w-6 h-6 text-emerald-400 mt-1 flex-shrink-0" />
+                        <ShieldCheckIcon className="w-6 h-6 text-emerald-400 mt-1 shrink-0" />
                         Comply with all applicable laws and regulations
                       </li>
                       <li className="flex items-start gap-3">
-                        <LockClosedIcon className="w-6 h-6 text-blue-400 mt-1 flex-shrink-0" />
+                        <LockClosedIcon className="w-6 h-6 text-blue-400 mt-1 shrink-0" />
                         Provide accurate information during registration
                       </li>
                       <li className="flex items-start gap-3">
-                        <UserIcon className="w-6 h-6 text-purple-400 mt-1 flex-shrink-0" />
+                        <UserIcon className="w-6 h-6 text-purple-400 mt-1 shrink-0" />
                         Not impersonate any other person or entity
                       </li>
                     </ul>
@@ -244,9 +244,9 @@ export default function TermsOfService() {
             {/* Limitation of Liability */}
             <section id="liability">
               <h2 className="text-3xl font-bold text-white mb-6">5. Limitation of Liability</h2>
-              <div className="bg-gradient-to-r from-red-500/10 to-orange-500/10 backdrop-blur-md rounded-2xl p-8 border border-red-500/20">
+              <div className="bg-linear-to-r from-red-500/10 to-orange-500/10 backdrop-blur-md rounded-2xl p-8 border border-red-500/20">
                 <div className="flex items-start gap-4 mb-6">
-                  <ScaleIcon className="w-12 h-12 text-red-400 mt-1 flex-shrink-0" />
+                  <ScaleIcon className="w-12 h-12 text-red-400 mt-1 shrink-0" />
                   <h3 className="text-2xl font-bold text-white">Important Legal Notice</h3>
                 </div>
                 <p className="text-lg text-slate-200 mb-6 leading-relaxed">
@@ -292,7 +292,7 @@ export default function TermsOfService() {
                 </p>
                 <Link
                   href="/contact"
-                  className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xl rounded-2xl shadow-2xl hover:shadow-emerald-500/50 hover:scale-105 transition-all duration-300"
+                  className="inline-flex items-center gap-3 px-10 py-5 bg-linear-to-r from-emerald-600 to-teal-600 text-white font-bold text-xl rounded-2xl shadow-2xl hover:shadow-emerald-500/50 hover:scale-105 transition-all duration-300"
                 >
                   Contact Support
                   <ArrowRightIcon className="w-6 h-6" />

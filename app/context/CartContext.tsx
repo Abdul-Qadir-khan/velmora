@@ -14,10 +14,10 @@ export interface CartItem {
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (item: Omit<CartItem, 'qty'> & { qty?: number }) => void;
-  removeFromCart: (id: number) => void;
-  clearCart: () => void;
   cartCount: number;
+  addToCart: (slug: string, quantity?: number) => Promise<void>;
+  removeFromCart: (productId: string | number) => Promise<void>;
+  clearCart: () => Promise<void>;
   isLoading: boolean;
 }
 
@@ -26,89 +26,108 @@ const CartContext = createContext<CartContextType | null>(null);
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSynced, setIsSynced] = useState(false);
 
-  // 🔥 FIXED: CORRECT cartCount
   const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
 
-  // Safe API sync
+  // Sync with backend API
   const syncWithBackend = useCallback(async () => {
     try {
       setIsLoading(true);
       const res = await fetch("/api/cart");
       if (res.ok) {
-        const data = await res.json();
-        setCart(Array.isArray(data) ? data : []);
-        setIsSynced(true);
+        const { cart: serverCart } = await res.json();
+        
+        // Transform server data to UI format
+        const uiCart: CartItem[] = serverCart.map((item: any) => ({
+          id: item.productId,
+          name: item.product.name,
+          price: parseFloat(item.product.price),
+          qty: item.quantity,
+          images: Array.isArray(item.product.images) ? item.product.images : [item.product.images],
+          selectedSize: "M",
+          selectedColor: "#000000",
+        }));
+        
+        setCart(uiCart);
       }
     } catch (error) {
-      console.error("Sync error:", error);
+      console.error("Cart sync error:", error);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Initial load + periodic sync
+  // Initial load ONLY (no auto-sync)
   useEffect(() => {
     syncWithBackend();
-    const interval = setInterval(syncWithBackend, 5000); // 5s sync
-    return () => clearInterval(interval);
   }, [syncWithBackend]);
 
-  // 🔥 FIXED: OPTIMISTIC UPDATES - Instant UI + Backend sync
-  const addToCart = (item: Omit<CartItem, 'qty'> & { qty?: number }) => {
-    const newItem: CartItem = {
-      ...item,
-      id: Number(item.id),
-      qty: item.qty || 1,
-      price: Number(item.price),
-    };
+  const addToCart = async (slug: string, quantity: number = 1) => {
+    try {
+      setIsLoading(true);
+      
+      // Call your existing Prisma API
+      const res = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, quantity }),
+      });
 
-    // 1. OPTIMISTIC: Update UI instantly
-    setCart(prev => {
-      const existing = prev.find(c => c.id === newItem.id);
-      if (existing) {
-        return prev.map(c =>
-          c.id === newItem.id 
-            ? { ...c, qty: c.qty + newItem.qty }
-            : c
-        );
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Failed to add to cart');
       }
-      return [...prev, newItem];
-    });
 
-    // 2. BACKEND: Sync in background
-    fetch("/api/cart", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newItem),
-    }).catch(console.error);
+      // Refresh cart from server
+      await syncWithBackend();
+      
+    } catch (error) {
+      console.error("addToCart error:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const removeFromCart = (id: number) => {
-    // 1. OPTIMISTIC: Remove instantly
-    setCart(prev => prev.filter(c => Number(c.id) !== id));
+  const removeFromCart = async (productId: string | number) => {
+    try {
+      setIsLoading(true);
+      
+      const res = await fetch("/api/cart", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId }),
+      });
 
-    // 2. BACKEND sync
-    fetch("/api/cart", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    }).catch(console.error);
+      if (!res.ok) throw new Error('Failed to remove from cart');
+
+      // Refresh cart
+      await syncWithBackend();
+      
+    } catch (error) {
+      console.error("removeFromCart error:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const clearCart = () => {
-    setCart([]);
-    fetch("/api/cart", { method: "DELETE" }).catch(console.error);
+  const clearCart = async () => {
+    try {
+      await fetch("/api/cart", { method: "DELETE" });
+      setCart([]);
+    } catch (error) {
+      console.error("clearCart error:", error);
+    }
   };
 
   return (
     <CartContext.Provider value={{
       cart,
+      cartCount,
       addToCart,
       removeFromCart,
       clearCart,
-      cartCount,
       isLoading,
     }}>
       {children}

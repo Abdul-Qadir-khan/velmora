@@ -32,7 +32,7 @@ export default function Home() {
     <div>
 
       {/* poup */}
-      {/* <NewsletterPopup/> */}
+      <NewsletterPopup/>
       {/* Hero Section */}
       <Hero />
 

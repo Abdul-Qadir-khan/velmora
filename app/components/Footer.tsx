@@ -81,7 +81,7 @@ export default function LycoonWearFooter() {
   return (
     <footer
       ref={footerRef}
-      className="bg-[#050505] text-gray-400 text-xs md:text-sm tracking-wide opacity-0 translate-y-8 transition-all duration-1000"
+      className="bg-[#050505] text-gray-400 text-xs md:text-sm tracking-wide"
     >
       {/* Main */}
       <div className="max-w-7xl mx-auto px-6 md:px-20 py-10 md:py-14">
@@ -140,7 +140,7 @@ export default function LycoonWearFooter() {
                       className="relative inline-block hover:text-white transition group text-sm"
                     >
                       {link.label}
-                      <span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                      <span className="absolute left-0 -bottom-1 w-0 h-px bg-white transition-all duration-300 group-hover:w-full"></span>
                     </Link>
                   </li>
                 ))}
@@ -184,7 +184,7 @@ export default function LycoonWearFooter() {
                 className="relative group hover:text-white transition"
               >
                 {item.label}
-                <span className="absolute left-0 -bottom-1 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute left-0 -bottom-1 w-0 h-px bg-white transition-all duration-300 group-hover:w-full"></span>
               </Link>
             ))}
           </div>

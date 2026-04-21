@@ -40,20 +40,20 @@ export default function ZaraHero() {
     setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
 
   return (
-    <section className="relative w-full h-[100svh] overflow-hidden bg-black">
+    <section className="relative w-full h-svh overflow-hidden bg-black">
 
       {/* Slides */}
       {slides.map((slide, i) => (
         <div
           key={i}
-          className={`absolute inset-0 transition-opacity duration-[1200ms] ease-out ${
+          className={`absolute inset-0 transition-opacity duration-1200 ease-out ${
             i === current ? "opacity-100" : "opacity-0"
           }`}
         >
           <img
             src={slide.image}
             alt={slide.title}
-            className="w-full h-full object-cover"
+            className="w-full md:h-svh h-full object-cover"
           />
 
           {/* subtle overlay */}
@@ -94,7 +94,7 @@ export default function ZaraHero() {
           {slides.map((_, i) => (
             <div
               key={i}
-              className={`h-[2px] w-6 transition-all ${
+              className={`h-0.5 w-6 transition-all ${
                 i === current ? "bg-white" : "bg-white/30"
               }`}
             />

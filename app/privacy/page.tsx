@@ -16,10 +16,10 @@ import {
 
 export default function PrivacyPolicy() {
   return (
-    <div className="bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 pb-12">
+    <div className="bg-linear-to-br from-slate-900 via-gray-900 to-slate-800 pb-12">
       
       {/* Hero Section - Dark Black Banner */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-black via-slate-900 to-gray-900 text-white pt-32 pb-28 px-6 lg:px-8">
+      <section className="relative overflow-hidden bg-linear-to-br from-black via-slate-900 to-gray-900 text-white pt-32 pb-28 px-6 lg:px-8">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-800/30 via-transparent to-transparent"></div>
         
         <div className="relative max-w-4xl mx-auto text-center">
@@ -28,7 +28,7 @@ export default function PrivacyPolicy() {
             <span className="font-semibold text-lg">Privacy Policy</span>
           </div>
           
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent mb-6 leading-tight">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold bg-linear-to-r from-white to-slate-200 bg-clip-text text-transparent mb-6 leading-tight">
             Privacy Policy
           </h1>
           
@@ -67,8 +67,8 @@ export default function PrivacyPolicy() {
   <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-xl hover:shadow-emerald-500/10 transition-all h-full flex flex-col relative group">
     
     {/* Header */}
-    <h3 className="text-lg font-bold text-white mb-6 tracking-tight flex items-center gap-2 flex-shrink-0">
-      <span className="w-6 h-6 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-lg flex items-center justify-center text-xs font-bold shadow-md">P</span>
+    <h3 className="text-lg font-bold text-white mb-6 tracking-tight flex items-center gap-2 shrink-0">
+      <span className="w-6 h-6 bg-linear-to-r from-emerald-400 to-teal-400 rounded-lg flex items-center justify-center text-xs font-bold shadow-md">P</span>
       Privacy Sections
     </h3>
 
@@ -94,11 +94,11 @@ export default function PrivacyPolicy() {
             className="group flex items-center gap-3 p-3 rounded-xl text-sm text-slate-300 hover:bg-white/10 hover:text-white font-medium transition-all duration-200 hover:-translate-x-1 border-r-4 border-transparent hover:border-emerald-400 pr-4"
           >
             <div className="w-2 h-2 bg-slate-400 rounded-full scale-75 group-hover:scale-100 group-hover:bg-emerald-400 transition-all"></div>
-            <span className="w-5 h-5 bg-slate-800/50 text-xs font-bold rounded-full flex items-center justify-center group-hover:bg-emerald-500/80 group-hover:text-white transition-all opacity-70 group-hover:opacity-100 ml-1 flex-shrink-0">
+            <span className="w-5 h-5 bg-slate-800/50 text-xs font-bold rounded-full flex items-center justify-center group-hover:bg-emerald-500/80 group-hover:text-white transition-all opacity-70 group-hover:opacity-100 ml-1 shrink-0">
               {index + 1}
             </span>
             <span className="flex-1 min-w-0 truncate">{item.title}</span>
-            <svg className="w-4 h-4 text-slate-500 opacity-0 group-hover:opacity-100 transition-all ml-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-slate-500 opacity-0 group-hover:opacity-100 transition-all ml-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </Link>
@@ -114,7 +114,7 @@ export default function PrivacyPolicy() {
             {/* Overview */}
             <section id="overview" className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl">
               <div className="flex items-start gap-4 mb-6">
-                <ShieldCheckIcon className="w-12 h-12 text-emerald-400 mt-1 flex-shrink-0" />
+                <ShieldCheckIcon className="w-12 h-12 text-emerald-400 mt-1 shrink-0" />
                 <div>
                   <h2 className="text-3xl font-bold text-white mb-2">1. Commitment to Privacy</h2>
                   <p className="text-slate-400">Your trust is our priority</p>
@@ -130,11 +130,11 @@ export default function PrivacyPolicy() {
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl">
-                    <CheckCircleIcon className="w-6 h-6 text-emerald-400 flex-shrink-0" />
+                    <CheckCircleIcon className="w-6 h-6 text-emerald-400 shrink-0" />
                     <span className="font-semibold text-emerald-300">GDPR Compliant</span>
                   </div>
                   <div className="flex items-center gap-3 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
-                    <CheckCircleIcon className="w-6 h-6 text-blue-400 flex-shrink-0" />
+                    <CheckCircleIcon className="w-6 h-6 text-blue-400 shrink-0" />
                     <span className="font-semibold text-blue-300">CCPA Compliant</span>
                   </div>
                 </div>
@@ -198,7 +198,7 @@ export default function PrivacyPolicy() {
             {/* Data Sharing */}
             <section id="data-sharing">
               <h2 className="text-3xl font-bold text-white mb-6">4. Data Sharing & Disclosure</h2>
-              <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 backdrop-blur-md rounded-2xl p-8 border border-orange-500/20">
+              <div className="bg-linear-to-r from-orange-500/10 to-red-500/10 backdrop-blur-md rounded-2xl p-8 border border-orange-500/20">
                 <div className="max-w-2xl mx-auto">
                   <p className="text-lg text-slate-200 mb-8 leading-relaxed text-center">
                     We <strong>never sell your personal data</strong>. We only share data with:
@@ -238,7 +238,7 @@ export default function PrivacyPolicy() {
                     </div>
                   </div>
                   <div>
-                    <Link href="/cookies" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 w-full justify-center">
+                    <Link href="/cookies" className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 w-full justify-center">
                       Cookie Settings
                       <ArrowRightIcon className="w-5 h-5" />
                     </Link>
@@ -271,7 +271,7 @@ export default function PrivacyPolicy() {
             {/* Security */}
             <section id="security">
               <h2 className="text-3xl font-bold text-white mb-6">7. Data Security</h2>
-              <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-md rounded-3xl p-10 border border-emerald-500/20 shadow-2xl">
+              <div className="bg-linear-to-br from-emerald-500/10 to-teal-500/10 backdrop-blur-md rounded-3xl p-10 border border-emerald-500/20 shadow-2xl">
                 <div className="text-center">
                   <LockClosedIcon className="w-20 h-20 text-emerald-400 mx-auto mb-8" />
                   <h3 className="text-2xl font-bold text-white mb-4">Bank-Level Security</h3>
@@ -298,7 +298,7 @@ export default function PrivacyPolicy() {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
                   <Link 
                     href="mailto:privacy@company.com"
-                    className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                    className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
                   >
                     privacy@company.com
                   </Link>

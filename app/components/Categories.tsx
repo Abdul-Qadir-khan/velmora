@@ -19,14 +19,14 @@ const CategoriesSection: FC = () => {
   ];
 
   return (
-    <section className="py-16 px-4 sm:px-6 bg-gradient-to-b from-slate-50/70 to-white/90 backdrop-blur-sm">
+    <section className="py-16 px-4 sm:px-6 bg-linear-to-b from-slate-50/70 to-white/90 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto">
         {/* Clean Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-slate-900 via-gray-800 to-slate-900 bg-clip-text text-transparent mb-2">
+          <h2 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-slate-900 via-gray-800 to-slate-900 bg-clip-text text-transparent mb-2">
             Shop by Category
           </h2>
-          <div className="w-20 h-1 mx-auto bg-gradient-to-r from-blue-500 to-purple-600 rounded-full shadow-sm" />
+          <div className="w-20 h-1 mx-auto bg-linear-to-r from-blue-500 to-purple-600 rounded-full shadow-sm" />
         </div>
 
         {/* Simple Clean Grid */}
@@ -39,7 +39,7 @@ const CategoriesSection: FC = () => {
                 group relative block p-4 rounded-2xl bg-white/80 backdrop-blur-sm shadow-md hover:shadow-xl 
                 border-2 transition-all duration-500 hover:-translate-y-2 hover:scale-[1.02] h-full
                 ${selectedCategory === category.slug
-                  ? "border-blue-500 bg-gradient-to-br from-blue-50/80 to-indigo-50/80 shadow-2xl shadow-blue-200/50 ring-2 ring-blue-200/50 -translate-y-1 scale-[1.01]"
+                  ? "border-blue-500 bg-linear-to-br from-blue-50/80 to-indigo-50/80 shadow-2xl shadow-blue-200/50 ring-2 ring-blue-200/50 -translate-y-1 scale-[1.01]"
                   : "border-transparent hover:border-blue-200 hover:shadow-blue-100/50"
                 }
               `}
@@ -54,7 +54,7 @@ const CategoriesSection: FC = () => {
                   sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
                 />
                 {/* Subtle overlay */}
-                <div className={`absolute inset-0 bg-gradient-to-t from-black/10 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 ${
+                <div className={`absolute inset-0 bg-linear-to-t from-black/10 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 ${
                   selectedCategory === category.slug ? 'opacity-20' : ''
                 }`} />
               </div>

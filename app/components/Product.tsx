@@ -433,7 +433,7 @@ export default function ShopSection() {
                       />
                     </div>
 
-                    <div className="absolute bottom-0 w-full translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-gradient-to-t from-black/90 to-transparent">
+                    <div className="absolute bottom-0 w-full translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-linear-to-t from-black/90 to-transparent">
                       <button
                         onClick={() => handleAddToCart(product)}
                         className="w-full bg-black text-white py-2 sm:py-3 text-sm flex items-center justify-center gap-1 hover:bg-gray-800 transition-colors backdrop-blur-sm"

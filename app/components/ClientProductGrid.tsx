@@ -160,7 +160,7 @@ const productsWithSlugs = useMemo(() => {
             <button
               key={cat}
               className={`block w-full text-left py-3 px-4 rounded-xl mb-3 transition-all border-2 text-sm font-medium ${searchParamsClient.get("category") === cat
-                  ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold shadow-lg border-blue-500"
+                  ? "bg-linear-to-r from-blue-500 to-indigo-500 text-white font-bold shadow-lg border-blue-500"
                   : "bg-gray-50 hover:bg-blue-50 border-gray-200 hover:border-blue-200 text-slate-800 hover:text-blue-700"
                 }`}
               onClick={() => updateSearchParams({ category: cat === "all" ? null : cat })}
@@ -181,7 +181,7 @@ const productsWithSlugs = useMemo(() => {
               <button
                 key={value}
                 className={`w-full py-3 px-4 rounded-xl border-2 text-left transition-all text-sm ${searchParamsClient.get("price") === value
-                    ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold shadow-lg border-emerald-500"
+                    ? "bg-linear-to-r from-emerald-500 to-teal-500 text-white font-bold shadow-lg border-emerald-500"
                     : "bg-gray-50 hover:bg-emerald-50 border-gray-200 hover:border-emerald-200 hover:text-emerald-700"
                   }`}
                 onClick={() => updateSearchParams({ price: value })}
@@ -199,7 +199,7 @@ const productsWithSlugs = useMemo(() => {
               <button
                 key={size}
                 className={`py-3 px-3 rounded-lg font-medium transition-all border-2 text-sm ${searchParamsClient.get("size") === size
-                    ? "bg-gradient-to-r from-purple-500 to-violet-500 text-white border-purple-500 shadow-lg"
+                    ? "bg-linear-to-r from-purple-500 to-violet-500 text-white border-purple-500 shadow-lg"
                     : "bg-gray-50 hover:bg-purple-50 border-gray-200 hover:border-purple-200 hover:text-purple-700"
                   }`}
                 onClick={() => updateSearchParams({ size: size })}
@@ -218,7 +218,7 @@ const productsWithSlugs = useMemo(() => {
               <button
                 key={brand}
                 className={`block w-full py-3 px-4 rounded-xl mb-2 transition-all border-2 text-sm ${searchParamsClient.get("brand") === brandValue
-                    ? "bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold shadow-lg border-orange-500"
+                    ? "bg-linear-to-r from-orange-500 to-red-500 text-white font-bold shadow-lg border-orange-500"
                     : "bg-gray-50 hover:bg-orange-50 border-gray-200 hover:border-orange-200 hover:text-orange-700"
                   }`}
                 onClick={() => updateSearchParams({ brand: brand === "All" ? null : brandValue })}
@@ -230,7 +230,7 @@ const productsWithSlugs = useMemo(() => {
         </div>
 
         <button
-          className="w-full py-3 px-4 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all mt-6 text-sm"
+          className="w-full py-3 px-4 bg-linear-to-r from-red-500 to-red-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all mt-6 text-sm"
           onClick={() => router.push("/shop")}
         >
           Clear All Filters
@@ -256,7 +256,7 @@ const productsWithSlugs = useMemo(() => {
             return (
               // 🔥 FIXED: Key (ONLY CHANGE)
               <div key={String(product.id)} className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
-                <div className="relative h-64 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+                <div className="relative h-64 bg-linear-to-br from-gray-50 to-gray-100 overflow-hidden">
                   <button
                     className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:scale-110 hover:bg-white/100 transition-all z-20 border"
                     onClick={(e) => toggleWishlist(product, e)}
@@ -285,7 +285,7 @@ const productsWithSlugs = useMemo(() => {
                     </h3>
                   </Link>
 
-                  <div className="flex items-center gap-1 mb-3">
+                  <div className="flex items-center mb-3">
                     {Array.from({ length: 5 }, (_, i) => (
                       <svg
                         key={i}
@@ -300,15 +300,16 @@ const productsWithSlugs = useMemo(() => {
                   </div>
 
                   <div className="flex items-center gap-2 mb-6">
+                    
+                    <span className="text-2xl font-bold text-gray-900">₹{product.price}</span>
                     {product.originalPrice && (
                       <span className="text-sm text-gray-500 line-through">₹{product.originalPrice}</span>
                     )}
-                    <span className="text-2xl font-bold text-gray-900">₹{product.price}</span>
                   </div>
 
                   <button
                     onClick={() => handleAddToCart(product)}
-                    className="w-full bg-gradient-to-r from-black to-gray-900 text-white py-3 px-6 rounded-xl font-semibold hover:from-gray-900 hover:to-gray-950 transition-all duration-300 flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-95 transform"
+                    className="w-full bg-linear-to-r from-black to-gray-900 text-white py-3 px-6 rounded-xl font-semibold hover:from-gray-900 hover:to-gray-950 transition-all duration-300 flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-95 transform"
                   >
                     <ShoppingCart size={20} />
                     <span>Add to Cart</span>

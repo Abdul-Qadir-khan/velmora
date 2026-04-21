@@ -53,17 +53,17 @@ export default function ClothingProductsSection() {
   const [active, setActive] = useState(0);
 
   return (
-    <section className="bg-[#f8f8f8] py-16 md:py-24 px-6 md:px-20 overflow-hidden">
+    <section className="bg-[#f8f8f8] py-10 md:py-16 px-4 md:px-12 overflow-hidden">
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-20 gap-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-5 md:mb-10 gap-6">
           <div>
-            <p className="text-gray-500 uppercase tracking-[0.3em] text-xs mb-4">
+            <p className="text-gray-500 uppercase tracking-[0.3em] text-xs mb-2">
               Latest Arrivals
             </p>
 
-            <h2 className="text-3xl md:text-5xl font-semibold leading-tight text-gray-900">
+            <h2 className="text-2xl md:text-4xl font-semibold leading-tight text-gray-900">
               Refined Style for <br className="hidden md:block" />
               Modern Living
             </h2>
@@ -81,7 +81,7 @@ export default function ClothingProductsSection() {
         <div className="grid lg:grid-cols-2 gap-10 md:gap-16 items-center">
 
           {/* IMAGE WITH ANIMATION */}
-          <div className="relative h-[380px] md:h-[520px] w-full overflow-hidden bg-[#eee]">
+          <div className="relative h-95 md:h-130 w-full overflow-hidden bg-[#eee]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={products[active].image}
@@ -100,7 +100,7 @@ export default function ClothingProductsSection() {
                 />
 
                 {/* Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/10 to-transparent" />
 
                 {/* TEXT ANIMATION */}
                 <motion.div
@@ -126,7 +126,7 @@ export default function ClothingProductsSection() {
           </div>
 
           {/* SELECTOR WITH SCROLL */}
-          <div className="flex flex-col divide-y divide-gray-300 max-h-[520px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent pr-2">
+          <div className="hidden md:flex flex-col divide-y divide-gray-300 max-h-130 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent pr-2">
             {products.map((product, idx) => (
               <div
                 key={idx}
@@ -162,7 +162,7 @@ export default function ClothingProductsSection() {
                   <motion.span
                     layout
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    className={`h-[2px] rounded-full transition-all duration-300 ${
+                    className={`h-0.5 rounded-full transition-all duration-300 ${
                       active === idx 
                         ? "bg-black w-12 shadow-sm" 
                         : "bg-gray-300 w-6 group-hover:w-8"

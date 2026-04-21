@@ -12,10 +12,10 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const products = await getProducts({ category: params.category });
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      <section className="pt-24 pb-20 bg-gradient-to-r from-slate-800 via-gray-800 to-slate-800">
+    <div className="min-h-screen bg-linear-to-b from-slate-50 to-white">
+      <section className="pt-24 pb-20 bg-linear-to-r from-slate-800 via-gray-800 to-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-slate-100 via-gray-100 to-slate-300 bg-clip-text text-transparent mb-2">
+          <h1 className="text-5xl md:text-7xl font-black bg-linear-to-r from-slate-100 via-gray-100 to-slate-300 bg-clip-text text-transparent mb-2">
             Our Collection
           </h1>
           <p className="text-xl md:text-2xl text-slate-400 max-w-2xl mx-auto leading-relaxed">

@@ -91,17 +91,17 @@ export default function Header() {
           <div className="flex items-center gap-4 md:gap-6">
             {/* YOUR SEARCH */}
             <button onClick={() => setSearchOpen(true)}>
-              <Search className="hover:opacity-70 transition" />
+              <Search className="cursor-pointer hover:opacity-70 transition" />
             </button>
 
             {/* YOUR USER */}
-            <Link href="/payment" className="hidden md:block relative">
-              <User className="hover:opacity-70 transition cursor-pointer hidden md:block" />
-            </Link>
+            {/* <Link href="/payment" className="hidden md:block relative">
+              <User className="cursor-pointer hover:opacity-70 transition hidden md:block" />
+            </Link> */}
 
             {/* 🔥 YOUR WISHLIST - NOW REAL-TIME */}
             <Link href="/wishlist" className="hidden md:block relative">
-              <Heart className="hover:opacity-70 transition" />
+              <Heart className="cursor-pointer hover:opacity-70 transition" />
               {isClient && wishlistCount > 0 && (
                 <span className="absolute -top-2 -right-2 text-xs bg-black text-white w-5 h-5 flex items-center justify-center rounded-full">
                   {wishlistCount}
@@ -124,7 +124,7 @@ export default function Header() {
 
       {/* YOUR EXACT SEARCH OVERLAY */}
       {searchOpen && (
-        <div className="fixed inset-0 bg-black z-[999] flex items-center justify-center">
+        <div className="fixed inset-0 bg-black z-999 flex items-center justify-center">
           <div className="w-full max-w-xl px-6">
             <input
               autoFocus
@@ -145,7 +145,7 @@ export default function Header() {
 
       {/* YOUR EXACT MOBILE MENU */}
       <div
-        className={`fixed inset-0 z-[998] transition ${mobileOpen ? "visible" : "invisible"
+        className={`fixed inset-0 z-998 transition ${mobileOpen ? "visible" : "invisible"
           }`}
       >
         {/* YOUR OVERLAY */}

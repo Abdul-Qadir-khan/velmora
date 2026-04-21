@@ -12,7 +12,7 @@ import {
 
 export default function ShippingDelivery() {
   return (
-    <div className="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
@@ -48,7 +48,7 @@ export default function ShippingDelivery() {
             <div className="space-y-6">
               {/* Standard */}
               <article className="group flex items-start gap-6 p-8 bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 hover:shadow-3xl hover:-translate-y-2 hover:border-blue-400/50 transition-all duration-500">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500/90 to-blue-600/90 backdrop-blur-sm rounded-2xl flex items-center justify-center flex-shrink-0 shadow-xl group-hover:scale-110 transition-all duration-300 border border-white/20">
+                <div className="w-16 h-16 bg-linear-to-br from-blue-500/90 to-blue-600/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shrink-0 shadow-xl group-hover:scale-110 transition-all duration-300 border border-white/20">
                   <TruckIcon className="w-7 h-7 text-white drop-shadow-sm" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -64,7 +64,7 @@ export default function ShippingDelivery() {
 
               {/* Express */}
               <article className="group flex items-start gap-6 p-8 bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 hover:shadow-3xl hover:-translate-y-2 hover:border-emerald-400/50 transition-all duration-500">
-                <div className="w-16 h-16 bg-gradient-to-br from-emerald-500/90 to-emerald-600/90 backdrop-blur-sm rounded-2xl flex items-center justify-center flex-shrink-0 shadow-xl group-hover:scale-110 transition-all duration-300 border border-white/20">
+                <div className="w-16 h-16 bg-linear-to-br from-emerald-500/90 to-emerald-600/90 backdrop-blur-sm rounded-2xl flex items-center justify-center shrink-0 shadow-xl group-hover:scale-110 transition-all duration-300 border border-white/20">
                   <ClockIcon className="w-7 h-7 text-white drop-shadow-sm" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -90,7 +90,7 @@ export default function ShippingDelivery() {
             </h2>
             <div className="bg-white/10 backdrop-blur-xl p-10 rounded-3xl shadow-2xl border border-white/20">
               <div className="flex items-start gap-6 mb-8">
-                <div className="w-20 h-20 bg-gradient-to-br from-orange-500/90 to-orange-600/90 backdrop-blur-sm rounded-3xl flex items-center justify-center shadow-2xl flex-shrink-0 border border-white/20">
+                <div className="w-20 h-20 bg-linear-to-br from-orange-500/90 to-orange-600/90 backdrop-blur-sm rounded-3xl flex items-center justify-center shadow-2xl shrink-0 border border-white/20">
                   <MapPinIcon className="w-9 h-9 text-white drop-shadow-lg" />
                 </div>
                 <div>
@@ -173,7 +173,7 @@ export default function ShippingDelivery() {
                 key={contact.id}
                 className="group relative p-10 bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 hover:shadow-3xl hover:-translate-y-3 hover:border-blue-400/40 transition-all duration-500 overflow-hidden"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-linear-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className={`w-20 h-20 ${contact.color} backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl group-hover:scale-110 transition-all duration-300 relative z-10 border border-white/20`}>
                   {contact.icon && <contact.icon className="w-9 h-9 text-white drop-shadow-lg" />}
                 </div>
@@ -184,7 +184,7 @@ export default function ShippingDelivery() {
                 <p className="text-base text-slate-300 mb-8 text-center relative z-10 drop-shadow-md">{contact.desc}</p>
                 <a 
                   href={contact.href}
-                  className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold rounded-2xl shadow-2xl hover:shadow-3xl hover:scale-[1.02] hover:from-blue-600 hover:to-purple-700 transition-all duration-300 relative z-10 group-hover:translate-x-2 backdrop-blur-sm border border-white/20"
+                  className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-blue-500 to-purple-600 text-white font-bold rounded-2xl shadow-2xl hover:shadow-3xl hover:scale-[1.02] hover:from-blue-600 hover:to-purple-700 transition-all duration-300 relative z-10 group-hover:translate-x-2 backdrop-blur-sm border border-white/20"
                   aria-label={`Contact us via ${contact.title}`}
                 >
                   {contact.label}

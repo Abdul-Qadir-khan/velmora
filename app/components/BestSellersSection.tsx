@@ -1,5 +1,7 @@
 "use client";
 
+// AT THE TOP OF YOUR FILE - ADD THIS LINE
+import { useWishlist } from '@/app/context/WishlistContext';
 import Image from "next/image";
 import { ShoppingCart, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -26,13 +28,15 @@ interface BestSellersSectionProps {
 
 export default function BestSellersSection({ filteredProducts }: BestSellersSectionProps) {
   const router = useRouter();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const initialLimit = 8;
 
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [visibleProducts, setVisibleProducts] = useState<Product[]>([]);
-  const [cartModalProduct, setCartModalProduct] = useState<Product | null>(null);
-  const [wishlist, setWishlist] = useState<Product[]>([]);
   const [wishlistToast, setWishlistToast] = useState(false);
+  const [cartModalProduct, setCartModalProduct] = useState<Product | null>(null);
+  // const [wishlist, setWishlist] = useState<Product[]>([]);
+  // const [wishlistToast, setWishlistToast] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -106,19 +110,6 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
     setVisibleProducts(productsToShow.slice(0, initialLimit));
   }, [allProducts, filteredProducts]);
 
-  // Load wishlist from localStorage
-  useEffect(() => {
-    try {
-      const storedWishlist = localStorage.getItem("wishlist");
-      if (storedWishlist) {
-        const parsed = JSON.parse(storedWishlist) as Product[];
-        setWishlist(parsed.filter(p => p.id)); // Filter valid items
-      }
-    } catch {
-      localStorage.removeItem("wishlist");
-    }
-  }, []);
-
   // Prevent scroll when cart modal is open
   useEffect(() => {
     document.body.style.overflow = cartModalProduct ? "hidden" : "auto";
@@ -126,15 +117,6 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
       document.body.style.overflow = "auto";
     };
   }, [cartModalProduct]);
-
-  const updateWishlist = (newWishlist: Product[]) => {
-    setWishlist(newWishlist);
-    try {
-      localStorage.setItem("wishlist", JSON.stringify(newWishlist));
-    } catch {
-      console.warn("LocalStorage quota exceeded");
-    }
-  };
 
   const loadMoreProducts = () => {
     setLoadingMore(true);
@@ -155,11 +137,11 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
   };
 
   const handleWishlist = (product: Product) => {
-    const exists = wishlist.some((p) => String(p.id) === String(product.id));
-    const updated = exists
-      ? wishlist.filter((p) => String(p.id) !== String(product.id))
-      : [...wishlist, product];
-    updateWishlist(updated);
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product);
+    }
     setWishlistToast(true);
     setTimeout(() => setWishlistToast(false), 1500);
   };
@@ -169,17 +151,17 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
   };
 
   return (
-    <section className="py-16 px-4 md:px-12 relative bg-white">
+    <section className="md:py-16 py-10 px-4 md:px-12 relative bg-white">
       <div className="max-w-7xl mx-auto w-full">
         {/* Header - UNCHANGED */}
         <div className="text-center mb-10 md:mb-16">
-          <span className="text-sm uppercase tracking-widest text-accent font-semibold">
+          <span className="text-sm uppercase tracking-widest text-accent font-medium">
             Best Sellers
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold mt-4 leading-tight text-gray-900">
+          <h2 className="text-2xl sm:text-2xl md:text-4xl font-semibold mt-2 leading-tight text-gray-900">
             Our Most Popular Products
           </h2>
-          <p className="text-gray-500 text-base md:text-xl mt-3 font-medium">
+          <p className="text-gray-500 mt-0 text-base md:text-lg font-light">
             Shop the best-selling items loved by our customers
           </p>
         </div>
@@ -204,17 +186,17 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
                 const discountPercent = hasDiscount
                   ? Math.round(((originalPrice - product.price) / originalPrice) * 100)
                   : 0;
-                const isWishlisted = wishlist.some((p) => String(p.id) === String(product.id));
+                const isWishlisted = isInWishlist(product.id);
 
                 return (
                   <div
                     key={uniqueKey} // ✅ FIXED: Always unique string key
-                    className="relative group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:ring-4 hover:ring-primary/10 hover:bg-white/90 backdrop-blur-sm border border-gray-100 flex flex-col"
+                    className="relative group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:ring-2 hover:ring-primary/10 hover:bg-white/90 backdrop-blur-sm border-2 border-gray-100 flex flex-col"
                   >
                     {/* Popular Badge - ENHANCED */}
                     {product.bestSeller && (
                       <motion.div
-                        className="absolute top-3 left-3 bg-linear-to-r from-red-500 to-pink-500 text-white text-xs font-bold uppercase px-3 py-1.5 rounded-full shadow-lg z-20"
+                        className="hidden md:block absolute top-3 left-3 bg-linear-to-r from-red-500 to-pink-500 text-white text-xs font-bold uppercase px-3 py-1.5 rounded-full shadow-lg z-20"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         whileHover={{ scale: 1.05 }}
@@ -254,8 +236,8 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
                           handleWishlist(product);
                         }}
                         className={`w-11 h-11 bg-white/95 hover:bg-white backdrop-blur-sm rounded-2xl shadow-xl border flex items-center justify-center transition-all duration-200 hover:scale-110 hover:shadow-2xl ${isWishlisted
-                            ? 'border-red-400 text-red-500 hover:bg-red-50/80'
-                            : 'hover:border-gray-300'
+                          ? 'border-red-400 text-red-500 hover:bg-red-50/80'
+                          : 'hover:border-gray-300'
                           }`}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
@@ -279,15 +261,15 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
                     </div>
 
                     {/* Info - ENHANCED */}
-                    <div className="p-5 pb-3" onClick={() => goToProduct(product)}>
-                      <h3 className="text-base md:text-lg font-bold text-gray-900 leading-tight line-clamp-2 group-hover:text-primary transition-all duration-300">
+                    <div className="md:p-5 p-3 md:pb-3" onClick={() => goToProduct(product)}>
+                      <h3 className="text-base md:text-md font-light text-gray-900 leading-tight line-clamp-2 group-hover:text-primary transition-all duration-300">
                         {product.name}
                       </h3>
-                      <div className="flex items-center mt-3 mb-4">
+                      <div className="flex items-center my-1">
                         {[...Array(5)].map((_, i) => (
                           <FaStar
                             key={`star-${i}-${uniqueKey}`} // ✅ Unique star keys too
-                            className={`w-4 h-4 transition-colors ${i < product.rating ? "text-amber-400 fill-amber-400" : "text-gray-300"
+                            className={`w-3 h-3 transition-colors ${i < product.rating ? "text-amber-400 fill-amber-400" : "text-gray-300"
                               }`}
                           />
                         ))}
@@ -296,11 +278,11 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
                         </span>
                       </div>
                       <div className="flex items-center gap-3 pt-1">
-                        <p className="text-xl md:text-2xl font-black text-gray-900 drop-shadow-sm">
+                        <p className="text-md md:text-xl font-black text-gray-900 drop-shadow-sm">
                           ${product.price.toLocaleString()}
                         </p>
                         {hasDiscount && (
-                          <p className="text-sm font-medium text-gray-400 line-through">
+                          <p className="text-sm font-light text-gray-400 line-through">
                             ${originalPrice?.toLocaleString()}
                           </p>
                         )}
@@ -320,7 +302,7 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
                   <Button
                     variant="primary"
-                    className="px-12 py-4 text-lg font-semibold shadow-xl hover:shadow-2xl hover:ring-4 hover:ring-primary/20 transition-all duration-300 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90"
+                    className="px-12 py-4 text-lg font-semibold shadow-xl hover:shadow-2xl hover:ring-4 hover:ring-primary/20 transition-all duration-300 bg-linear-to-r from-primary to-primary/90 hover:from-primary/90"
                     onClick={loadMoreProducts}
                     disabled={loadingMore}
                   >
@@ -343,12 +325,12 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
         <AnimatePresence>
           {cartModalProduct && (
             <motion.div
-              className="fixed bottom-6 right-6 md:bottom-10 md:right-10 bg-white/95 backdrop-blur-xl shadow-2xl rounded-2xl p-5 flex items-center gap-4 z-[200] border border-gray-200 max-w-sm"
+              className="fixed bottom-6 right-6 md:bottom-10 md:right-10 bg-white/95 backdrop-blur-xl shadow-2xl rounded-2xl p-5 flex items-center gap-4 z-200 border border-gray-200 max-w-sm"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 50 }}
             >
-              <div className="relative w-14 h-14 flex-shrink-0">
+              <div className="relative w-14 h-14 shrink-0">
                 <Image
                   src={(cartModalProduct.images as string[])[0] || "/placeholder.png"}
                   alt={cartModalProduct.name}
@@ -368,7 +350,7 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
         <AnimatePresence>
           {wishlistToast && (
             <motion.div
-              className="fixed bottom-28 right-6 md:bottom-32 md:right-10 bg-gradient-to-r from-gray-900 to-gray-800 text-white px-6 py-3 rounded-xl text-sm font-semibold shadow-2xl z-[200] border border-white/20"
+              className="fixed bottom-28 right-6 md:bottom-32 md:right-10 bg-linear-to-r from-gray-900 to-gray-800 text-white px-6 py-3 rounded-xl text-sm font-semibold shadow-2xl z-200 border border-white/20"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 30 }}

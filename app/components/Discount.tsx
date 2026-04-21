@@ -40,7 +40,7 @@ export default function DiscountsSection() {
   return (
     <section className="py-5 sm:py-10 lg:py-12 px-6 lg:px-12 overflow-hidden relative bg-black">
       {/* Subtle gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-slate-900/30 to-black" />
+      <div className="absolute inset-0 bg-linear-to-b from-black via-slate-900/30 to-black" />
       
       <div className="relative z-10 w-full max-w-md lg:max-w-lg mx-auto text-center text-white">
         
@@ -61,7 +61,7 @@ export default function DiscountsSection() {
           className="text-3xl sm:text-4xl lg:text-5xl font-serif font-light leading-tight mb-3"
         >
           Up to{' '}
-          <span className="block text-4xl sm:text-5xl lg:text-6xl font-black bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+          <span className="block text-4xl sm:text-5xl lg:text-6xl font-black bg-linear-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
             70% OFF
           </span>
         </motion.h2>

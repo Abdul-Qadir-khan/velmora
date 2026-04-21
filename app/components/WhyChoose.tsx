@@ -12,14 +12,14 @@ const features = [
 
 export default function WhyChooseUs() {
   return (
-    <section className="py-16 px-6 lg:px-12 bg-slate-50">
+    <section className="md:py-16 py-10 px-4 md:px-12 bg-slate-50">
       <div className="max-w-4xl mx-auto text-center">
         
         {/* Compact Header */}
         <motion.h2 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          className="text-3xl lg:text-4xl font-serif font-light text-slate-900 mb-4 leading-tight"
+          className="text-3xl lg:text-4xl font-serif font-medium text-slate-900 leading-tight"
         >
           Why Choose Us
         </motion.h2>
@@ -27,13 +27,13 @@ export default function WhyChooseUs() {
         <motion.p 
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
-          className="text-lg text-slate-600 font-light mb-12 max-w-lg mx-auto"
+          className="text-lg text-slate-600 font-light mb-5 max-w-lg mx-auto"
         >
           Luxury crafted for you
         </motion.p>
 
         {/* Tight Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-5">
           {features.map((feature, i) => (
             <motion.div
               key={feature.title}

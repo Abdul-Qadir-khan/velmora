@@ -421,13 +421,13 @@ export default function ProductForm({ initialData }: ProductFormProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl border border-white/50 p-8">
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Header */}
             <div className="text-center pb-8 border-b border-gray-200">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 {initialData ? "Edit Product" : "Add New Product"}
               </h1>
               <p className="text-gray-600 mt-2">Fill out all fields to create/update your product</p>
@@ -601,7 +601,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                       className="hidden"
                     />
                     <div className="space-y-3">
-                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center text-white font-semibold shadow-lg">
+                      <div className="w-16 h-16 bg-linear-to-br from-blue-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center text-white font-semibold shadow-lg">
                         📸
                       </div>
                       <div>
@@ -636,7 +636,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                 </div>
 
                 {/* Brand Section */}
-                <div className="space-y-4 p-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-3xl border-2 border-emerald-100">
+                <div className="space-y-4 p-6 bg-linear-to-r from-emerald-50 to-teal-50 rounded-3xl border-2 border-emerald-100">
                   <h3 className="text-lg font-bold text-emerald-900 flex items-center gap-2">🏷️ Brand</h3>
 
                   <input
@@ -686,7 +686,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
             {/* Variations & Specs */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Variations */}
-              <div className="space-y-4 p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-3xl border-2 border-purple-100">
+              <div className="space-y-4 p-6 bg-linear-to-r from-purple-50 to-indigo-50 rounded-3xl border-2 border-purple-100">
                 <h3 className="text-lg font-bold text-purple-900 flex items-center gap-2">🎨 Variations</h3>
 
                 <div className="space-y-4">
@@ -729,7 +729,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
               </div>
 
               {/* Specifications */}
-              <div className="space-y-4 p-6 bg-gradient-to-r from-orange-50 to-rose-50 rounded-3xl border-2 border-orange-100">
+              <div className="space-y-4 p-6 bg-linear-to-r from-orange-50 to-rose-50 rounded-3xl border-2 border-orange-100">
                 <h3 className="text-lg font-bold text-orange-900 flex items-center gap-2">📋 Specifications</h3>
                 <div className="grid grid-cols-1 gap-3">
                   {Object.entries(form.variations.specs).map(([key, value]) => (
@@ -748,7 +748,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
             </div>
 
             {/* SEO Section */}
-            <div className="p-8 bg-gradient-to-r from-indigo-50 to-violet-50 rounded-3xl border-2 border-indigo-100">
+            <div className="p-8 bg-linear-to-r from-indigo-50 to-violet-50 rounded-3xl border-2 border-indigo-100">
               <h3 className="text-xl font-bold text-indigo-900 mb-6 flex items-center gap-2">🔍 SEO Settings</h3>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
@@ -784,14 +784,14 @@ export default function ProductForm({ initialData }: ProductFormProps) {
 
             {/* Progress Bar */}
             {uploadProgress > 0 && (
-              <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl border-2 border-blue-200">
+              <div className="p-4 bg-linear-to-r from-blue-50 to-purple-50 rounded-2xl border-2 border-blue-200">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-blue-900">Saving Progress</span>
                   <span className="text-sm font-medium text-blue-900">{uploadProgress}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
                   <div
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 h-3 rounded-full transition-all duration-300 shadow-lg"
+                    className="bg-linear-to-r from-blue-600 to-purple-600 h-3 rounded-full transition-all duration-300 shadow-lg"
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
@@ -803,7 +803,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative px-12 py-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-lg rounded-3xl hover:from-blue-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-200 transform hover:scale-[1.02] transition-all duration-200 shadow-2xl hover:shadow-3xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="group relative px-12 py-6 bg-linear-to-r from-blue-600 to-purple-600 text-white font-bold text-lg rounded-3xl hover:from-blue-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-200 transform hover:scale-[1.02] transition-all duration-200 shadow-2xl hover:shadow-3xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 <span className="relative z-10 flex items-center gap-2">
                   {loading ? (

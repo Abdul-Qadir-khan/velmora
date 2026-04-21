@@ -210,8 +210,8 @@ export default function ProductClient({
                     key={c}
                     onClick={() => setSelectedColor(c)}
                     className={`px-4 py-1 border rounded-full text-sm transition-all ${selectedColor === c
-                        ? "bg-black text-white scale-110 shadow-lg"
-                        : "hover:bg-black hover:text-white"
+                      ? "bg-black text-white scale-110 shadow-lg"
+                      : "hover:bg-black hover:text-white"
                       }`}
                   >
                     {c}
@@ -228,8 +228,8 @@ export default function ProductClient({
                     key={s}
                     onClick={() => setSelectedSize(s)}
                     className={`px-4 py-1 border rounded-full text-sm transition-all ${selectedSize === s
-                        ? "bg-black text-white scale-110 shadow-lg"
-                        : "hover:bg-black hover:text-white"
+                      ? "bg-black text-white scale-110 shadow-lg"
+                      : "hover:bg-black hover:text-white"
                       }`}
                   >
                     {s}
@@ -262,8 +262,8 @@ export default function ProductClient({
               disabled={!selectedSize || !selectedColor}
               onClick={handleAddToCart}
               className={`px-6 py-3 rounded-full text-white transition transform ${selectedSize && selectedColor
-                  ? "bg-black hover:bg-gray-800 hover:scale-105"
-                  : "bg-gray-300 cursor-not-allowed"
+                ? "bg-black hover:bg-gray-800 hover:scale-105"
+                : "bg-gray-300 cursor-not-allowed"
                 }`}
             >
               Add to Cart
@@ -287,8 +287,8 @@ export default function ProductClient({
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 font-medium transition-all ${activeTab === tab
-                  ? "border-b-2 border-black text-black"
-                  : "text-gray-500 hover:text-black"
+                ? "border-b-2 border-black text-black"
+                : "text-gray-500 hover:text-black"
                 }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -356,7 +356,7 @@ export default function ProductClient({
             >
               {normalizedRecommended.map((p) => (
                 <Link key={p.id} href={`/shop/${p.slug}`}>
-                  <div className="flex-shrink-0 w-40 md:w-48 bg-gray-50 p-4 rounded-xl text-center hover:shadow-lg hover:scale-105 transition snap-start cursor-pointer">
+                  <div className="shrink-0 w-40 md:w-48 bg-gray-50 p-4 rounded-xl text-center hover:shadow-lg hover:scale-105 transition snap-start cursor-pointer">
                     <img
                       src={p.images[0] || "/placeholder.png"}
                       className="h-32 md:h-40 mx-auto object-contain transition-transform duration-300"

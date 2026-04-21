@@ -40,10 +40,10 @@ export default function FlashSalePopup() {
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="p-8 lg:p-10 bg-gradient-to-r from-rose-600 via-rose-500 to-orange-500 text-white relative">
-            <button
+          <div className="p-8 lg:p-10 bg-linear-to-r from-rose-600 via-rose-500 to-orange-500 text-white relative">
+            <button 
               onClick={closePopup}
-              className="absolute top-6 right-6 p-2 hover:bg-white/20 rounded-xl transition-all duration-300 hover:scale-110"
+              className="cursor-pointer absolute top-6 right-6 p-2 hover:bg-white/20 rounded-xl transition-all duration-300 hover:scale-110"
             >
               <X className="w-5 h-5" />
             </button>
@@ -85,7 +85,7 @@ export default function FlashSalePopup() {
             {/* CTA */}
             <Link 
               href="/shop"
-              className="group w-full flex items-center justify-center gap-3 py-5 px-8 bg-gradient-to-r from-rose-600 to-orange-500 hover:from-rose-700 hover:to-orange-600 text-white font-bold text-xl rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] mx-auto"
+              className="group w-full flex items-center justify-center gap-3 py-5 px-8 bg-linear-to-r from-rose-600 to-orange-500 hover:from-rose-700 hover:to-orange-600 text-white font-bold text-xl rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] mx-auto"
               onClick={() => setIsOpen(false)}
             >
               <span>Shop Sale Now</span>

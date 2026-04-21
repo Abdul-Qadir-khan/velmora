@@ -16,60 +16,66 @@ interface WishlistContextType {
   addToWishlist: (product: Product) => void;
   removeFromWishlist: (id: string | number) => void;
   isInWishlist: (id: string | number) => boolean;
+  isSyncing: boolean;
 }
 
 const WishlistContext = createContext<WishlistContextType | null>(null);
 
 export const WishlistProvider = ({ children }: { children: ReactNode }) => {
   const [wishlist, setWishlist] = useState<Product[]>([]);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const wishlistCount = wishlist.length;
 
-  // 🔥 OPTIMISTIC: Instant UI updates
-  const addToWishlist = (product: Product) => {
+  const addToWishlist = useCallback((product: Product) => {
     if (wishlist.some(p => String(p.id) === String(product.id))) return;
     
-    // 1. INSTANT UI update
+    // 1. OPTIMISTIC UI
     setWishlist(prev => [...prev, { ...product, id: String(product.id) }]);
     
-    // 2. Backend sync (fire & forget)
+    // 2. SAVE TO COOKIES
     fetch("/api/wishlist", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(product),
+      credentials: 'include'  // ✅ INCLUDE COOKIES
     }).catch(console.error);
-  };
+  }, [wishlist]);
 
-  const removeFromWishlist = (id: string | number) => {
-    // 1. INSTANT UI update
+  const removeFromWishlist = useCallback((id: string | number) => {
+    // 1. OPTIMISTIC UI
     setWishlist(prev => prev.filter(p => String(p.id) !== String(id)));
     
-    // 2. Backend sync
+    // 2. SAVE TO COOKIES
     fetch("/api/wishlist", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
+      credentials: 'include'  // ✅ INCLUDE COOKIES
     }).catch(console.error);
-  };
+  }, []);
 
-  const isInWishlist = (id: string | number) => 
-    wishlist.some(p => String(p.id) === String(id));
+  const isInWishlist = useCallback((id: string | number) => 
+    wishlist.some(p => String(p.id) === String(id)), [wishlist]);
 
-  // Periodic backend sync (every 5s)
+  // ✅ FIXED: Initial load ONLY - NO AUTO-SYNC
   useEffect(() => {
-    const interval = setInterval(async () => {
+    const syncWishlist = async () => {
+      setIsSyncing(true);
       try {
-        const res = await fetch("/api/wishlist");
+        const res = await fetch("/api/wishlist", { credentials: 'include' });
         if (res.ok) {
           const data = await res.json();
           setWishlist(Array.isArray(data) ? data : []);
         }
-      } catch (e) {
-        console.error("Wishlist sync error:", e);
+      } catch (error) {
+        console.error("Initial wishlist load error:", error);
+      } finally {
+        setIsSyncing(false);
       }
-    }, 5000);
-    
-    return () => clearInterval(interval);
+    };
+
+    syncWishlist(); // Load once on mount
   }, []);
 
   return (
@@ -78,7 +84,8 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
       wishlistCount,
       addToWishlist,
       removeFromWishlist,
-      isInWishlist
+      isInWishlist,
+      isSyncing
     }}>
       {children}
     </WishlistContext.Provider>
