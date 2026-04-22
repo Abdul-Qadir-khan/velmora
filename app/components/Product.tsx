@@ -222,17 +222,18 @@ export default function ShopSection() {
     const sizes = sizesRaw ? JSON.parse(sizesRaw) as string[] : [];
     const colors = colorsRaw ? JSON.parse(colorsRaw) as string[] : [];
 
-    addToCart({
-      id: Number(product.id),
-      name: product.name || "Unknown Product",
-      price: Number(product.price),
-      qty: 1,
-      images: Array.isArray(product.images)
-        ? product.images
-        : JSON.parse((product.images as any) || '[]'),
-      selectedSize: sizes[0] || "M",
-      selectedColor: colors[0] || "#000000",
-    });
+   // Product.tsx - Line 225 replacement:
+const handleAddToCart = async () => {
+  try {
+    // ✅ Send ONLY SLUG to API (your backend finds everything else)
+    await addToCart(product.slug, 1);
+    
+    toast.success(`${product.name} added to cart! 🎉`);
+  } catch (error) {
+    console.error("Add to cart error:", error);
+    toast.error("Failed to add to cart");
+  }
+};
 
     toast.success(`${product.name} added to cart! 🛒`);
   }, [addToCart]);

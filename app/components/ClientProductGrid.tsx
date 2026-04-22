@@ -84,27 +84,20 @@ const productsWithSlugs = useMemo(() => {
     });
   };
 
-  const handleAddToCart = (product: Product) => {
-    try {
-      const images = getProductImage(product.images);
-      addToCart({
-        id: Number(String(product.id)), // ✅ Safe conversion
-        name: product.name,
-        price: Number(product.price),
-        qty: 1,
-        images: [images],
-        selectedSize: "M",
-        selectedColor: "#000",
-      });
-      toast.success(`${product.name} added to cart! 🎉`, {
-        duration: 3000,
-        position: "top-right",
-      });
-    } catch (error) {
-      console.error("Add to cart error:", error);
-      toast.error("Failed to add to cart");
-    }
-  };
+  const handleAddToCart = async (product: Product) => {
+  try {
+    // ✅ Your API expects SLUG only, NOT full object
+    await addToCart(product.slug, 1);
+    
+    toast.success(`${product.name} added to cart! 🎉`, {
+      duration: 3000,
+      position: "top-right",
+    });
+  } catch (error) {
+    console.error("Add to cart error:", error);
+    toast.error("Failed to add to cart");
+  }
+};
 
   const getProductImage = (images: any): string => {
     if (!images || images === null || images === undefined || images === "") {
