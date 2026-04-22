@@ -1,3 +1,4 @@
+// app/context/CartContext.tsx - FIXED VERSION
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
@@ -7,9 +8,9 @@ export interface CartItem {
   name: string;
   price: number;
   qty: number;
-  images: string[];
-  selectedSize: string;
-  selectedColor: string;
+  images: any;  // Keep flexible
+  selectedSize?: string;
+  selectedColor?: string;
 }
 
 interface CartContextType {
@@ -29,35 +30,44 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
 
-  // Sync with backend API
+  // 🔧 FIXED: Sync with backend + transform data properly
   const syncWithBackend = useCallback(async () => {
     try {
+      console.log("🔄 Syncing cart with backend...");
       setIsLoading(true);
+      
       const res = await fetch("/api/cart");
-      if (res.ok) {
-        const { cart: serverCart } = await res.json();
+      if (!res.ok) throw new Error("Failed to fetch cart");
+      
+      const { cart: serverCart } = await res.json();
+      console.log("📦 Raw server cart:", serverCart);
+      
+      // 🔑 TRANSFORM Prisma data to Checkout format
+      const uiCart: CartItem[] = serverCart.map((item: any) => {
+        console.log("🖼️ Processing item images:", item.product?.images);
         
-        // Transform server data to UI format
-        const uiCart: CartItem[] = serverCart.map((item: any) => ({
-          id: item.productId,
-          name: item.product.name,
-          price: parseFloat(item.product.price),
-          qty: item.quantity,
-          images: Array.isArray(item.product.images) ? item.product.images : [item.product.images],
-          selectedSize: "M",
-          selectedColor: "#000000",
-        }));
-        
-        setCart(uiCart);
-      }
+        return {
+          id: item.productId || item.product?.id,
+          name: item.product?.name || "Unknown Product",
+          price: parseFloat(item.product?.price || 0),
+          qty: item.quantity || 1,  // ✅ Prisma uses 'quantity'
+          images: item.product?.images,  // ✅ Pass raw images (string or array)
+          selectedSize: item.selectedSize || "M",
+          selectedColor: item.selectedColor || "#000000",
+        };
+      });
+      
+      console.log("✅ Transformed cart:", uiCart);
+      setCart(uiCart);
+      
     } catch (error) {
       console.error("Cart sync error:", error);
+      setCart([]); // Empty on error
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Initial load ONLY (no auto-sync)
   useEffect(() => {
     syncWithBackend();
   }, [syncWithBackend]);
@@ -65,22 +75,18 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const addToCart = async (slug: string, quantity: number = 1) => {
     try {
       setIsLoading(true);
-      
-      // Call your existing Prisma API
       const res = await fetch("/api/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug, quantity }),
       });
-
+      
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error || 'Failed to add to cart');
       }
-
-      // Refresh cart from server
-      await syncWithBackend();
       
+      await syncWithBackend();
     } catch (error) {
       console.error("addToCart error:", error);
       throw error;
@@ -92,18 +98,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const removeFromCart = async (productId: string | number) => {
     try {
       setIsLoading(true);
-      
       const res = await fetch("/api/cart", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId }),
       });
-
-      if (!res.ok) throw new Error('Failed to remove from cart');
-
-      // Refresh cart
-      await syncWithBackend();
       
+      if (!res.ok) throw new Error('Failed to remove from cart');
+      await syncWithBackend();
     } catch (error) {
       console.error("removeFromCart error:", error);
       throw error;
