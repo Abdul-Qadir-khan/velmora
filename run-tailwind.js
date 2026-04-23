@@ -12,6 +12,6 @@ exec(
     if (stderr) {
       console.error(`stderr: ${stderr}`);
     }
-    console.log(stdout);
+    // console.log(stdout);
   }
 );

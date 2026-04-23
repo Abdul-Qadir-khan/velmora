@@ -22,7 +22,7 @@ export default function ProductsPage() {
       const res = await fetch("/api/products");
       const data = await res.json();
 
-      console.log("API response:", data); // 🔍 Debug
+      // console.log("API response:", data); // 🔍 Debug
 
       // ✅ Fix: handle different API formats safely
       if (Array.isArray(data)) {

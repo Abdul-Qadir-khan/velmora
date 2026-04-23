@@ -99,7 +99,7 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
 
         setAllProducts(normalized);
       } catch (err) {
-        console.error("Failed to fetch products:", err);
+        // console.error("Failed to fetch products:", err);
       } finally {
         setIsLoading(false);
       }
@@ -146,9 +146,9 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
       setCartModalProduct(product);
       setTimeout(() => setCartModalProduct(null), 2000);
 
-      console.log('🛒 Added to REAL cart:', product.name);
+      // console.log('🛒 Added to REAL cart:', product.name);
     } catch (error) {
-      console.error('❌ Cart add failed:', error);
+      // console.error('❌ Cart add failed:', error);
       // Still show modal for UX
       setCartModalProduct(product);
       setTimeout(() => setCartModalProduct(null), 2000);

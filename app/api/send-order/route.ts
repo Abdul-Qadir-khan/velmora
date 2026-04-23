@@ -9,20 +9,20 @@ export async function POST(req: NextRequest) {
     try {
       data = await req.json();
     } catch (parseError) {
-      console.error("💥 JSON Parse Error:", parseError);
+      // console.error("💥 JSON Parse Error:", parseError);
       return NextResponse.json(
         { success: false, error: "Invalid JSON data" }, 
         { status: 400 }
       );
     }
 
-    console.log("📦 Received order:", {
-      orderId: data?.orderId,
-      name: data?.name,
-      email: data?.email,
-      total: data?.total,
-      itemsCount: data?.items?.length || 0
-    });
+    // console.log("📦 Received order:", {
+    //   orderId: data?.orderId,
+    //   name: data?.name,
+    //   email: data?.email,
+    //   total: data?.total,
+    //   itemsCount: data?.items?.length || 0
+    // });
 
     // ✅ Enhanced validation
     const requiredFields = { orderId: data?.orderId, name: data?.name, email: data?.email };
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 
     // ✅ Check environment variables
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.error("💥 Missing EMAIL_USER or EMAIL_PASS in environment");
+      // console.error("💥 Missing EMAIL_USER or EMAIL_PASS in environment");
       return NextResponse.json(
         { success: false, error: "Email service not configured" }, 
         { status: 500 }
@@ -59,14 +59,14 @@ export async function POST(req: NextRequest) {
     }
 
     if (!process.env.ADMIN_EMAIL) {
-      console.error("💥 Missing ADMIN_EMAIL in environment");
+      // console.error("💥 Missing ADMIN_EMAIL in environment");
       return NextResponse.json(
         { success: false, error: "Admin email not configured" }, 
         { status: 500 }
       );
     }
 
-    console.log("🔧 Creating transporter...");
+    // console.log("🔧 Creating transporter...");
     
     // ✅ Gmail SMTP transporter with better config
     const transporter = nodemailer.createTransport({
@@ -91,9 +91,9 @@ export async function POST(req: NextRequest) {
           setTimeout(() => reject(new Error("Transporter verification timeout")), 10000)
         )
       ]);
-      console.log("✅ Gmail SMTP connected successfully");
+      // console.log("✅ Gmail SMTP connected successfully");
     } catch (verifyError) {
-      console.error("💥 SMTP Verification failed:", verifyError);
+      // console.error("💥 SMTP Verification failed:", verifyError);
       return NextResponse.json(
         { 
           success: false, 
@@ -196,7 +196,7 @@ export async function POST(req: NextRequest) {
       html: adminHTML,
     };
 
-    console.log("📧 Sending emails...");
+    // console.log("📧 Sending emails...");
     
     // ✅ Send emails with individual error handling
     const [customerResult, adminResult] = await Promise.allSettled([
@@ -207,12 +207,12 @@ export async function POST(req: NextRequest) {
     const customerSuccess = customerResult.status === 'fulfilled';
     const adminSuccess = adminResult.status === 'fulfilled';
 
-    console.log("📧 Email results:", {
-      customer: customerSuccess ? '✅' : '❌',
-      admin: adminSuccess ? '✅' : '❌',
-      customerError: customerSuccess ? null : (customerResult as PromiseRejectedResult).reason,
-      adminError: adminSuccess ? null : (adminResult as PromiseRejectedResult).reason
-    });
+    // console.log("📧 Email results:", {
+    //   customer: customerSuccess ? '✅' : '❌',
+    //   admin: adminSuccess ? '✅' : '❌',
+    //   customerError: customerSuccess ? null : (customerResult as PromiseRejectedResult).reason,
+    //   adminError: adminSuccess ? null : (adminResult as PromiseRejectedResult).reason
+    // });
 
     // ✅ Return success even if one email fails (business critical)
     return NextResponse.json({
@@ -228,7 +228,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error("💥 Email API Error:", error);
+    // console.error("💥 Email API Error:", error);
     
     return NextResponse.json(
       { 

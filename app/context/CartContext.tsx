@@ -33,18 +33,18 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   // 🔧 FIXED: Sync with backend + transform data properly
   const syncWithBackend = useCallback(async () => {
     try {
-      console.log("🔄 Syncing cart with backend...");
+      // console.log("🔄 Syncing cart with backend...");
       setIsLoading(true);
       
       const res = await fetch("/api/cart");
       if (!res.ok) throw new Error("Failed to fetch cart");
       
       const { cart: serverCart } = await res.json();
-      console.log("📦 Raw server cart:", serverCart);
+      // console.log("📦 Raw server cart:", serverCart);
       
       // 🔑 TRANSFORM Prisma data to Checkout format
       const uiCart: CartItem[] = serverCart.map((item: any) => {
-        console.log("🖼️ Processing item images:", item.product?.images);
+        // console.log("🖼️ Processing item images:", item.product?.images);
         
         return {
           id: item.productId || item.product?.id,
@@ -57,11 +57,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         };
       });
       
-      console.log("✅ Transformed cart:", uiCart);
+      // console.log("✅ Transformed cart:", uiCart);
       setCart(uiCart);
       
     } catch (error) {
-      console.error("Cart sync error:", error);
+      // console.error("Cart sync error:", error);
       setCart([]); // Empty on error
     } finally {
       setIsLoading(false);
@@ -88,7 +88,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       
       await syncWithBackend();
     } catch (error) {
-      console.error("addToCart error:", error);
+      // console.error("addToCart error:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -107,7 +107,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       if (!res.ok) throw new Error('Failed to remove from cart');
       await syncWithBackend();
     } catch (error) {
-      console.error("removeFromCart error:", error);
+      // console.error("removeFromCart error:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -119,7 +119,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       await fetch("/api/cart", { method: "DELETE" });
       setCart([]);
     } catch (error) {
-      console.error("clearCart error:", error);
+      // console.error("clearCart error:", error);
     }
   };
 

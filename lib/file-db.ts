@@ -10,7 +10,7 @@ export const readProducts = () => {
     const data = fs.readFileSync(filePath, "utf-8");
     return JSON.parse(data);
   } catch (error) {
-    console.error("Error reading products.json:", error);
+    // console.error("Error reading products.json:", error);
     return [];
   }
 };
@@ -21,7 +21,7 @@ export const writeProducts = (data: any) => {
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
     return true;
   } catch (error) {
-    console.error("Error writing products.json:", error);
+    // console.error("Error writing products.json:", error);
     return false;
   }
 };

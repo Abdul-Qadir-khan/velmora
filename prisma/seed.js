@@ -3,7 +3,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Seeding database...');
+  // console.log('Seeding database...');
 
   await prisma.product.deleteMany(); // optional: clear old data
 
@@ -48,7 +48,7 @@ async function main() {
     ],
   });
 
-  console.log('Seeding finished!');
+  // console.log('Seeding finished!');
 }
 
 main()

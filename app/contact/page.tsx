@@ -106,7 +106,7 @@ export default function Contact() {
         message: ""
       });
     } catch (error) {
-      console.error("Submit error:", error);
+      // console.error("Submit error:", error);
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);

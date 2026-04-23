@@ -15,7 +15,7 @@ export default function OrdersPage() {
         const json = await res.json();
         setOrders(json);
       } catch (err) {
-        console.error(err);
+        // console.error(err);
         setOrders([]);
       } finally {
         setLoading(false);

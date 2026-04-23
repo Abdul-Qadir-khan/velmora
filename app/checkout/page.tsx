@@ -28,10 +28,10 @@ interface OrderForm {
 
 // 🛡️ ULTIMATE Image Handler - Fixes JSON string issue
 const getSafeImage = (images: any): string => {
-  console.log("🔍 getSafeImage input:", images);
+  // console.log("🔍 getSafeImage input:", images);
   
   if (!images) {
-    console.log("❌ No images");
+    // console.log("❌ No images");
     return "/placeholder.png";
   }
 
@@ -46,27 +46,27 @@ const getSafeImage = (images: any): string => {
         const parsed = JSON.parse(images);
         if (Array.isArray(parsed)) {
           imageData = parsed;
-          console.log("✅ Parsed JSON string to array:", parsed);
+          // console.log("✅ Parsed JSON string to array:", parsed);
         }
       } catch (e) {
-        console.log("⚠️ Not valid JSON array:", images);
+        // console.log("⚠️ Not valid JSON array:", images);
         imageData = images;
       }
     }
 
     // Case 1: Array of images (parsed or real)
     if (Array.isArray(imageData)) {
-      console.log("📂 Array found:", imageData);
+      // console.log("📂 Array found:", imageData);
       for (const img of imageData) {
         if (img && typeof img === 'string' && img.trim()) {
           const url = img.trim();
           if (url.startsWith('http') || url.startsWith('/') || url.startsWith('https')) {
-            console.log("✅ Found valid image:", url);
+            // console.log("✅ Found valid image:", url);
             return url;
           }
         }
       }
-      console.log("❌ No valid array images");
+      // console.log("❌ No valid array images");
       return "/placeholder.png";
     }
 
@@ -74,7 +74,7 @@ const getSafeImage = (images: any): string => {
     if (typeof imageData === 'string') {
       const url = imageData.trim();
       if (url && (url.startsWith('http') || url.startsWith('/') || url.startsWith('https'))) {
-        console.log("✅ Direct string URL:", url);
+        // console.log("✅ Direct string URL:", url);
         return url;
       }
     }
@@ -86,7 +86,7 @@ const getSafeImage = (images: any): string => {
         if (imageData[key]) {
           const img = getSafeImage(imageData[key]); // Recursive
           if (img !== "/placeholder.png") {
-            console.log("✅ Found in object:", img);
+            // console.log("✅ Found in object:", img);
             return img;
           }
         }
@@ -94,10 +94,10 @@ const getSafeImage = (images: any): string => {
     }
 
   } catch (error) {
-    console.error("💥 Image parsing error:", error);
+    // console.error("💥 Image parsing error:", error);
   }
 
-  console.log("❌ Final fallback to placeholder");
+  // console.log("❌ Final fallback to placeholder");
   return "/placeholder.png";
 };
 
@@ -412,16 +412,16 @@ export default function CheckoutPage() {
   const [placingOrder, setPlacingOrder] = useState(false);
 
   const displayCart = useMemo((): CartProduct[] => {
-  console.log("🛒 Raw cart from context:", cart);
+  // console.log("🛒 Raw cart from context:", cart);
   return cart
     .filter(item => item?.id)
     .map(item => {
       const safeImage = getSafeImage(item.images);
-      console.log(`🖼️ Item ${item.id}:`, {
-        rawImages: item.images,
-        safeImage,
-        name: item.name
-      });
+      // console.log(`🖼️ Item ${item.id}:`, {
+      //   rawImages: item.images,
+      //   safeImage,
+      //   name: item.name
+      // });
       
       return {
         productId: String(item.id),
@@ -500,7 +500,7 @@ export default function CheckoutPage() {
         timestamp: new Date().toISOString(),
       };
 
-      console.log("📦 Placing order:", orderData);
+      // console.log("📦 Placing order:", orderData);
 
       const response = await fetch('/api/orders', {
         method: 'POST',
@@ -517,7 +517,7 @@ export default function CheckoutPage() {
         throw new Error(errorData.message || 'Order placement failed');
       }
     } catch (error: any) {
-      console.error("❌ Order failed:", error);
+      // console.error("❌ Order failed:", error);
       alert(`Order failed: ${error.message}`);
     } finally {
       setPlacingOrder(false);

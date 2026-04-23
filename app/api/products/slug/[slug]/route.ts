@@ -28,7 +28,7 @@ export async function GET(req: Request, context: Context) {
 
     return NextResponse.json(product, { status: 200 });
   } catch (error) {
-    console.error("GET /api/products/slug error:", error);
+    // console.error("GET /api/products/slug error:", error);
     return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
   }
 }

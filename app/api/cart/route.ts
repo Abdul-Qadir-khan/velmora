@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     // ✅ Filter out null products AFTER query (TypeScript safe)
     const validCart = cart.filter(item => item.product !== null);
 
-    console.log("✅ Cart GET:", validCart.length, "valid items");
+    // console.log("✅ Cart GET:", validCart.length, "valid items");
     return NextResponse.json({ cart: validCart });
   } catch (err) {
     console.error("❌ GET /api/cart error:", err);
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     const userId = getUserId(req);
     const { slug, quantity } = await req.json();
 
-    console.log("🛒 POST add to cart:", { userId, slug, quantity });
+    // console.log("🛒 POST add to cart:", { userId, slug, quantity });
 
     if (!slug || !quantity || quantity < 1) {
       return NextResponse.json({ error: "Invalid input" }, { status: 400 });
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
 
     const validCart = cart.filter(item => item.product !== null);
 
-    console.log("✅ Added to cart:", cartItem.id);
+    // console.log("✅ Added to cart:", cartItem.id);
     return NextResponse.json({ cart: validCart });
   } catch (err) {
     console.error("❌ POST /api/cart error:", err);
@@ -104,13 +104,13 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const userId = getUserId(req);
-    console.log("🗑️ DELETE cart for user:", userId);
+    // console.log("🗑️ DELETE cart for user:", userId);
     
     let body: any = {};
     try {
       body = await req.json();
     } catch (e) {
-      console.log("ℹ️ Empty body - clearing all cart");
+      // console.log("ℹ️ Empty body - clearing all cart");
     }
     
     const { productId } = body;
@@ -119,10 +119,10 @@ export async function DELETE(req: NextRequest) {
       const deleted = await prisma.cartItem.deleteMany({
         where: { userId, productId: String(productId) }
       });
-      console.log("✅ Removed", deleted.count, "product(s):", productId);
+      // console.log("✅ Removed", deleted.count, "product(s):", productId);
     } else {
       const deleted = await prisma.cartItem.deleteMany({ where: { userId } });
-      console.log("✅ Cleared", deleted.count, "cart items");
+      // console.log("✅ Cleared", deleted.count, "cart items");
     }
 
     // ✅ Fetch remaining cart and filter null products

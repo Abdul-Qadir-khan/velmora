@@ -69,7 +69,7 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
           setWishlist(Array.isArray(data) ? data : []);
         }
       } catch (error) {
-        console.error("Initial wishlist load error:", error);
+        // console.error("Initial wishlist load error:", error);
       } finally {
         setIsSyncing(false);
       }

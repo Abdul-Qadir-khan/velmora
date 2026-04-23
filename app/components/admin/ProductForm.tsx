@@ -412,7 +412,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
       router.push("/admin/products");
 
     } catch (err: any) {
-      console.error("Submit error:", err);
+      // console.error("Submit error:", err);
       setError(err.message || "Failed to save product");
     } finally {
       setLoading(false);

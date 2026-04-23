@@ -131,17 +131,17 @@ export default function WishlistPage() {
     try {
       const slug = product.slug || product.name?.toLowerCase().replace(/\s+/g, '-');
       
-      console.log("✅ Adding to cart (slug):", slug);
+      // console.log("✅ Adding to cart (slug):", slug);
       
       // Call CartContext with correct API
       await addToCart(slug, 1);
       
       // Remove from wishlist AFTER success
       removeFromWishlist(product.id);
-      console.log("✅ Removed from wishlist");
+      // console.log("✅ Removed from wishlist");
       
     } catch (error) {
-      console.error("❌ Cart add failed:", error);
+      // console.error("❌ Cart add failed:", error);
     }
   };
 

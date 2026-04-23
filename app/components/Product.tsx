@@ -71,7 +71,7 @@ export default function ShopSection() {
 
         setAllProducts(normalized);
       } catch (err) {
-        console.error("Failed to fetch products:", err);
+        // console.error("Failed to fetch products:", err);
       } finally {
         setIsLoading(false);
       }
@@ -230,7 +230,7 @@ const handleAddToCart = async () => {
     
     toast.success(`${product.name} added to cart! 🎉`);
   } catch (error) {
-    console.error("Add to cart error:", error);
+    // console.error("Add to cart error:", error);
     toast.error("Failed to add to cart");
   }
 };

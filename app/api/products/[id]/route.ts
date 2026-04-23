@@ -95,7 +95,7 @@ export async function PUT(
 
     return NextResponse.json(updatedProduct);
   } catch (error: any) {
-    console.error("PUT /api/products/[id] error:", error);
+    // console.error("PUT /api/products/[id] error:", error);
 
     return NextResponse.json(
       {
@@ -128,7 +128,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error("DELETE /api/products/[id] error:", error);
+    // console.error("DELETE /api/products/[id] error:", error);
 
     return NextResponse.json(
       {

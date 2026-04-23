@@ -35,10 +35,10 @@ const setWishlistCookie = (response: NextResponse, wishlist: Product[]) => {
 export async function GET(request: NextRequest) {
   try {
     const wishlist = getWishlist(request);
-    console.log('❤️ Wishlist GET:', wishlist.length, 'items');
+    // console.log('❤️ Wishlist GET:', wishlist.length, 'items');
     return NextResponse.json(wishlist);
   } catch (error) {
-    console.error('❌ GET wishlist error:', error);
+    // console.error('❌ GET wishlist error:', error);
     return NextResponse.json([], { status: 200 }); // ✅ Graceful fallback
   }
 }
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const product: Product = await request.json();
-    console.log('❤️ Adding to wishlist:', product.id);
+    // console.log('❤️ Adding to wishlist:', product.id);
     
     let wishlist = getWishlist(request);
     
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     
     return response;
   } catch (error) {
-    console.error('❌ POST wishlist error:', error);
+    // console.error('❌ POST wishlist error:', error);
     return NextResponse.json({ error: 'Failed to add to wishlist' }, { status: 500 });
   }
 }
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const { id } = await request.json();
-    console.log('❤️ Removing from wishlist:', id);
+    // console.log('❤️ Removing from wishlist:', id);
     
     let wishlist = getWishlist(request);
     const newWishlist = wishlist.filter(p => String(p.id) !== String(id));
@@ -82,7 +82,7 @@ export async function DELETE(request: NextRequest) {
     
     return response;
   } catch (error) {
-    console.error('❌ DELETE wishlist error:', error);
+    // console.error('❌ DELETE wishlist error:', error);
     return NextResponse.json({ error: 'Failed to remove from wishlist' }, { status: 500 });
   }
 }

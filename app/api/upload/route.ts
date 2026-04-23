@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     });
 
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }
