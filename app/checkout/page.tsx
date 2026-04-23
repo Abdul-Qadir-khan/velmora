@@ -191,7 +191,7 @@ const CartStep = ({
 
                 <button
                   onClick={() => removeFromCart(item.productId)}
-                  className="group/remove flex items-center gap-1.5 lg:gap-2 text-xs lg:text-sm font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 px-3 lg:px-4 py-2 rounded-xl transition-all duration-200 hover:shadow-sm"
+                  className="group/remove flex items-center gap-1.5 lg:gap-2 text-xs lg:text-sm font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 px-3 lg:px-4 py-2 rounded-xl transition-all duration-200 hover:shadow-sm cursor-pointer"
                 >
                   <svg className="w-3.5 h-3.5 lg:w-4 lg:h-4 group-hover/remove:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -536,7 +536,7 @@ export default function CheckoutPage() {
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Refined typography */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-serif font-light tracking-tight bg-gradient-to-r from-white via-slate-100 to-emerald-100/80 bg-clip-text text-transparent mb-8 leading-[0.9] drop-shadow-xl">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-light tracking-tight bg-gradient-to-r from-white via-slate-100 to-emerald-100/80 bg-clip-text text-transparent mb-8 leading-[0.9] drop-shadow-xl">
             Checkout
           </h1>
 
@@ -642,14 +642,14 @@ export default function CheckoutPage() {
               <div className="bg-white/90 backdrop-blur-xl p-6 lg:p-8 rounded-2xl shadow-2xl border border-white/60 ring-1 ring-slate-100/50 hover:ring-slate-200/60 transition-all duration-500 group/summary">
 
                 {/* 🏛️ Compact Header */}
-                <h3 className="text-xl font-serif font-light tracking-tight text-slate-900 uppercase border-b border-slate-100 pb-4 mb-6">
+                <h3 className="text-xl font-light tracking-tight text-slate-900 uppercase border-b border-slate-100 pb-4 mb-6">
                   Order Summary
                 </h3>
 
                 {/* 📊 Tight Pricing */}
                 <div className="space-y-4 mb-8">
                   <div className="flex justify-between py-3 border-b border-slate-100/50">
-                    <span className="text-sm font-serif font-light text-slate-700">
+                    <span className="text-sm font-light text-slate-700">
                       Subtotal ({cartCount} {cartCount === 1 ? 'item' : 'items'})
                     </span>
                     <span className="text-xl font-mono font-normal text-slate-900">
@@ -658,7 +658,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="flex justify-between py-3 border-b border-slate-100/50">
-                    <span className="text-sm font-serif font-light text-slate-700">Shipping</span>
+                    <span className="text-sm font-light text-slate-700">Shipping</span>
                     {isFreeShipping ? (
                       <span className="text-lg font-medium text-emerald-600 px-2 py-1 bg-emerald-50/80 rounded-full text-xs uppercase tracking-wider">
                         Free
@@ -684,7 +684,7 @@ export default function CheckoutPage() {
                 {/* 💎 Compact Total */}
                 <div className="border-t border-slate-100 pt-6">
                   <div className="flex justify-between items-baseline mb-6 p-4 bg-gradient-to-r from-slate-50/70 to-white/50 rounded-xl border border-slate-100/30 shadow-sm">
-                    <span className="text-lg font-serif font-light text-slate-900">Total</span>
+                    <span className="text-lg font-light text-slate-900">Total</span>
                     <span className="text-3xl font-mono font-normal bg-gradient-to-r from-slate-900 to-slate-800 bg-clip-text text-transparent">
                       ₹{total.toLocaleString()}
                     </span>
@@ -702,7 +702,7 @@ export default function CheckoutPage() {
                     <button
                       onClick={() => setStep(2)}
                       disabled={displayCart.length === 0}
-                      className="group w-full bg-gradient-to-r from-slate-900 to-slate-950 text-white py-4 px-6 rounded-xl font-serif font-light text-sm uppercase tracking-wider hover:from-slate-800 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 shadow-lg border border-slate-900/20 disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden relative"
+                      className="group w-full bg-gradient-to-r from-slate-900 to-slate-950 text-white py-4 px-6 rounded-xl font-light text-sm uppercase tracking-wider hover:from-slate-800 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 shadow-lg border border-slate-900/20 disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden relative"
                     >
                       <div className="flex items-center justify-center gap-2 relative z-10">
                         Checkout
