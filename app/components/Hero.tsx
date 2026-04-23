@@ -7,7 +7,7 @@ const slides = [
   {
     title: "NEW COLLECTION",
     subtitle: "Refined essentials for everyday wear.",
-    image: "/images/categories/mens-wear.avif",
+    image: "/images/new-collection.jpg",
     cta: "Shop Now",
   },
   {
@@ -19,7 +19,7 @@ const slides = [
   {
     title: "TIMELESS PIECES",
     subtitle: "Designed to outlast trends.",
-    image: "/images/categories/watches.jpg",
+    image: "/images/watches.jpg",
     cta: "Discover",
   },
 ];

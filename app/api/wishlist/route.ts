@@ -1,5 +1,4 @@
-import { cookies } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 interface Product {
   id: string | number;
@@ -9,10 +8,10 @@ interface Product {
   images: string[] | string;
 }
 
-// ✅ FIXED: Better cookie reading
-const getWishlist = (cookieStore: any): Product[] => {
+// ✅ FIXED: Use NextRequest.cookies directly (no await needed)
+const getWishlist = (request: NextRequest): Product[] => {
   try {
-    const cookieValue = cookieStore.get('wishlist')?.value;
+    const cookieValue = request.cookies.get('wishlist')?.value;
     if (!cookieValue) return [];
     
     const parsed = JSON.parse(cookieValue);
@@ -22,8 +21,9 @@ const getWishlist = (cookieStore: any): Product[] => {
   }
 };
 
-const setWishlist = (cookies: any, wishlist: Product[]) => {
-  cookies().set('wishlist', JSON.stringify(wishlist), {
+// ✅ FIXED: Use response.cookies.set (no await needed)
+const setWishlistCookie = (response: NextResponse, wishlist: Product[]) => {
+  response.cookies.set('wishlist', JSON.stringify(wishlist), {
     httpOnly: false, // Allow client access
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
@@ -32,35 +32,37 @@ const setWishlist = (cookies: any, wishlist: Product[]) => {
 };
 
 // GET: Fetch wishlist
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const cookieStore = cookies();
-    const wishlist = getWishlist(cookieStore);
+    const wishlist = getWishlist(request);
+    console.log('❤️ Wishlist GET:', wishlist.length, 'items');
     return NextResponse.json(wishlist);
   } catch (error) {
-    console.error('GET wishlist error:', error);
-    return NextResponse.json([], { status: 500 });
+    console.error('❌ GET wishlist error:', error);
+    return NextResponse.json([], { status: 200 }); // ✅ Graceful fallback
   }
 }
 
 // POST: Add to wishlist
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = cookies();
     const product: Product = await request.json();
+    console.log('❤️ Adding to wishlist:', product.id);
     
-    let wishlist = getWishlist(cookieStore);
+    let wishlist = getWishlist(request);
     
-    // Remove existing product first (in case of duplicates)
+    // Remove existing product first (avoid duplicates)
     wishlist = wishlist.filter(p => String(p.id) !== String(product.id));
     // Add to beginning
     wishlist.unshift({ ...product, id: String(product.id) });
     
-    setWishlist(cookieStore, wishlist);
+    // ✅ Create response and set cookie
+    const response = NextResponse.json({ success: true, wishlist });
+    setWishlistCookie(response, wishlist);
     
-    return NextResponse.json({ success: true });
+    return response;
   } catch (error) {
-    console.error('POST wishlist error:', error);
+    console.error('❌ POST wishlist error:', error);
     return NextResponse.json({ error: 'Failed to add to wishlist' }, { status: 500 });
   }
 }
@@ -68,17 +70,19 @@ export async function POST(request: NextRequest) {
 // DELETE: Remove from wishlist
 export async function DELETE(request: NextRequest) {
   try {
-    const cookieStore = cookies();
     const { id } = await request.json();
+    console.log('❤️ Removing from wishlist:', id);
     
-    let wishlist = getWishlist(cookieStore);
+    let wishlist = getWishlist(request);
     const newWishlist = wishlist.filter(p => String(p.id) !== String(id));
     
-    setWishlist(cookieStore, newWishlist);
+    // ✅ Create response and set cookie
+    const response = NextResponse.json({ success: true, wishlist: newWishlist });
+    setWishlistCookie(response, newWishlist);
     
-    return NextResponse.json({ success: true });
+    return response;
   } catch (error) {
-    console.error('DELETE wishlist error:', error);
+    console.error('❌ DELETE wishlist error:', error);
     return NextResponse.json({ error: 'Failed to remove from wishlist' }, { status: 500 });
   }
 }

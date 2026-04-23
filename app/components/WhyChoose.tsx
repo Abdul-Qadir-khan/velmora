@@ -12,60 +12,59 @@ const features = [
 
 export default function WhyChooseUs() {
   return (
-    <section className="md:py-16 py-10 px-4 md:px-12 bg-slate-50">
-      <div className="max-w-4xl mx-auto text-center">
-        
-        {/* Compact Header */}
-        <motion.h2 
+    <section className="py-16 md:py-24 px-6 md:px-12 bg-white text-black">
+      <div className="max-w-5xl mx-auto">
+
+        {/* Editorial Header */}
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          className="text-3xl lg:text-4xl font-serif font-medium text-slate-900 leading-tight"
+          className="mb-14"
         >
-          Why Choose Us
-        </motion.h2>
+          <h2 className="text-4xl md:text-5xl font-serif font-light tracking-tight">
+            Why We Stand Apart
+          </h2>
+          <p className="mt-3 text-sm uppercase tracking-[0.25em] text-black/50">
+            Crafted with intention
+          </p>
+        </motion.div>
 
-        <motion.p 
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          className="text-lg text-slate-600 font-light mb-5 max-w-lg mx-auto"
-        >
-          Luxury crafted for you
-        </motion.p>
-
-        {/* Tight Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-5">
+        {/* Minimal Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-12 gap-x-8 mb-16">
           {features.map((feature, i) => (
             <motion.div
               key={feature.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.08 }}
-              whileHover={{ y: -4, scale: 1.01 }}
-              className="group p-6 rounded-xl bg-white/60 backdrop-blur-sm border border-slate-100 hover:border-slate-200 hover:shadow-lg transition-all duration-400 cursor-pointer"
+              className="group cursor-pointer"
             >
-              <div className="text-xl lg:text-2xl font-serif font-normal text-slate-900 mb-2 group-hover:text-slate-800">
+              {/* Stat */}
+              <div className="text-xl md:text-2xl font-serif mb-2">
                 {feature.stat}
               </div>
-              <div className="text-sm lg:text-base font-light text-slate-700 leading-tight">
+
+              {/* Title */}
+              <div className="text-sm text-black/60 leading-snug relative inline-block">
                 {feature.title}
+                
+                {/* Underline hover (fashion style) */}
+                <span className="absolute left-0 -bottom-1 w-0 h-px bg-black transition-all duration-300 group-hover:w-full" />
               </div>
             </motion.div>
           ))}
         </div>
 
-        {/* Compact CTA */}
+        {/* Minimal CTA */}
         <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.98 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
         >
-          <Link 
+          <Link
             href="/shop"
-            className="group inline-flex items-center gap-2 px-8 py-3 font-medium border border-slate-200 bg-white rounded-full text-slate-900 hover:bg-slate-900 hover:text-white hover:border-slate-900 shadow-md hover:shadow-lg transition-all duration-400"
+            className="inline-block text-sm uppercase tracking-widest border-b border-black pb-1 hover:opacity-60 transition"
           >
             Shop Collection
-            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
           </Link>
         </motion.div>
 

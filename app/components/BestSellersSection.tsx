@@ -1,7 +1,9 @@
 "use client";
 
-// AT THE TOP OF YOUR FILE - ADD THIS LINE
+// AT THE TOP - ADD THESE IMPORTS
+import { useCart } from '@/app/context/CartContext';  // ✅ ADD THIS
 import { useWishlist } from '@/app/context/WishlistContext';
+
 import Image from "next/image";
 import { ShoppingCart, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -27,6 +29,9 @@ interface BestSellersSectionProps {
 }
 
 export default function BestSellersSection({ filteredProducts }: BestSellersSectionProps) {
+
+  // INSIDE COMPONENT - ADD THIS:
+  const { addToCart } = useCart();  // ✅ ADD THIS HOOK
   const router = useRouter();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const initialLimit = 8;
@@ -131,9 +136,23 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
     }, 500);
   };
 
-  const handleAddToCart = (product: Product) => {
-    setCartModalProduct(product);
-    setTimeout(() => setCartModalProduct(null), 2000);
+  // ✅ NEW (Real cart + visual feedback)
+  const handleAddToCart = async (product: Product) => {
+    try {
+      // 🔥 REAL CART API CALL
+      await addToCart(product.slug!, 1);  // Add 1 item
+
+      // Visual feedback
+      setCartModalProduct(product);
+      setTimeout(() => setCartModalProduct(null), 2000);
+
+      console.log('🛒 Added to REAL cart:', product.name);
+    } catch (error) {
+      console.error('❌ Cart add failed:', error);
+      // Still show modal for UX
+      setCartModalProduct(product);
+      setTimeout(() => setCartModalProduct(null), 2000);
+    }
   };
 
   const handleWishlist = (product: Product) => {

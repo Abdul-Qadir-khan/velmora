@@ -73,7 +73,7 @@ function WishlistItem({ product, onRemove, onAddToCart }: WishlistItemProps) {
             src={imageSrc}
             alt={product.name || "Product"}
             fill
-            className="object-contain p-4"
+            className="object-cover"
             sizes="300px"
           />
         </div>
@@ -96,7 +96,7 @@ function WishlistItem({ product, onRemove, onAddToCart }: WishlistItemProps) {
               e.stopPropagation();
               onAddToCart(product);
             }}
-            className="flex items-center gap-2 text-sm bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all duration-200 flex-1 justify-center"
+            className="flex items-center gap-2 text-sm bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all duration-200 flex-1 justify-center cursor-pointer"
           >
             <ShoppingCart size={16} />
             Add to Cart
@@ -107,7 +107,7 @@ function WishlistItem({ product, onRemove, onAddToCart }: WishlistItemProps) {
               e.stopPropagation();
               onRemove(product.id);
             }}
-            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200"
+            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200 cursor-pointer"
             title="Remove from wishlist"
           >
             <Trash2 size={18} />
