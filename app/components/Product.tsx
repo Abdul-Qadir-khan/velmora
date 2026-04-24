@@ -41,7 +41,7 @@ export default function ShopSection() {
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch("/api/products");
+        const res = await fetch("/api/products/");
         const json = await res.json();
         const data: Product[] = json.products || [];
 
