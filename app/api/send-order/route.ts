@@ -6,15 +6,17 @@ export async function POST(req: NextRequest) {
     let data;
     
     // ✅ Parse JSON safely
-    try {
-      data = await req.json();
-    } catch (parseError) {
-      // console.error("💥 JSON Parse Error:", parseError);
-      return NextResponse.json(
-        { success: false, error: "Invalid JSON data" }, 
-        { status: 400 }
-      );
-    }
+try {
+  data = await req.json();
+} catch (parseError) {
+  return NextResponse.json(
+    { success: false, error: "Invalid JSON data" }, 
+    { status: 400 }
+  );
+}
+
+// 🔥 FIX: Generate orderId if missing
+data.orderId = data.orderId || Date.now().toString();
 
     // console.log("📦 Received order:", {
     //   orderId: data?.orderId,
