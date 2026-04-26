@@ -30,7 +30,7 @@ const dmSans = DM_Sans({
 
 /* ================= SEO ================= */
 export const metadata: Metadata = {
-  metadataBase: new URL("https://lycoonwear.com"),
+  metadataBase: new URL("http://localhost:3000/"),
   title: {
     default: "Lycoon Wear | Premium Fashion & Streetwear",
     template: "%s | Lycoon Wear",
@@ -54,9 +54,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Lycoon Wear | Premium Fashion Brand",
     description: "Shop modern streetwear, denim, and essentials with Lycoon Wear.",
-    url: "https://lycoonwear.com",
+    url: "http://localhost:3000/",
     siteName: "Lycoon Wear",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Lycoonwear Fashion Collection" }],
+    images: [{ url: "/images/watches.jpg", width: 1200, height: 630, alt: "Lycoonwear Fashion Collection" }],
     locale: "en_US",
     type: "website",
   },
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Lycoonwear Fashion",
     description: "Premium streetwear & modern fashion essentials.",
-    images: ["/og-image.jpg"],
+    images: ["/images/categories/casual-hoodie.jpg"],
   },
   icons: { icon: "/favicon.ico", apple: "/apple-touch-icon.png" },
 };
@@ -84,8 +84,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "Lycoon Wear",
-              url: "https://lycoonwear.com",
-              logo: "https://lycoonwear.com/lycoonwear.png",
+              url: "http://localhost:3000/",
+              logo: "http://localhost:3000//lycoonwear.png",
               sameAs: [
                 "https://instagram.com/lycoonwear",
                 "https://facebook.com/lycoonwear",

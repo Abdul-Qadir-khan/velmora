@@ -39,10 +39,10 @@ export default function DiscountsSection() {
   );
 
   return (
-    <section className="py-12 lg:py-16 px-4 lg:px-8 relative overflow-hidden bg-gradient-to-r from-slate-900 via-black to-slate-900">
+    <section className="py-12 lg:py-16 px-4 lg:px-8 relative overflow-hidden bg-linear-to-r from-slate-900 via-black to-slate-900">
       {/* ✨ Subtle particles */}
       <div className="absolute inset-0">
-        <div className="absolute top-10 left-10 w-72 h-72 bg-gradient-to-r from-amber-400/10 to-orange-400/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-10 left-10 w-72 h-72 bg-linear-to-r from-amber-400/10 to-orange-400/5 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-l from-rose-500/5 to-orange-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
       
@@ -52,7 +52,7 @@ export default function DiscountsSection() {
         <motion.div 
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-rose-500/90 to-orange-500/90 backdrop-blur-md border border-white/20 rounded-2xl mb-6 shadow-xl w-fit mx-auto"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-linear-to-r from-rose-500/90 to-orange-500/90 backdrop-blur-md border border-white/20 rounded-2xl mb-6 shadow-xl w-fit mx-auto"
         >
           <div className="w-2 h-2 bg-white rounded-full animate-ping" />
           <span className="text-sm uppercase tracking-widest font-medium">Live Now</span>
@@ -62,7 +62,7 @@ export default function DiscountsSection() {
         <motion.h2 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-4xl sm:text-5xl lg:text-7xl font-serif font-black bg-gradient-to-r from-amber-300 via-orange-300 to-rose-400 bg-clip-text text-transparent drop-shadow-2xl leading-none mb-4"
+          className="text-4xl sm:text-5xl lg:text-7xl font-serif font-black bg-linear-to-r from-amber-300 via-orange-300 to-rose-400 bg-clip-text text-transparent drop-shadow-2xl leading-none mb-4"
         >
           70% OFF
         </motion.h2>
@@ -117,7 +117,7 @@ export default function DiscountsSection() {
             
             {/* ✨ Glow trail */}
             <motion.div 
-              className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-3xl -skew-x-12 opacity-0 group-hover:opacity-100"
+              className="absolute inset-0 bg-linear-to-r from-white/20 to-transparent rounded-3xl -skew-x-12 opacity-0 group-hover:opacity-100"
               initial={{ x: -100 }}
               animate={{ x: '100%' }}
               transition={{ duration: 0.6, ease: "easeOut" }}

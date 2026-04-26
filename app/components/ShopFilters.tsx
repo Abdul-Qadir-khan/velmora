@@ -19,7 +19,7 @@ export default function ShopFilters({ filters, params }: { filters: Filters; par
   return (
     <div className="space-y-4 p-6 bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 sticky top-6 lg:top-24 z-10 lg:w-64">
       <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-200">
-        <h3 className="text-lg font-medium bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+        <h3 className="text-lg font-medium bg-linear-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
           Filters
         </h3>
         <a href="/shop" className="text-xs font-medium text-slate-500 hover:text-slate-700 px-2 py-1 rounded-full hover:bg-slate-100 transition-all">
@@ -61,7 +61,7 @@ function FilterSection({
             href={`?${param}=${option.value}`}
             className={`block px-3 py-2 rounded-lg text-xs font-medium transition-all group hover:shadow-md duration-200 ${
               active === option.value
-                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg border border-blue-400 scale-[1.02]'
+                ? 'bg-linear-to-r from-blue-500 to-blue-600 text-white shadow-lg border border-blue-400 scale-[1.02]'
                 : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900 hover:shadow-sm border border-slate-100'
             }`}
           >
@@ -238,12 +238,12 @@ function PriceRangeSlider({ active }: { active?: string }) {
           onTouchStart={handleTouchStart}
         >
           <div 
-            className="absolute top-0 h-2 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 rounded-full shadow-md transition-all duration-300"
+            className="absolute top-0 h-2 bg-linear-to-r from-emerald-500 via-emerald-600 to-teal-600 rounded-full shadow-md transition-all duration-300"
             style={{ width: `${Math.min((priceValue / 5000) * 100, 100)}%` }}
           />
           
           <div 
-            className={`absolute top-[-5px] w-4.5 h-4.5 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full shadow-lg border-3 border-white ring-2 ring-emerald-500/50 transform transition-all duration-200 cursor-grab active:cursor-grabbing hover:scale-125 hover:shadow-xl group-hover:scale-110 ${isDragging ? 'scale-130 shadow-2xl ring-emerald-500/75 !ring-4' : ''}`}
+            className={`absolute top-[-5px] w-4.5 h-4.5 bg-linear-to-r from-emerald-500 to-emerald-600 rounded-full shadow-lg border-3 border-white ring-2 ring-emerald-500/50 transform transition-all duration-200 cursor-grab active:cursor-grabbing hover:scale-125 hover:shadow-xl group-hover:scale-110 ${isDragging ? 'scale-130 shadow-2xl ring-emerald-500/75 !ring-4' : ''}`}
             style={{ left: `calc(${Math.min((priceValue / 5000) * 100, 100)}% - 7px)` }}
           />
         </div>

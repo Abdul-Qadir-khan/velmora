@@ -149,7 +149,7 @@ export default function ClientProductGrid({ initialProducts, searchParams }: Pro
 
           return (
             <div key={String(product.id)} className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300">
-              <div className="relative h-64 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+              <div className="relative h-64 bg-linear-to-br from-gray-50 to-gray-100 overflow-hidden">
                 <button
                   className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:scale-110 hover:bg-white/100 transition-all z-20 border"
                   onClick={(e) => toggleWishlist(product, e)}
@@ -221,7 +221,7 @@ export default function ClientProductGrid({ initialProducts, searchParams }: Pro
                 {/* Add to Cart */}
                 <button
                   onClick={() => handleAddToCart(product)}
-                  className="w-full bg-gradient-to-r from-black to-gray-900 text-white py-3 px-6 rounded-xl font-light hover:from-gray-900 hover:to-gray-950 transition-all duration-300 flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-95 transform"
+                  className="w-full bg-linear-to-r from-black to-gray-900 text-white py-3 px-6 rounded-xl font-light hover:from-gray-900 hover:to-gray-950 transition-all duration-300 flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-95 transform"
                 >
                   <ShoppingCart size={20} />
                   <span>Add to Cart</span>

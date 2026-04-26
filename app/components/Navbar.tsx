@@ -205,7 +205,7 @@ export default function Header() {
                       onClick={closeSearch}
                       className="group flex items-center gap-4 p-4 hover:bg-white/10 rounded-2xl transition-all border border-transparent hover:border-white/20"
                     >
-                      <div className="w-16 h-16 bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl overflow-hidden flex-shrink-0">
+                      <div className="w-16 h-16 bg-linear-to-br from-gray-700 to-gray-800 rounded-xl overflow-hidden flex-shrink-0">
                         <Image
                           src={product.image}
                           alt={product.name}
@@ -227,7 +227,7 @@ export default function Header() {
                 </div>
                 <button
                   onClick={handleSearchSubmit}
-                  className="w-full mt-8 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 px-6 rounded-2xl font-semibold transition-all shadow-lg hover:shadow-xl"
+                  className="w-full mt-8 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 px-6 rounded-2xl font-semibold transition-all shadow-lg hover:shadow-xl"
                 >
                   View All {searchResults.length} Results
                 </button>

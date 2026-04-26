@@ -172,19 +172,15 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
   return (
     <section className="md:py-16 py-10 px-4 md:px-12 relative bg-white">
       <div className="max-w-7xl mx-auto w-full">
-        {/* Header - UNCHANGED */}
-        <div className="text-center mb-10 md:mb-16">
-          <span className="text-sm uppercase tracking-widest text-accent font-medium">
+        {/* Clean Header */}
+        <div className="text-center mb-16">
+          <div className="inline-block border border-black px-6 py-3 mb-6 uppercase tracking-widest text-sm font-bold hover:bg-black hover:text-white transition-all">
             Best Sellers
-          </span>
-          <h2 className="text-2xl sm:text-2xl md:text-4xl font-semibold mt-2 leading-tight text-gray-900">
-            Our Most Popular Products
+          </div>
+          <h2 className="text-4xl lg:text-5xl font-light uppercase tracking-tight">
+            Top Products
           </h2>
-          <p className="text-gray-500 mt-0 text-base md:text-lg font-light">
-            Shop the best-selling items loved by our customers
-          </p>
         </div>
-
         {/* Products */}
         {isLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8">
@@ -210,24 +206,12 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
                 return (
                   <div
                     key={uniqueKey} // ✅ FIXED: Always unique string key
-                    className="relative group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:ring-2 hover:ring-primary/10 hover:bg-white/90 backdrop-blur-sm border-2 border-gray-100 flex flex-col"
+                    className="relative group bg-white rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:ring-2 hover:ring-primary/10 hover:bg-white/90 backdrop-blur-sm border-2 border-black flex flex-col"
                   >
-                    {/* Popular Badge - ENHANCED */}
-                    {product.bestSeller && (
-                      <motion.div
-                        className="hidden md:block absolute top-3 left-3 bg-linear-to-r from-red-500 to-pink-500 text-white text-xs font-bold uppercase px-3 py-1.5 rounded-full shadow-lg z-20"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        whileHover={{ scale: 1.05 }}
-                      >
-                        🔥 Popular
-                      </motion.div>
-                    )}
-
                     {/* Discount Badge - ENHANCED */}
                     {hasDiscount && (
                       <motion.div
-                        className="absolute top-3 right-3 bg-linear-to-r from-amber-400 to-orange-400 text-black text-xs font-bold px-3 py-1.5 rounded-full shadow-lg z-20"
+                        className="absolute top-3 left-3 bg-black text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg z-20"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         whileHover={{ scale: 1.05 }}
@@ -267,7 +251,7 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
 
                     {/* Image - ENHANCED */}
                     <div
-                      className="relative w-full h-64 md:h-72 bg-linear-to-t from-gray-50 to-white overflow-hidden pt-14 px-3 rounded-xl"
+                      className="relative w-full h-64 md:h-90 bg-linear-to-t from-gray-50 to-white overflow-hidden pt-14 px-3"
                       onClick={() => goToProduct(product)}
                     >
                       <Image
@@ -275,13 +259,13 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
                         alt={product.name}
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        className="object-cover transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110 group-hover:rotate-1 shadow-lg rounded-xl"
+                        className="object-cover transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110 group-hover:rotate-1 shadow-lg"
                       />
                     </div>
 
                     {/* Info - ENHANCED */}
                     <div className="md:p-5 p-3 md:pb-3" onClick={() => goToProduct(product)}>
-                      <h3 className="text-base md:text-md font-light text-gray-900 leading-tight line-clamp-2 group-hover:text-primary transition-all duration-300">
+                      <h3 className="text-base md:text-md font-light text-gray-900 leading-tight line-clamp-2 group-hover:text-primary transition-all duration-300 uppercase">
                         {product.name}
                       </h3>
                       <div className="flex items-center my-1">
@@ -297,12 +281,12 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
                         </span>
                       </div>
                       <div className="flex items-center gap-3 pt-1">
-                        <p className="text-md md:text-xl font-black text-gray-900 drop-shadow-sm">
-                          ${product.price.toLocaleString()}
+                        <p className="text-2xl font-light uppercase tracking-widest text-gray-900">
+                          ₹{product.price.toLocaleString()}
                         </p>
                         {hasDiscount && (
                           <p className="text-sm font-light text-gray-400 line-through">
-                            ${originalPrice?.toLocaleString()}
+                            ₹{originalPrice?.toLocaleString()}
                           </p>
                         )}
                       </div>

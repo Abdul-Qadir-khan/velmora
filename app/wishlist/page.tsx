@@ -152,10 +152,10 @@ export default function WishlistPage() {
   return (
     <>
       {/* Header */}
-      <section className="px-4 md:px-12 pt-24 pb-8 bg-gradient-to-r from-black to-gray-900">
+      <section className="px-4 md:px-12 pt-24 pb-8 bg-linear-to-r from-black to-gray-900">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent mb-4">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold bg-linear-to-r from-white to-gray-200 bg-clip-text text-transparent mb-4">
               Your Wishlist
             </h1>
             <p className="text-xl text-gray-300 font-light">
@@ -174,7 +174,7 @@ export default function WishlistPage() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center py-32"
             >
-              <div className="w-28 h-28 mx-auto mb-8 bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center shadow-xl">
+              <div className="w-28 h-28 mx-auto mb-8 bg-linear-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center shadow-xl">
                 <ShoppingCart className="w-14 h-14 text-gray-400" />
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
@@ -185,7 +185,7 @@ export default function WishlistPage() {
               </p>
               <Link
                 href="/shop"
-                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-black to-gray-800 text-white text-lg font-semibold rounded-2xl hover:from-gray-800 hover:to-black transition-all duration-300 shadow-2xl hover:shadow-3xl hover:-translate-y-1"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-black to-gray-800 text-white text-lg font-semibold rounded-2xl hover:from-gray-800 hover:to-black transition-all duration-300 shadow-2xl hover:shadow-3xl hover:-translate-y-1"
               >
                 Start Shopping
                 <ShoppingCart size={20} />

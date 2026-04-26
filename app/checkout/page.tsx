@@ -125,7 +125,7 @@ const CartStep = ({
 
     {cart.length === 0 ? (
       <div className="text-center py-16 lg:py-20">
-        <div className="w-20 h-20 lg:w-24 lg:h-24 mx-auto mb-6 lg:mb-8 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl flex items-center justify-center border border-gray-200">
+        <div className="w-20 h-20 lg:w-24 lg:h-24 mx-auto mb-6 lg:mb-8 bg-linear-to-br from-gray-50 to-gray-100 rounded-2xl flex items-center justify-center border border-gray-200">
           <svg className="w-8 h-8 lg:w-12 lg:h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 7.5M7 13l-1.5 7.5M17 13l1.5 7.5M17 13l2.5-7.5M16 15a4 4 0 01-8 0" />
           </svg>
@@ -308,7 +308,7 @@ const ShippingStep = ({
       </button>
       <button
         onClick={onNext}
-        className="flex-1 bg-gradient-to-r from-black to-gray-800 text-white px-8 py-4 rounded-2xl font-semibold hover:from-gray-800 hover:to-black transition-all duration-200 shadow-lg hover:shadow-xl active:scale-[0.98]"
+        className="flex-1 bg-linear-to-r from-black to-gray-800 text-white px-8 py-4 rounded-2xl font-semibold hover:from-gray-800 hover:to-black transition-all duration-200 shadow-lg hover:shadow-xl active:scale-[0.98]"
       >
         Continue to Payment →
       </button>
@@ -378,7 +378,7 @@ const PaymentStep = ({
       <button
         onClick={onPlaceOrder}
         disabled={loading}
-        className="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 active:scale-[0.98]"
+        className="flex-1 bg-linear-to-r from-emerald-600 to-emerald-700 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 active:scale-[0.98]"
       >
         {loading ? (
           <>
@@ -536,7 +536,7 @@ export default function CheckoutPage() {
   return (
     <>
       {/* 🏠 Hero Section */}
-      <section className="bg-gradient-to-br from-slate-900 via-gray-900 to-slate-950 text-white pt-28 pb-20 text-center overflow-hidden relative">
+      <section className="bg-linear-to-br from-slate-900 via-gray-900 to-slate-950 text-white pt-28 pb-20 text-center overflow-hidden relative">
         {/* Subtle luxury gradient overlay */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-900/10 via-transparent to-slate-900/30" />
 
@@ -545,7 +545,7 @@ export default function CheckoutPage() {
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Refined typography */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-light tracking-tight bg-gradient-to-r from-white via-slate-100 to-emerald-100/80 bg-clip-text text-transparent mb-8 leading-[0.9] drop-shadow-xl">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-light tracking-tight bg-linear-to-r from-white via-slate-100 to-emerald-100/80 bg-clip-text text-transparent mb-8 leading-[0.9] drop-shadow-xl">
             Checkout
           </h1>
 
@@ -689,9 +689,9 @@ export default function CheckoutPage() {
 
                 {/* 💎 Compact Total */}
                 <div className="border-t border-slate-100 pt-6">
-                  <div className="flex justify-between items-baseline mb-6 p-4 bg-gradient-to-r from-slate-50/70 to-white/50 rounded-xl border border-slate-100/30 shadow-sm">
+                  <div className="flex justify-between items-baseline mb-6 p-4 bg-linear-to-r from-slate-50/70 to-white/50 rounded-xl border border-slate-100/30 shadow-sm">
                     <span className="text-lg font-light text-slate-900">Total</span>
-                    <span className="text-3xl font-mono font-normal bg-gradient-to-r from-slate-900 to-slate-800 bg-clip-text text-transparent">
+                    <span className="text-3xl font-mono font-normal bg-linear-to-r from-slate-900 to-slate-800 bg-clip-text text-transparent">
                       ₹{total.toLocaleString()}
                     </span>
                   </div>
@@ -708,7 +708,7 @@ export default function CheckoutPage() {
                     <button
                       onClick={() => setStep(2)}
                       disabled={displayCart.length === 0}
-                      className="group w-full bg-gradient-to-r from-slate-900 to-slate-950 text-white py-4 px-6 rounded-xl font-light text-sm uppercase tracking-wider hover:from-slate-800 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 shadow-lg border border-slate-900/20 disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden relative"
+                      className="group w-full bg-linear-to-r from-slate-900 to-slate-950 text-white py-4 px-6 rounded-xl font-light text-sm uppercase tracking-wider hover:from-slate-800 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 shadow-lg border border-slate-900/20 disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden relative"
                     >
                       <div className="flex items-center justify-center gap-2 relative z-10">
                         Checkout
@@ -716,7 +716,7 @@ export default function CheckoutPage() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                         </svg>
                       </div>
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                      <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                     </button>
                   )}
                 </div>

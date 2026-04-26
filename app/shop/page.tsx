@@ -39,7 +39,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50/50 to-white/80 backdrop-blur-sm">
       {/* 🏠 Hero */}
-      <section className="pt-24 pb-20 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
+      <section className="pt-24 pb-20 bg-linear-to-r from-slate-900 via-slate-800 to-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-medium text-white mb-2 drop-shadow-2xl">
             Our Collection
@@ -58,7 +58,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             {/* ✅ LEFT: Filters */}
             <div className="lg:col-span-3 hidden lg:block">
               <Suspense fallback={
-                <div className="h-96 bg-gradient-to-br from-slate-100/50 to-slate-200/50 rounded-3xl animate-pulse shadow-xl border border-slate-200/50" />
+                <div className="h-96 bg-linear-to-br from-slate-100/50 to-slate-200/50 rounded-3xl animate-pulse shadow-xl border border-slate-200/50" />
               }>
                 <ShopFilters filters={filters} params={params} />
               </Suspense>
@@ -81,7 +81,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                     </p>
                     <a 
                       href="/shop" 
-                      className="inline-flex px-8 py-3.5 bg-gradient-to-r from-slate-900 to-slate-800 text-white font-light rounded-2xl hover:from-slate-800 hover:to-slate-700 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-0.5 text-sm tracking-wide border border-slate-800/50"
+                      className="inline-flex px-8 py-3.5 bg-linear-to-r from-slate-900 to-slate-800 text-white font-light rounded-2xl hover:from-slate-800 hover:to-slate-700 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-0.5 text-sm tracking-wide border border-slate-800/50"
                     >
                       Browse All Products
                     </a>
@@ -92,7 +92,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                   {/* ✅ PREMIUM HEADER */}
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-6 pb-2 border-b border-slate-200/50">
                     <div>
-                      <h2 className="text-2xl lg:text-3xl xl:text-4xl font-light bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-1.5 tracking-tight">
+                      <h2 className="text-2xl lg:text-3xl xl:text-4xl font-light bg-linear-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-1.5 tracking-tight">
                         {params.category
                           ? `${capitalizeWords(params.category)} Collection`
                           : 'Featured Collection'
@@ -106,22 +106,22 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                     {/* Filter Summary Chips */}
                     <div className="flex flex-wrap gap-2 mt-4 lg:mt-0">
                       {params.category && (
-                        <span className="px-3 py-1.5 bg-gradient-to-r from-blue-500/10 to-blue-600/10 text-blue-700 text-xs font-light rounded-full border border-blue-200/50 backdrop-blur-sm shadow-sm hover:shadow-md transition-all">
+                        <span className="px-3 py-1.5 bg-linear-to-r from-blue-500/10 to-blue-600/10 text-blue-700 text-xs font-light rounded-full border border-blue-200/50 backdrop-blur-sm shadow-sm hover:shadow-md transition-all">
                           {capitalizeWords(params.category)}
                         </span>
                       )}
                       {params.brand && (
-                        <span className="px-3 py-1.5 bg-gradient-to-r from-purple-500/10 to-purple-600/10 text-purple-700 text-xs font-light rounded-full border border-purple-200/50 shadow-sm">
+                        <span className="px-3 py-1.5 bg-linear-to-r from-purple-500/10 to-purple-600/10 text-purple-700 text-xs font-light rounded-full border border-purple-200/50 shadow-sm">
                           {params.brand}
                         </span>
                       )}
                       {params.size && (
-                        <span className="px-3 py-1.5 bg-gradient-to-r from-emerald-500/10 to-emerald-600/10 text-emerald-700 text-xs font-light rounded-full border border-emerald-200/50 shadow-sm">
+                        <span className="px-3 py-1.5 bg-linear-to-r from-emerald-500/10 to-emerald-600/10 text-emerald-700 text-xs font-light rounded-full border border-emerald-200/50 shadow-sm">
                           {params.size.toUpperCase()}
                         </span>
                       )}
                       {params.price && (
-                        <span className="px-3 py-1.5 bg-gradient-to-r from-amber-500/10 to-amber-600/10 text-amber-700 text-xs font-light rounded-full border border-amber-200/50 shadow-sm">
+                        <span className="px-3 py-1.5 bg-linear-to-r from-amber-500/10 to-amber-600/10 text-amber-700 text-xs font-light rounded-full border border-amber-200/50 shadow-sm">
                           {params.price.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                         </span>
                       )}
@@ -132,7 +132,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                   <Suspense fallback={
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
                       {Array.from({ length: 20 }).map((_, i) => (
-                        <div key={i} className="aspect-[3/4] bg-gradient-to-br from-slate-100/50 to-slate-200/50 rounded-2xl animate-pulse shadow-lg border border-slate-200/50" />
+                        <div key={i} className="aspect-[3/4] bg-linear-to-br from-slate-100/50 to-slate-200/50 rounded-2xl animate-pulse shadow-lg border border-slate-200/50" />
                       ))}
                     </div>
                   }>
@@ -144,7 +144,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
             {/* ✅ Mobile Filters Toggle */}
             <div className="lg:hidden col-span-full mb-6">
-              <button className="w-full p-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white font-light rounded-2xl hover:from-slate-800 hover:to-slate-700 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-0.5 text-sm tracking-wide border border-slate-800/50">
+              <button className="w-full p-4 bg-linear-to-r from-slate-900 to-slate-800 text-white font-light rounded-2xl hover:from-slate-800 hover:to-slate-700 transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-0.5 text-sm tracking-wide border border-slate-800/50">
                 🛠️ Filters ({Object.keys(params).length})
               </button>
             </div>

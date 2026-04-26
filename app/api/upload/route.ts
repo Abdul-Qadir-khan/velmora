@@ -1,5 +1,6 @@
+// ✅ CORRECT PATH: app/api/upload/route.ts (NOT api/upload)
 import { NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
+import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
 export async function POST(req: Request) {
@@ -11,29 +12,37 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
-    // Convert file to buffer
+    // ✅ CREATE UPLOADS DIRECTORY IF NOT EXISTS
+    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    await mkdir(uploadDir, { recursive: true });
+
+    // ✅ VALIDATE FILE TYPE & SIZE
+    if (!file.type.startsWith('image/')) {
+      return NextResponse.json({ error: "Only images allowed" }, { status: 400 });
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      return NextResponse.json({ error: "File too large (max 5MB)" }, { status: 400 });
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Create unique file name
-    const fileName = `${Date.now()}-${file.name}`;
+    // ✅ SANITIZE FILENAME
+    const ext = path.extname(file.name);
+    const name = file.name.replace(ext, '').replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+    const fileName = `${Date.now()}-${name}${ext}`;
 
-    // Save path
-    const filePath = path.join(process.cwd(), "public/uploads", fileName);
-
-    // Save file
+    const filePath = path.join(uploadDir, fileName);
     await writeFile(filePath, buffer);
-
-    // Return URL
-    const fileUrl = `/uploads/${fileName}`;
 
     return NextResponse.json({
       success: true,
-      url: fileUrl,
+      url: `/uploads/${fileName}`,
+      name: fileName
     });
 
   } catch (error) {
-    // console.error(error);
+    console.error("Upload error:", error);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }

@@ -39,14 +39,14 @@ export default function Home() {
       {/* Brands Section */}
       <BrandsSlider />
 
+      {/* New Arrivals or Timeless Fashion */}
+      <NewArrivals />
       {/* Categories Section */}
        {/* <CategoriesSection /> */}
       <hr className="border-gray-300" />
       {/* Best Sellers Section */}
       <BestSellerSection />
 
-      {/* New Arrivals or Timeless Fashion */}
-      <NewArrivals />
 
       {/* Discounts and Offers Section */}
       <DiscountsSection />

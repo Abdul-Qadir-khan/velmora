@@ -1,194 +1,128 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
-const products = [
+const categories = [
   {
-    name: "Men's T-Shirt",
-    category: "T-Shirt",
+    name: "Men's Wear",
+    slug: "mens-wear",
     image: "/images/categories/mens-wear.avif",
-    price: "₹799",
+    products: ["T-Shirts", "Hoodies", "Jackets"],
+    featuredPrice: "₹799",
   },
   {
-    name: "Slim Fit Jeans",
-    category: "Pants",
+    name: "Denim",
+    slug: "denim",
     image: "/images/categories/jeans.jpg",
-    price: "₹1,499",
+    products: ["Slim Fit", "Bootcut", "Distressed"],
+    featuredPrice: "₹1,499",
   },
   {
-    name: "Casual Hoodie",
-    category: "Hoodies",
-    image: "/images/categories/casual-hoodie.jpg",
-    price: "₹1,199",
-  },
-  {
-    name: "Premium Attar",
-    category: "Fragrance",
-    image: "/images/categories/attar.jpg",
-    price: "₹899",
-  },
-  {
-    name: "Classic Watch",
-    category: "Watches",
-    image: "/images/categories/watches.jpg",
-    price: "₹4,999",
-  },
-  {
-    name: "Leather Wallet",
-    category: "Accessories",
+    name: "Accessories",
+    slug: "accessories",
     image: "/images/categories/wallet.jpg",
-    price: "₹1,299",
+    products: ["Wallets", "Belts", "Sunglasses"],
+    featuredPrice: "₹1,299",
   },
   {
-    name: "Sunglasses",
-    category: "Eyewear",
-    image: "/images/categories/sunglasses.jpg",
-    price: "₹1,799",
+    name: "Watches",
+    slug: "watches",
+    image: "/images/categories/watches.jpg",
+    products: ["Classic", "Sport", "Luxury"],
+    featuredPrice: "₹4,999",
+  },
+  {
+    name: "Fragrance",
+    slug: "fragrance",
+    image: "/images/categories/attar.jpg",
+    products: ["Attar", "Eau de Parfum", "Body Mist"],
+    featuredPrice: "₹899",
   },
 ];
 
-export default function ClothingProductsSection() {
-  const [active, setActive] = useState(0);
-
+export default function CategoryShowcase() {
   return (
-    <section className="bg-[#f8f8f8] py-10 md:py-16 px-4 md:px-12 overflow-hidden">
-      <div className="max-w-7xl mx-auto">
-
+    <section className="py-10 lg:py-12 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-5 md:mb-10 gap-6">
-          <div>
-            <p className="text-gray-500 uppercase tracking-[0.3em] text-xs mb-2">
-              Latest Arrivals
-            </p>
-
-            <h2 className="text-2xl md:text-4xl font-semibold leading-tight text-gray-900">
-              Refined Style for <br className="hidden md:block" />
-              Modern Living
-            </h2>
-          </div>
-
-          <button className="group text-sm uppercase tracking-widest border-b border-black pb-1 hover:opacity-60 transition">
-            View All Products
-            <span className="ml-2 inline-block transform transition group-hover:translate-x-1">
-              →
-            </span>
-          </button>
+        <div className="text-center mb-6 lg:mb-10">
+          <h2 className="text-4xl lg:text-5xl font-light uppercase tracking-tight mb-2">
+            Shop by <span className="font-black">Category</span>
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Discover curated collections across all your favorite styles
+          </p>
         </div>
 
-        {/* Layout */}
-        <div className="grid lg:grid-cols-2 gap-10 md:gap-16 items-center">
-
-          {/* IMAGE WITH ANIMATION */}
-          <div className="relative h-95 md:h-130 w-full overflow-hidden bg-[#eee]">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={products[active].image}
-                initial={{ opacity: 0, scale: 1.05 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.02 }}
-                transition={{ duration: 0.6, ease: "easeInOut" }}
-                className="absolute inset-0"
-              >
-                <Image
-                  src={products[active].image}
-                  alt={products[active].name}
-                  fill
-                  sizes="100vw"
-                  className="object-cover"
-                />
-
-                {/* Gradient */}
-                <div className="absolute inset-0 bg-linear-to-t from-black/50 via-black/10 to-transparent" />
-
-                {/* TEXT ANIMATION */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.5 }}
-                  className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white"
-                >
-                  <p className="text-xs tracking-widest uppercase text-gray-300 mb-2">
-                    {products[active].category}
-                  </p>
-
-                  <h3 className="text-2xl md:text-4xl font-semibold">
-                    {products[active].name}
-                  </h3>
-
-                  <p className="mt-2 text-sm md:text-base text-gray-200">
-                    {products[active].price}
-                  </p>
-                </motion.div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* SELECTOR WITH SCROLL */}
-          <div className="hidden md:flex flex-col divide-y divide-gray-300 max-h-130 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent pr-2">
-            {products.map((product, idx) => (
-              <div
-                key={idx}
-                onClick={() => setActive(idx)}
-                className="group py-5 cursor-pointer flex justify-between items-center transition hover:bg-gray-50 px-2 rounded-lg"
-              >
-                <div>
-                  <h4
-                    className={`text-lg md:text-xl font-medium transition ${
-                      active === idx
-                        ? "text-black"
-                        : "text-gray-600 group-hover:text-black"
-                    }`}
-                  >
-                    {product.name}
-                  </h4>
-
-                  <p className="text-xs text-gray-400 tracking-wide mt-1">
-                    {product.category}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <span
-                    className={`text-sm font-medium ${
-                      active === idx ? "text-black" : "text-gray-500"
-                    }`}
-                  >
-                    {product.price}
-                  </span>
-
-                  {/* Animated line */}
-                  <motion.span
-                    layout
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    className={`h-0.5 rounded-full transition-all duration-300 ${
-                      active === idx 
-                        ? "bg-black w-12 shadow-sm" 
-                        : "bg-gray-300 w-6 group-hover:w-8"
-                    }`}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-
-        </div>
-
-        {/* Navigation Dots - Mobile */}
-        <div className="lg:hidden flex justify-center gap-2 mt-8">
-          {products.map((_, idx) => (
-            <button
+        {/* Category Grid - Clean & Clickable */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 lg:gap-8">
+          {categories.map((category, idx) => (
+            <motion.div
               key={idx}
-              onClick={() => setActive(idx)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                active === idx ? "bg-black scale-125" : "bg-gray-300 hover:bg-gray-400"
-              }`}
-              aria-label={`Go to product ${idx + 1}`}
-            />
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              whileHover={{ y: -10 }}
+              className="group cursor-pointer overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 border hover:border-black h-80 lg:h-96"
+            >
+              <Link href={`/shop/${category.slug}`} className="block h-full flex flex-col">
+                {/* Category Image */}
+                <div className="relative flex-1 overflow-hidden">
+                  <Image
+                    src={category.image}
+                    alt={category.name}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  
+                  {/* Category Badge */}
+                  <div className="absolute top-6 left-6 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider shadow-lg">
+                    {category.name}
+                  </div>
+                </div>
+
+                {/* Product Teaser */}
+                <div className="p-6 flex-1 flex flex-col justify-end">
+                  <div className="space-y-1">
+                    <p className="text-xs uppercase tracking-wider font-medium text-gray-500">
+                      Popular: {category.products.slice(0, 2).join(" • ")}
+                    </p>
+                    <p className="text-2xl font-light uppercase tracking-widest text-gray-900">
+                      {category.featuredPrice}
+                    </p>
+                  </div>
+                  
+                  {/* Shop CTA */}
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                    <span className="text-sm uppercase tracking-wider font-bold text-gray-600 group-hover:text-black transition-colors">
+                      Shop Collection
+                    </span>
+                    <motion.div
+                      whileHover={{ x: 4 }}
+                      className="text-lg font-bold"
+                    >
+                      →
+                    </motion.div>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
           ))}
         </div>
 
+        {/* Main CTA */}
+        <div className="text-center mt-10">
+          <Link href="/shop">
+            <button className="px-8 py-4 border-2 border-black text-lg uppercase tracking-wider font-medium hover:bg-black hover:text-white transition-all rounded-full shadow-md hover:shadow-xl">
+              Browse All Categories
+            </button>
+          </Link>
+        </div>
       </div>
     </section>
   );
