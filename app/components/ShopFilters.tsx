@@ -31,7 +31,7 @@ export default function ShopFilters({ filters, params }: { filters: Filters; par
       <FilterSection title="Brand" options={filters.brands.slice(0, 8)} active={params.brand} param="brand" />
       <FilterSection title="Size" options={filters.sizes} active={params.size} param="size" isGrid />
       
-      <PriceRangeSlider active={params.price} />
+      {/* <PriceRangeSlider active={params.price} /> */}
     </div>
   );
 }

@@ -40,7 +40,7 @@ export default function FlashSalePopup() {
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="p-8 lg:p-10 bg-linear-to-r from-rose-600 via-rose-500 to-orange-500 text-white relative">
+          <div className="p-4 lg:p-6 bg-linear-to-r from-rose-600 via-rose-500 to-orange-500 text-white relative">
             <button 
               onClick={closePopup}
               className="cursor-pointer absolute top-6 right-6 p-2 hover:bg-white/20 rounded-xl transition-all duration-300 hover:scale-110"
@@ -64,9 +64,9 @@ export default function FlashSalePopup() {
           </div>
 
           {/* Content */}
-          <div className="p-8 lg:p-10 flex-1 flex flex-col justify-between">
+          <div className="p-4 lg:p-6 flex-1 flex flex-col justify-between">
             {/* Event Details */}
-            <div className="space-y-4 mb-8">
+            <div className="space-y-4 mb-2">
               <div className="flex items-center justify-center gap-2 text-2xl lg:text-3xl font-bold text-rose-600 mb-2">
                 <ShoppingBag className="w-8 h-8" />
                 <span>Collection Sale</span>
@@ -93,7 +93,7 @@ export default function FlashSalePopup() {
             </Link>
 
             {/* Footer */}
-            <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+            <div className="mt-3 pt-3 border-t border-gray-300 px-4 text-center w-fit mx-auto">
               <p className="text-xs text-slate-500">
                 Don't miss out - sale ends in 24 hours
               </p>

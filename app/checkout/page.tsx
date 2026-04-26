@@ -29,7 +29,7 @@ interface OrderForm {
 // 🛡️ ULTIMATE Image Handler - Fixes JSON string issue
 const getSafeImage = (images: any): string => {
   // console.log("🔍 getSafeImage input:", images);
-  
+
   if (!images) {
     // console.log("❌ No images");
     return "/placeholder.png";
@@ -38,7 +38,7 @@ const getSafeImage = (images: any): string => {
   try {
     // 🔑 FIX 1: Handle JSON STRING arrays from Prisma
     let imageData = images;
-    
+
     // If it's a JSON string, parse it
     if (typeof images === 'string') {
       try {
@@ -108,10 +108,10 @@ const CartStep = ({
   onNext,
 }: {
   cart: CartProduct[];
-  removeFromCart: (productId: string) => void;
+  removeFromCart: (productId: string, size?: string, color?: string) => void;
   onNext: () => void;
 }) => (
-  <div className="bg-white p-6 lg:p-8 rounded-3xl shadow-xl border border-gray-50">
+  <div className="bg-white p-4 lg:p-8 rounded-3xl shadow-xl border border-gray-50">
     <div className="flex items-center justify-between mb-8 lg:mb-10">
       <h2 className="text-xl lg:text-2xl font-light tracking-tight text-gray-900">
         Shopping Bag ({cart.length})
@@ -143,10 +143,10 @@ const CartStep = ({
       </div>
     ) : (
       <>
-        <div className="space-y-6 lg:space-y-8 mb-10 lg:mb-12">
-          {cart.map((item) => (
+        <div className="space-y-6 lg:space-y-8 mb-6 lg:mb-12">
+          {cart.map((item, index) => (
             <div
-              key={item.productId}
+              key={`${item.productId}-${item.size}-${item.color}-${index}`}  // ✅ FIXED
               className="group flex items-start gap-4 lg:gap-6 pb-6 lg:pb-8 border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50 p-3 lg:p-4 -m-3 lg:-m-4 rounded-2xl transition-all duration-300 hover:shadow-sm"
             >
               <div className="relative w-20 h-24 lg:w-24 lg:h-32 shrink-0 rounded-2xl overflow-hidden bg-gray-50 shadow-sm group-hover:shadow-md transition-shadow duration-300">
@@ -190,7 +190,7 @@ const CartStep = ({
                 </div>
 
                 <button
-                  onClick={() => removeFromCart(item.productId)}
+                  onClick={() => removeFromCart(item.productId, item.size, item.color)}
                   className="group/remove flex items-center gap-1.5 lg:gap-2 text-xs lg:text-sm font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 px-3 lg:px-4 py-2 rounded-xl transition-all duration-200 hover:shadow-sm cursor-pointer"
                 >
                   <svg className="w-3.5 h-3.5 lg:w-4 lg:h-4 group-hover/remove:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,7 +203,7 @@ const CartStep = ({
           ))}
         </div>
 
-        <div className="pt-6 lg:pt-8 border-t border-gray-100">
+        <div className="pt-3 lg:pt-8 border-t border-gray-100">
           <div className="flex items-center justify-between mb-6 lg:mb-8 text-xl lg:text-2xl font-light text-gray-900">
             <span>Total</span>
             <span className="text-2xl lg:text-3xl font-normal tracking-tight">
@@ -243,7 +243,7 @@ const ShippingStep = ({
   onBack: () => void;
   onNext: () => void;
 }) => (
-  <div className="bg-white p-6 rounded-2xl shadow-lg">
+  <div className="bg-white p-4 rounded-2xl shadow-lg">
     <h2 className="text-2xl font-bold mb-8">Shipping Details</h2>
     <form className="space-y-4">
       <div className="grid md:grid-cols-2 gap-4">
@@ -299,7 +299,7 @@ const ShippingStep = ({
       </div>
     </form>
 
-    <div className="flex gap-4 mt-10">
+    <div className="flex flex-col md:flex-row gap-4 mt-10">
       <button
         onClick={onBack}
         className="flex-1 border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-2xl font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98]"
@@ -330,7 +330,7 @@ const PaymentStep = ({
   onPlaceOrder: () => void;
   loading: boolean;
 }) => (
-  <div className="bg-white p-6 rounded-2xl shadow-lg">
+  <div className="bg-white p-4 rounded-2xl shadow-lg">
     <h2 className="text-2xl font-bold mb-8">Payment Method</h2>
 
     <div className="space-y-3 mb-10">
@@ -355,7 +355,12 @@ const PaymentStep = ({
       </div>
       <div className="flex justify-between text-lg">
         <span className="text-gray-700 font-medium">Shipping</span>
-        <span className="font-semibold text-emerald-600">₹50</span>
+        <div className="text-right text-emerald-600 font-semibold flex flex-col sm:flex-row sm:items-end sm:gap-1 text-sm">
+          <span>₹50 - ₹250</span>
+          <span className="text-emerald-500 font-normal text-xs sm:text-sm">
+            (varies by location)
+          </span>
+        </div>
       </div>
       <div className="flex justify-between text-2xl font-black border-t pt-6 py-4 bg-gray-50 rounded-xl">
         <span className="text-gray-900">Total</span>
@@ -363,7 +368,7 @@ const PaymentStep = ({
       </div>
     </div>
 
-    <div className="flex gap-4 mt-10">
+    <div className="flex flex-col md:flex-row gap-4 mt-10">
       <button
         onClick={onBack}
         className="flex-1 border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-2xl font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98]"
@@ -412,38 +417,42 @@ export default function CheckoutPage() {
   const [placingOrder, setPlacingOrder] = useState(false);
 
   const displayCart = useMemo((): CartProduct[] => {
-  // console.log("🛒 Raw cart from context:", cart);
-  return cart
-    .filter(item => item?.id)
-    .map(item => {
-      const safeImage = getSafeImage(item.images);
-      // console.log(`🖼️ Item ${item.id}:`, {
-      //   rawImages: item.images,
-      //   safeImage,
-      //   name: item.name
-      // });
-      
-      return {
-        productId: String(item.id),
-        name: item.name || "Unknown Product",
-        price: Number(item.price) || 0,
-        qty: Number(item.qty) || 1,
-        size: item.selectedSize || "M",
-        color: item.selectedColor || "Black",
-        image: safeImage,
-      };
-    })
-    .filter(item => item.price > 0);
-}, [cart]);
+    // console.log("🛒 Raw cart from context:", cart);
+    return cart
+      .filter(item => item?.id)
+      .map(item => {
+        const safeImage = getSafeImage(item.images);
+        // console.log(`🖼️ Item ${item.id}:`, {
+        //   rawImages: item.images,
+        //   safeImage,
+        //   name: item.name
+        // });
+
+        return {
+          productId: String(item.id),
+          name: item.name || "Unknown Product",
+          price: Number(item.price) || 0,
+          qty: Number(item.qty) || 1,
+          size: item.selectedSize || "M",
+          color: item.selectedColor || "Black",
+          image: safeImage,
+        };
+      })
+      .filter(item => item.price > 0);
+  }, [cart]);
 
   // 💰 Optimized calculations
   const subtotal = useMemo(() =>
     cart.reduce((acc, item) => acc + (Number(item.price) || 0) * (Number(item.qty) || 0), 0), [cart]
   );
 
-  const shipping = useMemo(() => subtotal > 499 ? 0 : 50, [subtotal]);
+  // ✅ WITH THIS
+  const shipping = useMemo(() => {
+    if (subtotal >= 5000) return 0; // Free shipping
+    return 50; // ₹50 flat rate
+  }, [subtotal]);
   const total = subtotal + shipping;
-  const isFreeShipping = subtotal >= 499;
+  const isFreeShipping = subtotal >= 4999;
 
   // 📝 Form handlers
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -502,7 +511,7 @@ export default function CheckoutPage() {
 
       // console.log("📦 Placing order:", orderData);
 
-      const response = await fetch('/api/orders', {
+      const response = await fetch('/api/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData),
@@ -565,10 +574,10 @@ export default function CheckoutPage() {
       </section>
 
       {/* 📋 Main Content */}
-      <section className="bg-gradient-to-b from-gray-50 to-white min-h-screen pb-24 px-4 md:px-8 lg:px-12">
+      <section className="bg-gradient-to-b from-gray-50 to-white min-h-screen pb-24 px-4 md:px-8 lg:px-12 overflow-hidden">
         <div className="max-w-7xl mx-auto pt-20">
           {/* 👜 Progress Bar */}
-          <div className="w-full max-w-2xl mx-auto mb-10 px-8">
+          <div className="w-full max-w-2xl mx-auto mb-10 md:px-8">
             <div className="relative flex items-center justify-between">
               {["Cart", "Shipping", "Payment"].map((label, i) => (
                 <div key={i} className="flex flex-col items-center z-10 relative">
@@ -601,13 +610,13 @@ export default function CheckoutPage() {
               <div
                 className={`absolute h-px bg-blue-400 shadow-sm transition-all duration-700 ease-out top-5 mx-12 ${step === 1 ? "w-1/4" :
                   step === 2 ? "w-1/2" :
-                    step === 3 ? "w-full" : "w-0"
+                    step === 3 ? "w-full mx-auto" : "w-0"
                   }`}
               />
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-[1fr_auto] xl:grid-cols-[1.3fr_auto] gap-6 lg:gap-8 items-start max-w-6xl mx-auto px-5 lg:px-0 bg-gray-50/50 min-h-screen">
+          <div className="grid lg:grid-cols-[1fr_auto] xl:grid-cols-[1.3fr_auto] gap-6 lg:gap-8 items-start max-w-6xl mx-auto lg:px-0 bg-gray-50/50 min-h-screen">
             {/* 📱 Main Content */}
             <div className="space-y-8 lg:max-w-4xl">
               {step === 1 && (
@@ -668,17 +677,14 @@ export default function CheckoutPage() {
                     )}
                   </div>
 
-                  {isFreeShipping && (
-                    <div className="bg-emerald-50/80 p-3 rounded-xl border border-emerald-100/60 text-xs">
-                      <div className="flex justify-between font-medium text-emerald-700 mb-1">
-                        <span>Free shipping</span>
-                        <span>-₹50</span>
-                      </div>
-                      <div className="text-emerald-600 font-light tracking-wider">
-                        Over ₹500
-                      </div>
-                    </div>
-                  )}
+{isFreeShipping && (
+  <div className="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-500/10 backdrop-blur-sm text-emerald-300 border border-emerald-500/20 rounded-xl text-sm font-medium tracking-wide">
+    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+    </svg>
+    Free Shipping
+  </div>
+)}
                 </div>
 
                 {/* 💎 Compact Total */}

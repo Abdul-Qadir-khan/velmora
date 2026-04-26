@@ -2,6 +2,7 @@ import ClientProductGrid from "@/app/components/ClientProductGrid";
 import ShopFilters from "@/app/components/ShopFilters";
 import { getProducts } from "@/app/lib/api/product";
 import { Suspense } from "react";
+import Image from 'next/image'
 
 interface ShopPageProps {
   searchParams: Promise<{
@@ -40,7 +41,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
       {/* 🏠 Hero */}
       <section className="pt-24 pb-20 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black bg-gradient-to-r from-slate-100 via-white to-slate-200 bg-clip-text text-transparent mb-4 drop-shadow-2xl">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-medium text-white mb-2 drop-shadow-2xl">
             Our Collection
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl text-slate-200 max-w-2xl mx-auto leading-relaxed font-light tracking-wide">
@@ -68,17 +69,13 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
               {products.length === 0 ? (
                 <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200/50 p-12 lg:p-16 text-center max-w-4xl mx-auto">
                   <div className="max-w-md mx-auto">
-                    <div className="w-24 h-24 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl border border-slate-200/50">
-                      <svg className="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                      </svg>
-                    </div>
-                    <h2 className="text-3xl lg:text-4xl font-black text-slate-900 mb-4 tracking-tight">
+                    <Image alt="Product Not Found - LycoonWear" title="Product Not Found - LycoonWear" className="mx-auto" width={100} height={100} src="/images/product-not-found.jpg" />
+                    <h2 className="text-3xl lg:text-4xl font-light text-slate-900 mb-2 tracking-tight">
                       No Products Found
                     </h2>
-                    <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+                    <p className="text-md text-slate-600 mb-4 leading-relaxed">
                       Try adjusting your filters or{' '}
-                      <a href="/shop" className="font-light text-blue-600 hover:text-blue-700 underline decoration-2">
+                      <a href="/shop" className="font-light text-gray-600 hover:text-black underline decoration-2">
                         clear all filters
                       </a>
                     </p>
@@ -93,7 +90,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
               ) : (
                 <div>
                   {/* ✅ PREMIUM HEADER */}
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 pb-6 border-b border-slate-200/50">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-6 pb-2 border-b border-slate-200/50">
                     <div>
                       <h2 className="text-2xl lg:text-3xl xl:text-4xl font-light bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-1.5 tracking-tight">
                         {params.category

@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     // ✅ Filter out null products AFTER query (TypeScript safe)
     const validCart = cart.filter(item => item.product !== null);
 
-    // console.log("✅ Cart GET:", validCart.length, "valid items");
+    console.log("✅ Cart GET:", validCart.length, "valid items");
     return NextResponse.json({ cart: validCart });
   } catch (err) {
     console.error("❌ GET /api/cart error:", err);
@@ -41,9 +41,16 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const userId = getUserId(req);
-    const { slug, quantity } = await req.json();
+    // ✅ FIXED: Now accepts size/color
+    const { slug, quantity, selectedSize, selectedColor } = await req.json();
 
-    // console.log("🛒 POST add to cart:", { userId, slug, quantity });
+    console.log("🛒 POST add to cart:", { 
+      userId, 
+      slug, 
+      quantity, 
+      selectedSize, 
+      selectedColor 
+    });
 
     if (!slug || !quantity || quantity < 1) {
       return NextResponse.json({ error: "Invalid input" }, { status: 400 });
@@ -60,22 +67,44 @@ export async function POST(req: NextRequest) {
 
     const productId = product.id;
 
-    let cartItem = await prisma.cartItem.findFirst({
-      where: { userId, productId }
+    // ✅ FIXED: Unique by product + size + color (not just product)
+    const existingCartItem = await prisma.cartItem.findFirst({
+      where: { 
+        userId, 
+        productId,
+        // ✅ Match exact size/color combination
+        ...(selectedSize && { selectedSize }),
+        ...(selectedColor && { selectedColor }),
+      }
     });
 
-    if (cartItem) {
+    let cartItem;
+
+    if (existingCartItem) {
+      // ✅ UPDATE quantity for same product/size/color
       cartItem = await prisma.cartItem.update({
-        where: { id: cartItem.id },
-        data: { quantity: cartItem.quantity + quantity },
+        where: { id: existingCartItem.id },
+        data: { 
+          quantity: existingCartItem.quantity + quantity 
+        },
       });
+      console.log("✅ Updated existing cart item:", existingCartItem.id);
     } else {
+      // ✅ CREATE new with selected size/color
       cartItem = await prisma.cartItem.create({
-        data: { userId, productId, quantity }
+        data: { 
+          userId, 
+          productId, 
+          quantity,
+          // ✅ SAVE SELECTED VALUES
+          selectedSize: selectedSize || "M",
+          selectedColor: selectedColor || "#000000",
+        }
       });
+      console.log("✅ Created new cart item:", cartItem.id);
     }
 
-    // ✅ Fetch full cart and filter null products
+    // ✅ Return full valid cart
     const cart = await prisma.cartItem.findMany({
       where: { userId },
       include: { 
@@ -93,39 +122,50 @@ export async function POST(req: NextRequest) {
 
     const validCart = cart.filter(item => item.product !== null);
 
-    // console.log("✅ Added to cart:", cartItem.id);
+    console.log("✅ Cart updated:", validCart.length, "items");
     return NextResponse.json({ cart: validCart });
   } catch (err) {
     console.error("❌ POST /api/cart error:", err);
-    return NextResponse.json({ cart: [] }, { status: 200 });
+    return NextResponse.json({ error: "Failed to add to cart" }, { status: 500 });
   }
 }
 
 export async function DELETE(req: NextRequest) {
   try {
     const userId = getUserId(req);
-    // console.log("🗑️ DELETE cart for user:", userId);
+    console.log("🗑️ DELETE cart for user:", userId);
     
-    let body: any = {};
+    // ✅ FIXED: Safely handle body - may be empty!
+    let body;
+    let productId, selectedSize, selectedColor;
+    
     try {
       body = await req.json();
-    } catch (e) {
-      // console.log("ℹ️ Empty body - clearing all cart");
+      ({ productId, selectedSize, selectedColor } = body);
+    } catch (jsonError) {
+      // ✅ NO BODY? That's fine for full cart clear
+      console.log("ℹ️ DELETE request has no JSON body - clearing entire cart");
+      productId = null;
     }
-    
-    const { productId } = body;
 
     if (productId) {
+      // Remove specific item (product + size + color)
       const deleted = await prisma.cartItem.deleteMany({
-        where: { userId, productId: String(productId) }
+        where: { 
+          userId, 
+          productId: String(productId),
+          ...(selectedSize && { selectedSize }),
+          ...(selectedColor && { selectedColor })
+        }
       });
-      // console.log("✅ Removed", deleted.count, "product(s):", productId);
+      console.log("✅ Removed", deleted.count, "precise item:", { productId, selectedSize, selectedColor });
     } else {
+      // ✅ Clear ENTIRE cart (no productId = clear all)
       const deleted = await prisma.cartItem.deleteMany({ where: { userId } });
-      // console.log("✅ Cleared", deleted.count, "cart items");
+      console.log("✅ Cleared entire cart:", deleted.count, "items");
     }
 
-    // ✅ Fetch remaining cart and filter null products
+    // Return remaining cart
     const cart = await prisma.cartItem.findMany({
       where: { userId },
       include: { 
@@ -142,7 +182,6 @@ export async function DELETE(req: NextRequest) {
     });
 
     const validCart = cart.filter(item => item.product !== null);
-
     return NextResponse.json({ cart: validCart });
   } catch (err) {
     console.error("❌ DELETE /api/cart error:", err);

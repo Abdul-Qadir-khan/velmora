@@ -66,7 +66,7 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("/api/products");
+        const res = await fetch("/api/products/");
         const json = await res.json();
         let data: Product[] = json.products || [];
 

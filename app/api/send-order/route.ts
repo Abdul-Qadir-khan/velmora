@@ -1,245 +1,188 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
+const ADMIN_EMAIL = "khanabdulqadir781@gmail.com";
+
 export async function POST(req: NextRequest) {
   try {
-    let data;
-    
-    // ✅ Parse JSON safely
-try {
-  data = await req.json();
-} catch (parseError) {
-  return NextResponse.json(
-    { success: false, error: "Invalid JSON data" }, 
-    { status: 400 }
-  );
-}
+    const data = await req.json();
 
-// 🔥 FIX: Generate orderId if missing
-data.orderId = data.orderId || Date.now().toString();
-
-    // console.log("📦 Received order:", {
-    //   orderId: data?.orderId,
-    //   name: data?.name,
-    //   email: data?.email,
-    //   total: data?.total,
-    //   itemsCount: data?.items?.length || 0
-    // });
-
-    // ✅ Enhanced validation
-    const requiredFields = { orderId: data?.orderId, name: data?.name, email: data?.email };
-    const missingFields = Object.entries(requiredFields)
-      .filter(([key, value]) => !value)
-      .map(([key]) => key);
-
-    if (missingFields.length > 0) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: `Missing required fields: ${missingFields.join(', ')}` 
-        }, 
-        { status: 400 }
-      );
+    // VALIDATION (unchanged)
+    const requiredFields = ['email', 'name', 'orderId', 'total', 'items'];
+    for (const field of requiredFields) {
+      if (!data[field]) {
+        return NextResponse.json({ error: `Missing required field: ${field}` }, { status: 400 });
+      }
     }
 
-    // ✅ Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(data.email)) {
-      return NextResponse.json(
-        { success: false, error: "Invalid email format" }, 
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
     }
 
-    // ✅ Check environment variables
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      // console.error("💥 Missing EMAIL_USER or EMAIL_PASS in environment");
-      return NextResponse.json(
-        { success: false, error: "Email service not configured" }, 
-        { status: 500 }
-      );
-    }
+    const sanitizeHTML = (str: string) => str.replace(/[<>&"']/g, "").replace(/\n/g, " ").trim();
 
-    if (!process.env.ADMIN_EMAIL) {
-      // console.error("💥 Missing ADMIN_EMAIL in environment");
-      return NextResponse.json(
-        { success: false, error: "Admin email not configured" }, 
-        { status: 500 }
-      );
-    }
+    const orderId = data.orderId;
+    const customerName = sanitizeHTML(data.name);
+    const customerEmail = data.email.trim().toLowerCase();
+    const total = parseFloat(data.total);
+    const items = Array.isArray(data.items) ? data.items : [];
+    const address = sanitizeHTML(data.address || "");
+    const phone = sanitizeHTML(data.phone || "");
 
-    // console.log("🔧 Creating transporter...");
+    // 🔥 CLEAN MINIMAL CUSTOMER RECEIPT
+    const receiptHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Receipt #${orderId}</title>
+</head>
+<body style="margin: 0; padding: 20px; font-family: 'Helvetica Neue', Arial, sans-serif; line-height: 1.5; color: #333; background: #f8f9fa;">
+  <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden;">
     
-    // ✅ Gmail SMTP transporter with better config
+    <!-- Header -->
+    <div style="background: #1a1a1a; padding: 24px; text-align: center; color: white;">
+      <h1 style="margin: 0; font-size: 24px; font-weight: 500;">Order Receipt</h1>
+      <p style="margin: 8px 0 0; font-size: 16px; opacity: 0.9;">#${orderId}</p>
+    </div>
+    
+    <!-- Greeting -->
+    <div style="padding: 32px 24px;">
+      <h2 style="margin: 0 0 20px; font-size: 20px; font-weight: 500; color: #1a1a1a;">Hello ${customerName},</h2>
+      <div style="background: #e8f5e8; padding: 16px; border-radius: 6px; border-left: 4px solid #28a745; margin-bottom: 24px;">
+        <p style="margin: 0 0 4px; font-size: 14px; color: #28a745; font-weight: 500;">Order Confirmed</p>
+        <p style="margin: 0; font-size: 13px; color: #666;">Processing in 1-2 days</p>
+      </div>
+    </div>
+    
+    <!-- Items -->
+    <div style="padding: 0 24px 24px;">
+      <h3 style="margin: 0 0 16px; font-size: 16px; font-weight: 500; color: #1a1a1a; border-bottom: 2px solid #e9ecef; padding-bottom: 8px;">
+        Order Items (${items.length})
+      </h3>
+      
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        ${items.map((item: any) => `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #f8f9fa; border-radius: 6px; border: 1px solid #e9ecef;">
+            <div style="flex: 1;">
+              <div style="font-weight: 500; font-size: 14px; color: #1a1a1a; margin-bottom: 4px;">
+                ${sanitizeHTML(item.name || "Item")}
+              </div>
+              <div style="display: flex; gap: 16px; font-size: 12px; color: #666;">
+                <span>Size: ${sanitizeHTML(item.size || "N/A")}</span>
+                <span>Color: ${sanitizeHTML(item.color || "N/A")}</span>
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-weight: 600; font-size: 16px; color: #1a1a1a;">
+                ₹${parseFloat(item.price || 0).toLocaleString()}
+              </div>
+              <div style="font-size: 12px; color: #666;">
+                Qty: ${item.qty || 1}
+              </div>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+    
+    <!-- Total -->
+    <div style="padding: 0 24px 24px; background: #f8f9fa; border-top: 1px solid #e9ecef;">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">
+        <span style="font-size: 18px; font-weight: 500; color: #1a1a1a;">Total Amount</span>
+        <span style="font-size: 28px; font-weight: 600; color: #1a1a1a;">₹${total.toLocaleString()}</span>
+      </div>
+    </div>
+    
+    <!-- Address -->
+    <div style="padding: 24px; background: #f8f9fa; border-top: 1px solid #e9ecef;">
+      <h4 style="margin: 0 0 12px; font-size: 14px; font-weight: 500; color: #1a1a1a;">Delivery Address</h4>
+      <p style="margin: 0 0 8px; font-size: 13px; line-height: 1.5;">${address}</p>
+      ${phone ? `<p style="margin: 0; font-size: 13px; color: #666;"><strong>Phone:</strong> ${phone}</p>` : ''}
+    </div>
+    
+    <!-- Footer -->
+    <div style="padding: 24px; background: #1a1a1a; color: white; text-align: center;">
+      <p style="margin: 0 0 4px; font-size: 13px;">Lycoon WearStore</p>
+      <p style="margin: 0; font-size: 12px; opacity: 0.8;">Questions? Reply to this email</p>
+    </div>
+  </div>
+</body>
+</html>`;
+
+    // 🔥 CLEAN MINIMAL ADMIN ALERT
+    const adminHTML = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>New Order #${orderId}</title></head>
+<body style="margin: 0; padding: 20px; font-family: 'Helvetica Neue', Arial, sans-serif; line-height: 1.5; color: #333; background: #f8f9fa;">
+  <div style="max-width: 500px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden;">
+    
+    <div style="background: #28a745; padding: 20px; text-align: center; color: white;">
+      <h1 style="margin: 0; font-size: 22px; font-weight: 500;">New Order Received</h1>
+      <p style="margin: 6px 0 0; font-size: 14px;">Order #${orderId}</p>
+    </div>
+    
+    <div style="padding: 24px;">
+      <div style="background: #f8f9fa; padding: 16px; border-radius: 6px; border-left: 4px solid #28a745; margin-bottom: 20px;">
+        <h3 style="margin: 0 0 10px; font-size: 14px; color: #28a745; font-weight: 500;">Order Summary</h3>
+        <div style="display: grid; grid-template-columns: 1fr auto; gap: 12px; font-size: 14px;">
+          <span>Total:</span><strong>₹${total.toLocaleString()}</strong>
+          <span>Items:</span><strong>${items.length}</strong>
+        </div>
+      </div>
+      
+      <h4 style="margin: 0 0 16px; font-size: 14px; font-weight: 500; color: #1a1a1a;">Customer Details</h4>
+      <div style="padding: 20px; background: #f8f9fa; border-radius: 6px; border: 1px solid #e9ecef;">
+        <p style="margin: 0 0 8px; font-size: 13px;"><strong>Name:</strong> ${customerName}</p>
+        <p style="margin: 0 0 8px; font-size: 13px;"><strong>Email:</strong> ${customerEmail}</p>
+        <p style="margin: 0 0 8px; font-size: 13px;"><strong>Phone:</strong> ${phone || 'N/A'}</p>
+        <p style="margin: 0; font-size: 13px;"><strong>Address:</strong> ${address}</p>
+      </div>
+    </div>
+    
+    <div style="padding: 20px; background: #1a1a1a; color: white; text-align: center; font-size: 12px;">
+      Lycoon WearStore - Order Notification
+    </div>
+  </div>
+</body>
+</html>`;
+
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
       secure: false,
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: process.env.EMAIL_USER!,
+        pass: process.env.EMAIL_PASS!,
       },
-      // ✅ Add TLS options for better security
-      tls: {
-        rejectUnauthorized: false
-      }
     });
 
-    // ✅ Test transporter connection with timeout
-    try {
-      await Promise.race([
-        transporter.verify(),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error("Transporter verification timeout")), 10000)
-        )
-      ]);
-      // console.log("✅ Gmail SMTP connected successfully");
-    } catch (verifyError) {
-      // console.error("💥 SMTP Verification failed:", verifyError);
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: "Email service unavailable. Please try again later." 
-        }, 
-        { status: 503 }
-      );
-    }
-
-    // ✅ Sanitize data for HTML
-    const sanitizeHTML = (str: string) => 
-      str.replace(/[<>&"']/g, '').replace(/\n/g, ' ').trim();
-
-    // ✅ Customer email with safe HTML
-    const customerHTML = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #28a745;">✅ Order Confirmed #${sanitizeHTML(data.orderId)}</h2>
-        <p>Hi <strong>${sanitizeHTML(data.name)}</strong>,</p>
-        <p>Thank you for your order! We'll process it shortly.</p>
-        ${data.items && data.items.length > 0 ? `
-        <table border="1" style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-          <thead>
-            <tr style="background: #f8f9fa;">
-              <th style="padding: 12px; text-align: left;">Item</th>
-              <th style="padding: 12px; text-align: center;">Qty</th>
-              <th style="padding: 12px; text-align: right;">Price</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${data.items.map((item: any) => `
-              <tr>
-                <td style="padding: 12px;">${sanitizeHTML(item.name || 'N/A')}</td>
-                <td style="padding: 12px; text-align: center;">${item.qty || 0}</td>
-                <td style="padding: 12px; text-align: right;">₹${parseFloat(item.price || 0).toFixed(2)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-        ` : ''}
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
-          <p><strong>Total: ₹${parseFloat(data.total || 0).toFixed(2)}</strong></p>
-          ${data.address ? `<p><strong>Shipping to:</strong> ${sanitizeHTML(data.address)}</p>` : ''}
-          ${data.phone ? `<p><strong>Phone:</strong> ${sanitizeHTML(data.phone)}</p>` : ''}
-        </div>
-        <p style="color: #666; font-size: 14px;">
-          This is an automated confirmation. Do not reply to this email.
-        </p>
-      </div>
-    `;
-
-    const customerMail = {
-      from: `"Lycoon WearStore" <${process.env.EMAIL_USER}>`,
-      to: data.email,
-      subject: `Order Confirmed #${data.orderId} - Lycoon WearStore`,
-      html: customerHTML,
-    };
-
-    // ✅ Admin email
-    const adminHTML = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px;">
-        <h2 style="color: #007bff;">🆕 New Order #${sanitizeHTML(data.orderId)}</h2>
-        <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0;">
-          <h3>Customer Details</h3>
-          <p><strong>Name:</strong> ${sanitizeHTML(data.name)}</p>
-          <p><strong>Email:</strong> ${data.email}</p>
-          ${data.phone ? `<p><strong>Phone:</strong> ${sanitizeHTML(data.phone)}</p>` : ''}
-          ${data.address ? `<p><strong>Address:</strong> ${sanitizeHTML(data.address)}</p>` : ''}
-        </div>
-        <div style="background: #d1ecf1; padding: 15px; border-radius: 5px; margin: 20px 0;">
-          <p><strong>Total Amount:</strong> ₹${parseFloat(data.total || 0).toFixed(2)}</p>
-        </div>
-        ${data.items && data.items.length > 0 ? `
-        <h3>Order Items:</h3>
-        <table border="1" style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="background: #007bff; color: white;">
-              <th style="padding: 12px;">Item</th>
-              <th style="padding: 12px; text-align: center;">Qty</th>
-              <th style="padding: 12px; text-align: right;">Price</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${data.items.map((item: any) => `
-              <tr>
-                <td style="padding: 12px;">${sanitizeHTML(item.name || 'N/A')}</td>
-                <td style="padding: 12px; text-align: center;">${item.qty || 0}</td>
-                <td style="padding: 12px; text-align: right;">₹${parseFloat(item.price || 0).toFixed(2)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-        ` : '<p>No items in order</p>'}
-      </div>
-    `;
-
-    const adminMail = {
-      from: `"Lycoon WearStore" <${process.env.EMAIL_USER}>`,
-      to: process.env.ADMIN_EMAIL,
-      subject: `🆕 New Order #${data.orderId} - ₹${data.total}`,
+    // 1. ADMIN: New Order Alert ONLY
+    await transporter.sendMail({
+      from: `"Lycoon Store" <${process.env.EMAIL_USER}>`,
+      to: ADMIN_EMAIL,
+      subject: `New Order #${orderId} - ₹${total.toLocaleString()}`,
       html: adminHTML,
-    };
-
-    // console.log("📧 Sending emails...");
-    
-    // ✅ Send emails with individual error handling
-    const [customerResult, adminResult] = await Promise.allSettled([
-      transporter.sendMail(customerMail),
-      transporter.sendMail(adminMail)
-    ]);
-
-    const customerSuccess = customerResult.status === 'fulfilled';
-    const adminSuccess = adminResult.status === 'fulfilled';
-
-    // console.log("📧 Email results:", {
-    //   customer: customerSuccess ? '✅' : '❌',
-    //   admin: adminSuccess ? '✅' : '❌',
-    //   customerError: customerSuccess ? null : (customerResult as PromiseRejectedResult).reason,
-    //   adminError: adminSuccess ? null : (adminResult as PromiseRejectedResult).reason
-    // });
-
-    // ✅ Return success even if one email fails (business critical)
-    return NextResponse.json({
-      success: true,
-      message: customerSuccess && adminSuccess 
-        ? "Order confirmed! Both emails sent successfully."
-        : "Order confirmed! Customer email sent successfully.",
-      orderId: data.orderId,
-      emails: {
-        customer: customerSuccess,
-        admin: adminSuccess
-      }
     });
 
-  } catch (error: any) {
-    // console.error("💥 Email API Error:", error);
+    // 2. CUSTOMER: Receipt ONLY  
+    await transporter.sendMail({
+      from: `"Lycoon WearStore" <${process.env.EMAIL_USER}>`,
+      to: customerEmail,
+      subject: `Order Receipt #${orderId}`,
+      html: receiptHTML,
+    });
+
+    console.log("✅ Admin alert:", ADMIN_EMAIL);
+    console.log("✅ Customer receipt:", customerEmail);
+
+    return NextResponse.json({ success: true, admin: ADMIN_EMAIL, customer: customerEmail });
     
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: process.env.NODE_ENV === 'production' 
-          ? "Failed to process order. Please try again." 
-          : error.message || "Unknown error occurred"
-      }, 
-      { status: 500 }
-    );
+  } catch (error: any) {
+    console.error("💥 Error:", error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

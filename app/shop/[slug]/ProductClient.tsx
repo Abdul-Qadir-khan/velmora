@@ -1,21 +1,20 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Heart, X } from "lucide-react";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
+import { useCart } from "@/app/context/CartContext"; // ✅ CORRECT IMPORT
 
-type CartItem = {
-  productId: string;
-  name: string;
-  price: number;
-  qty: number;
-  size: string;
-  color: string;
-  image: string;
-};
+// ✅ DELETE: No longer needed - CartContext handles everything
+// type CartItem = { ... };
+// const safeParseArray = ... (keep only for UI)
+// const safeParseObject = ... (keep only for UI)
+// const getCart = ... ❌ DELETED
+// const addToCart = ... ❌ DELETED
 
+// ✅ KEEP THESE for UI display only (images, variations)
 const safeParseArray = (data: any): string[] => {
   try {
     if (Array.isArray(data)) return data;
@@ -36,21 +35,6 @@ const safeParseObject = (data: any): Record<string, any> => {
   }
 };
 
-const getCart = (): CartItem[] => {
-  if (typeof window === "undefined") return [];
-  try {
-    return JSON.parse(localStorage.getItem("cart") || "[]");
-  } catch {
-    return [];
-  }
-};
-
-const addToCart = (item: CartItem) => {
-  const cart = getCart();
-  cart.push(item);
-  localStorage.setItem("cart", JSON.stringify(cart));
-};
-
 interface ProductClientProps {
   product: any;
   recommendedProducts?: any[];
@@ -61,6 +45,9 @@ export default function ProductClient({
   recommendedProducts = [],
 }: ProductClientProps) {
   const router = useRouter();
+  
+  // ✅ USE CART CONTEXT INSTEAD OF LOCALSTORAGE
+  const { addToCart, cartCount, isLoading } = useCart();
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState("");
@@ -72,6 +59,7 @@ export default function ProductClient({
 
   const carouselRef = useRef<HTMLDivElement>(null);
 
+  // ✅ UI HELPERS - Keep these for display
   const images = safeParseArray(product.images);
   const variationRaw = product.variations?.[0] || {};
   const variation = {
@@ -91,27 +79,40 @@ export default function ProductClient({
       ((product.originalPrice - product.price) / product.originalPrice) * 100
     );
 
-  const handleAddToCart = () => {
-    if (!selectedColor || !selectedSize) {
-      toast.error("Please select color and size");
-      return;
-    }
-    addToCart({
-      productId: product.id,
-      name: product.name,
-      price: product.price,
-      qty,
-      size: selectedSize,
-      color: selectedColor,
-      image: images[0] || "/placeholder.png",
-    });
-    toast.success("Added to cart!");
-  };
+  // ✅ REPLACE your handleAddToCart & handleBuyNow with these:
+const handleAddToCart = async () => {
+  if (!selectedColor || !selectedSize) {
+    toast.error("Please select color and size");
+    return;
+  }
 
-  const handleBuyNow = () => {
-    handleAddToCart();
+  try {
+    // ✅ PASS SELECTED COLOR/SIZE to CartContext
+    await addToCart(
+      product.slug,     // Product identifier
+      qty,             // Quantity  
+      selectedSize,    // ✅ SELECTED SIZE (S/M/L/XL)
+      selectedColor    // ✅ SELECTED COLOR (Red/Blue/Black)
+    );
+    toast.success(`Added ${qty}x ${selectedSize} ${selectedColor} to cart!`);
+  } catch (error) {
+    toast.error("Failed to add to cart");
+  }
+};
+
+const handleBuyNow = async () => {
+  if (!selectedColor || !selectedSize) {
+    toast.error("Please select color and size");
+    return;
+  }
+
+  try {
+    await addToCart(product.slug, qty, selectedSize, selectedColor);
     router.push("/checkout");
-  };
+  } catch (error) {
+    toast.error("Failed to add to cart");
+  }
+};
 
   const handleCarouselScroll = (dir: "left" | "right") => {
     if (!carouselRef.current) return;
@@ -121,6 +122,8 @@ export default function ProductClient({
       behavior: "smooth",
     });
   };
+
+  // ✅ PASTE YOUR RETURN JSX HERE (no changes needed except buttons)
 
   return (<>
     <section className="bg-black text-white pt-12 pb-5 text-center">

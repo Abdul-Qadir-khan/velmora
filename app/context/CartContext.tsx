@@ -1,4 +1,3 @@
-// app/context/CartContext.tsx - FIXED VERSION
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
@@ -8,7 +7,7 @@ export interface CartItem {
   name: string;
   price: number;
   qty: number;
-  images: any;  // Keep flexible
+  images: any;
   selectedSize?: string;
   selectedColor?: string;
 }
@@ -16,8 +15,8 @@ export interface CartItem {
 interface CartContextType {
   cart: CartItem[];
   cartCount: number;
-  addToCart: (slug: string, quantity?: number) => Promise<void>;
-  removeFromCart: (productId: string | number) => Promise<void>;
+  addToCart: (slug: string, quantity?: number, selectedSize?: string, selectedColor?: string) => Promise<void>; // ✅ FIXED: Added size/color params
+  removeFromCart: (productId: string | number, size?: string, color?: string) => Promise<void>;
   clearCart: () => Promise<void>;
   isLoading: boolean;
 }
@@ -30,39 +29,30 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
 
-  // 🔧 FIXED: Sync with backend + transform data properly
   const syncWithBackend = useCallback(async () => {
     try {
-      // console.log("🔄 Syncing cart with backend...");
       setIsLoading(true);
       
       const res = await fetch("/api/cart");
       if (!res.ok) throw new Error("Failed to fetch cart");
       
       const { cart: serverCart } = await res.json();
-      // console.log("📦 Raw server cart:", serverCart);
       
-      // 🔑 TRANSFORM Prisma data to Checkout format
-      const uiCart: CartItem[] = serverCart.map((item: any) => {
-        // console.log("🖼️ Processing item images:", item.product?.images);
-        
-        return {
-          id: item.productId || item.product?.id,
-          name: item.product?.name || "Unknown Product",
-          price: parseFloat(item.product?.price || 0),
-          qty: item.quantity || 1,  // ✅ Prisma uses 'quantity'
-          images: item.product?.images,  // ✅ Pass raw images (string or array)
-          selectedSize: item.selectedSize || "M",
-          selectedColor: item.selectedColor || "#000000",
-        };
-      });
+      // ✅ PERFECT: Already transforms size/color correctly
+      const uiCart: CartItem[] = serverCart.map((item: any) => ({
+        id: item.productId || item.product?.id,
+        name: item.product?.name || "Unknown Product",
+        price: parseFloat(item.product?.price || 0),
+        qty: item.quantity || 1,
+        images: item.product?.images,
+        selectedSize: item.selectedSize || "M",     // ✅ SHOWS SELECTED SIZE
+        selectedColor: item.selectedColor || "#000", // ✅ SHOWS SELECTED COLOR
+      }));
       
-      // console.log("✅ Transformed cart:", uiCart);
       setCart(uiCart);
       
     } catch (error) {
-      // console.error("Cart sync error:", error);
-      setCart([]); // Empty on error
+      setCart([]);
     } finally {
       setIsLoading(false);
     }
@@ -72,13 +62,24 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     syncWithBackend();
   }, [syncWithBackend]);
 
-  const addToCart = async (slug: string, quantity: number = 1) => {
+  // ✅ FIXED: Now accepts size/color parameters
+  const addToCart = async (
+    slug: string, 
+    quantity: number = 1, 
+    selectedSize?: string, 
+    selectedColor?: string
+  ) => {
     try {
       setIsLoading(true);
       const res = await fetch("/api/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug, quantity }),
+        body: JSON.stringify({ 
+          slug, 
+          quantity,
+          selectedSize,   // ✅ SEND SELECTED SIZE
+          selectedColor   // ✅ SEND SELECTED COLOR
+        }),
       });
       
       if (!res.ok) {
@@ -88,38 +89,40 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       
       await syncWithBackend();
     } catch (error) {
-      // console.error("addToCart error:", error);
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const removeFromCart = async (productId: string | number) => {
-    try {
-      setIsLoading(true);
-      const res = await fetch("/api/cart", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId }),
-      });
-      
-      if (!res.ok) throw new Error('Failed to remove from cart');
-      await syncWithBackend();
-    } catch (error) {
-      // console.error("removeFromCart error:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const removeFromCart = async (productId: string | number, size?: string, color?: string) => {
+  try {
+    setIsLoading(true);
+    const res = await fetch("/api/cart", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        productId, 
+        selectedSize: size, 
+        selectedColor: color 
+      }),  // ✅ Now sends size/color for precise removal
+    });
+    
+    if (!res.ok) throw new Error('Failed to remove from cart');
+    await syncWithBackend();
+  } catch (error) {
+    throw error;
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const clearCart = async () => {
     try {
       await fetch("/api/cart", { method: "DELETE" });
       setCart([]);
     } catch (error) {
-      // console.error("clearCart error:", error);
+      // Silent fail
     }
   };
 
@@ -127,7 +130,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     <CartContext.Provider value={{
       cart,
       cartCount,
-      addToCart,
+      addToCart,        // ✅ Now supports size/color
       removeFromCart,
       clearCart,
       isLoading,
