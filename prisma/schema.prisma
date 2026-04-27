@@ -1,4 +1,3 @@
-// This file is maintained by Prisma Migrate
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,78 +7,77 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ==============================
-//  PRODUCT MODEL (ENHANCED)
-// ==============================
-model Product {
-  id            String  @id @default(cuid())
-  name          String
-  slug          String  @unique
-  description   String?
-  price         Float
-  originalPrice Float?
-  stock         Int     @default(0)
-  rating        Float   @default(0)
-  category      String
-  isNew         Boolean @default(false)
-  bestSeller    Boolean @default(false)
-  images        String? // ✅ FIXED: Json → String (SQLite compatible)
-
-  brandId String
-  brand   Brand  @relation(fields: [brandId], references: [id], onDelete: Cascade)
-
-  variations Variation[]
-  cartItems  CartItem[]
-
-  seoTitle       String?
-  seoDescription String?
-  seoKeywords    String?
-
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  products  Product[]
 }
 
-// ==============================
-//  BRAND MODEL
-// ==============================
-model Brand {
-  id   String  @id @default(cuid())
-  name String  @unique
-  logo String?
+model Product {
+  id              String      @id @default(cuid())
+  name            String
+  slug            String      @unique
+  description     String?
+  price           Float
+  originalPrice   Float?
+  stock           Int         @default(0)
+  rating          Float       @default(0)
+  category        String      // ✅ String field
+  categoryId      String?     // ✅ Relation (nullable)
+  categoryObj     Category?   @relation(fields: [categoryId], references: [id])
+  
+  isNew           Boolean     @default(false)
+  bestSeller      Boolean     @default(false)
+  images          String?
+  
+  brandId         String
+  brand           Brand       @relation(fields: [brandId], references: [id])
+  
+  variations      Variation[]
+  cartItems       CartItem[]
 
+  seoTitle        String? @default("")
+  seoDescription  String? @default("")
+  seoKeywords     String? @default("")
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Brand {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  logo     String?
   products Product[]
 }
 
-// ==============================
-//  VARIATION MODEL (IMPROVED)
-// ==============================
 model Variation {
-  id     String @id @default(cuid())
-  colors String // ✅ FIXED: Json → String (SQLite compatible)
-  sizes  String // ✅ FIXED: Json → String (SQLite compatible)
-  specs  String // ✅ FIXED: Json → String (SQLite compatible)
-
+  id       String  @id @default(cuid())
+  colors   String
+  sizes    String
+  specs    String
+  
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
+  
   @@unique([productId])
 }
 
-// ==============================
-//  CART ITEM
-// ==============================
 model CartItem {
-  id           String   @id @default(cuid())
-  userId       String
-  productId    String
-  quantity     Int      @default(1)
-  selectedSize String?  // 🔥 REQUIRED
-  selectedColor String? // 🔥 REQUIRED
+  id             String   @id @default(cuid())
+  userId         String
+  productId      String
+  quantity       Int      @default(1)
+  selectedSize   String?
+  selectedColor  String?
 
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@unique([userId, productId, selectedSize, selectedColor])
 }

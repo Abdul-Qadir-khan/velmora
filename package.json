@@ -8,7 +8,13 @@
     "postinstall": "prisma generate",
     "build:prod": "NODE_OPTIONS='--max-old-space-size=4096' next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint",
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate",
+    "db:seed": "node prisma/seed.js",
+    "db:reset": "prisma db push --force-reset && npm run db:seed",
+    "db:studio": "prisma studio",
+    "seed": "npm run db:seed"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -41,6 +47,7 @@
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.2",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }
