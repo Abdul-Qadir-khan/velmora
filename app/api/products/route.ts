@@ -11,7 +11,6 @@ function generateSlug(name: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-// ✅ TYPE-SAFE HELPER FUNCTION
 function capitalizeWords(str: string): string {
   return str
     .replace(/-/g, ' ')
@@ -58,87 +57,139 @@ const createProductSchema = z.object({
   }).optional()
 });
 
-// 🔥 PERFECTLY TYPE-SAFE FILTERS FUNCTION
+const updateProductSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, "Name is required").optional(),
+  description: z.string().optional(),
+  price: z.coerce.number().positive("Price must be positive").optional(),
+  originalPrice: z.coerce.number().optional(),
+  stock: z.coerce.number().min(0, "Stock cannot be negative").optional(),
+  rating: z.coerce.number().min(0).max(5, "Rating must be 0-5").optional(),
+  category: z.enum([
+    "mens", "womens", "kids", "t-shirts", "shirts", 
+    "jeans", "jackets", "hoodies", "accessories"
+  ]).optional(),
+  isNew: z.boolean().optional(),
+  bestSeller: z.boolean().optional(),
+  images: z.array(z.string()).optional(),
+  brand: z.object({
+    name: z.string().min(1, "Brand name required").optional(),
+    logo: z.string().optional()
+  }).optional(),
+  variations: z.object({
+    colors: z.array(z.string()).optional(),
+    sizes: z.array(z.string()).optional(),
+    specs: z.object({
+      material: z.string().optional(),
+      fit: z.string().optional(),
+      sleeve: z.string().optional(),
+      pattern: z.string().optional(),
+      washing: z.string().optional()
+    }).optional()
+  }).optional(),
+  seo: z.object({
+    title: z.string().optional(),
+    description: z.string().optional(),
+    keywords: z.string().optional()
+  }).optional()
+}).passthrough();
+
 async function getDynamicFilters(appliedFilters: Record<string, any> = {}) {
   try {
-    // 1. CATEGORIES
-    const categories = await prisma.product.groupBy({
-      by: ['category'],
-      where: { stock: { gt: 0 }, ...appliedFilters },
-      _count: { id: true },
-      orderBy: { _count: { id: 'desc' } }
-    });
-
-    // 2. BRANDS - Separate queries for type safety
-    const brandsRaw = await prisma.product.groupBy({
-      by: ['brandId'],
-      where: { stock: { gt: 0 }, ...appliedFilters },
-      _count: { id: true },
-      orderBy: { _count: { id: 'desc' } }
-    });
-
-    const brandIds = brandsRaw
-      .map((b: any) => b.brandId)
-      .filter((id: string | null) => id !== null) as string[];
-
-    const brands = brandIds.length > 0 
-      ? await prisma.brand.findMany({
-          where: { id: { in: brandIds } },
-          select: { id: true, name: true }
-        })
-      : [];
-
-    // 3. SIZES
-    const sizesData = await prisma.variation.findMany({
+    const allProducts = await prisma.product.findMany({
       where: { 
-        product: { 
-          stock: { gt: 0 }, 
-          ...appliedFilters 
-        } 
+        stock: { gt: 0 }, 
+        ...appliedFilters 
       },
-      select: { sizes: true },
-      distinct: ['productId']
-    });
-
-    const sizesSet = new Set<string>();
-    sizesData.forEach((v: any) => {
-      try {
-        const parsedSizes = JSON.parse(v.sizes || '[]') as string[];
-        parsedSizes.forEach((size: string) => sizesSet.add(size));
-      } catch {
-        // Ignore parse errors
+      select: { 
+        category: true 
       }
     });
-    const sizes = Array.from(sizesSet).sort();
+
+    const categoryCounts = allProducts.reduce((acc: Record<string, number>, product: any) => {
+      const cat = product.category || 'uncategorized';
+      acc[cat] = (acc[cat] || 0) + 1;
+      return acc;
+    }, {});
+
+    const brandProducts = await prisma.product.findMany({
+      where: { 
+        stock: { gt: 0 }, 
+        ...appliedFilters 
+      },
+      select: { 
+        brand: {
+          select: {
+            name: true
+          }
+        }
+      }
+    });
+
+    const brandCounts = brandProducts.reduce((acc: Record<string, number>, product: any) => {
+      const brandName = product.brand?.name || 'Unknown';
+      acc[brandName] = (acc[brandName] || 0) + 1;
+      return acc;
+    }, {});
+
+    const sizeProducts = await prisma.product.findMany({
+      where: { 
+        stock: { gt: 0 }, 
+        ...appliedFilters 
+      },
+      include: { 
+        variations: true 
+      }
+    });
+
+    const sizeCounts = new Map<string, number>();
+    sizeProducts.forEach(product => {
+      product.variations.forEach((variation: any) => {
+        try {
+          const sizes = JSON.parse(variation.sizes || '[]') as string[];
+          sizes.forEach((size: string) => {
+            sizeCounts.set(size, (sizeCounts.get(size) || 0) + 1);
+          });
+        } catch {
+          // Skip invalid JSON
+        }
+      });
+    });
 
     return {
-      categories: categories.map((c: any) => ({
-        value: c.category,
-        label: capitalizeWords(c.category), // ✅ TYPE SAFE!
-        count: c._count.id
-      })),
-      brands: brands.map((b: any) => {
-        const count = brandsRaw.find((raw: any) => raw.brandId === b.id)?._count.id || 0;
-        return {
-          value: b.name,
-          label: b.name.toUpperCase(),
+      categories: Object.entries(categoryCounts)
+        .map(([value, count]) => ({
+          value,
+          label: capitalizeWords(value),
           count
-        };
-      }),
-      sizes: sizes.map((s: string) => ({
-        value: s.toLowerCase(),
-        label: s,
-        count: 0
-      })),
+        }))
+        .sort((a, b) => b.count - a.count),
+      
+      brands: Object.entries(brandCounts)
+        .map(([value, count]) => ({
+          value,
+          label: capitalizeWords(value),
+          count
+        }))
+        .sort((a, b) => b.count - a.count),
+      
+      sizes: Array.from(sizeCounts.entries())
+        .map(([value, count]) => ({
+          value: value.toLowerCase(),
+          label: value.toUpperCase(),
+          count
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+      
       priceRanges: [
-        { value: 'under-500', label: 'Under ₹500', count: 0 },
-        { value: '500-1000', label: '₹500 - ₹1,000', count: 0 },
-        { value: '1000-2000', label: '₹1,000 - ₹2,000', count: 0 },
-        { value: '2000+', label: '₹2,000+', count: 0 }
+        { value: 'under-500', label: 'Under ₹500' },
+        { value: '500-1000', label: '₹500 - ₹1,000' },
+        { value: '1000-2000', label: '₹1,000 - ₹2,000' },
+        { value: '2000+', label: '₹2,000+' }
       ]
     };
   } catch (error) {
-    console.error('Filter generation error:', error);
+    console.error('🔥 Filter generation error:', error);
     return {
       categories: [],
       brands: [],
@@ -152,6 +203,42 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     
+    // 🔥 FIXED: Single product fetch for admin edit
+    const id = searchParams.get("id");
+    if (id) {
+      const product = await prisma.product.findUnique({
+        where: { id },
+        include: { brand: true, variations: true }
+      });
+      
+      if (!product) {
+        return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+      }
+
+      return NextResponse.json({ 
+        product: {
+          id: product.id,
+          slug: product.slug,
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          originalPrice: product.originalPrice,
+          stock: product.stock,
+          rating: product.rating,
+          category: product.category,
+          isNew: product.isNew,
+          bestSeller: product.bestSeller,
+          images: product.images ? JSON.parse(product.images) : [], // ✅ PARSED IMAGES
+          brand: product.brand,
+          variations: product.variations,
+          seoTitle: product.seoTitle,
+          seoDescription: product.seoDescription,
+          seoKeywords: product.seoKeywords
+        }
+      });
+    }
+    
+    // Your existing list logic
     const category = searchParams.get("category");
     const brand = searchParams.get("brand");
     const size = searchParams.get("size");
@@ -235,15 +322,12 @@ export async function GET(request: NextRequest) {
 
     const filterOptions = await getDynamicFilters(whereClause);
 
-    // console.log(`✅ Found ${products.length}/${total} products`);
-
     return NextResponse.json({ 
       products, 
       pagination: { total, page, limit, pages: Math.ceil(total / limit) },
       filters: filterOptions
     });
   } catch (err: unknown) {
-    // console.error("❌ API ERROR:", err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -273,7 +357,7 @@ export async function POST(request: NextRequest) {
         category: validated.category,
         isNew: validated.isNew ?? false,
         bestSeller: validated.bestSeller ?? false,
-        images: validated.images ? JSON.stringify(validated.images) : "",
+        images: validated.images ? JSON.stringify(validated.images) : "[]",
         seoTitle: validated.seo?.title || "",
         seoDescription: validated.seo?.description || "",
         seoKeywords: validated.seo?.keywords || "",
@@ -302,7 +386,120 @@ export async function POST(request: NextRequest) {
         details: error.issues 
       }, { status: 400 });
     }
-    // console.error("POST error:", error);
     return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const validated = updateProductSchema.parse(body);
+    
+    const productId = validated.id;
+    if (!productId) {
+      return NextResponse.json({ error: "Product ID (id) is required" }, { status: 400 });
+    }
+
+    const updateData: any = {};
+
+    if (validated.name !== undefined) {
+      updateData.name = validated.name;
+      updateData.slug = generateSlug(validated.name);
+    }
+    
+    if (validated.description !== undefined) updateData.description = validated.description;
+    if (validated.price !== undefined) updateData.price = validated.price;
+    if (validated.originalPrice !== undefined) updateData.originalPrice = validated.originalPrice;
+    if (validated.stock !== undefined) updateData.stock = validated.stock;
+    if (validated.rating !== undefined) updateData.rating = validated.rating;
+    if (validated.category !== undefined) updateData.category = validated.category;
+    if (validated.isNew !== undefined) updateData.isNew = validated.isNew;
+    if (validated.bestSeller !== undefined) updateData.bestSeller = validated.bestSeller;
+    
+    // 🔥 PERFECT IMAGE HANDLING
+    if (validated.images !== undefined) {
+      updateData.images = Array.isArray(validated.images) && validated.images.length > 0
+        ? JSON.stringify(validated.images)
+        : "[]";
+    }
+
+    if (validated.seo) {
+      updateData.seoTitle = validated.seo.title || "";
+      updateData.seoDescription = validated.seo.description || "";
+      updateData.seoKeywords = validated.seo.keywords || "";
+    }
+
+    if (validated.brand) {
+      updateData.brand = {
+        upsert: {
+          where: { name: validated.brand.name },
+          update: { 
+            name: validated.brand.name,
+            logo: validated.brand.logo || null
+          },
+          create: { 
+            name: validated.brand.name, 
+            logo: validated.brand.logo || null 
+          }
+        }
+      };
+    }
+
+    if (validated.variations) {
+      // Update first variation
+      const firstVariation = await prisma.variation.findFirst({
+        where: { productId }
+      });
+      
+      if (firstVariation) {
+        await prisma.variation.update({
+          where: { id: firstVariation.id },
+          data: {
+            colors: validated.variations.colors ? JSON.stringify(validated.variations.colors) : "[]",
+            sizes: validated.variations.sizes ? JSON.stringify(validated.variations.sizes) : "[]",
+            specs: validated.variations.specs ? JSON.stringify(validated.variations.specs) : "{}",
+          }
+        });
+      }
+    }
+
+    const product = await prisma.product.update({
+      where: { id: productId },
+      data: updateData,
+      include: { brand: true, variations: true },
+    });
+
+    return NextResponse.json({ 
+      product: {
+        ...product,
+        images: product.images ? JSON.parse(product.images) : [] // ✅ PARSED
+      }
+    }, { status: 200 });
+  } catch (error: unknown) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ 
+        error: "Validation failed", 
+        details: error.issues 
+      }, { status: 400 });
+    }
+    console.error("PUT error:", error);
+    return NextResponse.json({ error: "Failed to update product" }, { status: 500 });
+  }
+}
+
+// 🔥 BONUS: DELETE
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    
+    if (!id) {
+      return NextResponse.json({ error: "ID required" }, { status: 400 });
+    }
+
+    await prisma.product.delete({ where: { id } });
+    return NextResponse.json({ message: "Deleted" });
+  } catch (error) {
+    return NextResponse.json({ error: "Delete failed" }, { status: 500 });
   }
 }

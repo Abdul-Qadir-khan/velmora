@@ -50,21 +50,19 @@ const CategoriesSection: FC = () => {
                   src={category.image}
                   alt={category.name}
                   fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw" // ✅ Add this
+                  className="object-cover group-hover:scale-110 transition-transform duration-700"
                 />
                 {/* Subtle overlay */}
-                <div className={`absolute inset-0 bg-linear-to-t from-black/10 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 ${
-                  selectedCategory === category.slug ? 'opacity-20' : ''
-                }`} />
+                <div className={`absolute inset-0 bg-linear-to-t from-black/10 via-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 ${selectedCategory === category.slug ? 'opacity-20' : ''
+                  }`} />
               </div>
 
               {/* Category Name */}
-              <h3 className={`font-semibold text-sm lg:text-base text-center leading-tight transition-all duration-300 ${
-                selectedCategory === category.slug
+              <h3 className={`font-semibold text-sm lg:text-base text-center leading-tight transition-all duration-300 ${selectedCategory === category.slug
                   ? "text-blue-700 font-bold drop-shadow-sm"
                   : "text-slate-800 group-hover:text-slate-900"
-              }`}>
+                }`}>
                 {category.name}
               </h3>
 

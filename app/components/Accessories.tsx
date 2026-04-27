@@ -49,16 +49,16 @@ export default function CategoryShowcase() {
         
         {/* Header */}
         <div className="text-center mb-6 lg:mb-10">
-          <h2 className="text-4xl lg:text-5xl font-light uppercase tracking-tight mb-2">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-light uppercase tracking-tight mb-2">
             Shop by <span className="font-black">Category</span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
             Discover curated collections across all your favorite styles
           </p>
         </div>
 
-        {/* Category Grid - Clean & Clickable */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 lg:gap-8">
+        {/* Category Grid - Horizontal scroll on mobile, Grid on desktop */}
+        <div className="lg:grid-cols-3 xl:grid-cols-5 hidden lg:grid grid-cols-1 gap-6 lg:gap-8">
           {categories.map((category, idx) => (
             <motion.div
               key={idx}
@@ -68,7 +68,7 @@ export default function CategoryShowcase() {
               whileHover={{ y: -10 }}
               className="group cursor-pointer overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 border hover:border-black h-80 lg:h-96"
             >
-              <Link href={`/shop/${category.slug}`} className="block h-full flex flex-col">
+              <Link href={`/categories/${category.slug}`} className="block h-full flex flex-col">
                 {/* Category Image */}
                 <div className="relative flex-1 overflow-hidden">
                   <Image
@@ -113,6 +113,66 @@ export default function CategoryShowcase() {
               </Link>
             </motion.div>
           ))}
+        </div>
+
+        {/* Mobile Horizontal Scroll */}
+        <div className="lg:hidden overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 pb-4 -mb-4">
+          <div className="flex gap-4 sm:gap-6 pb-2">
+            {categories.map((category, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                whileHover={{ scale: 1.02, y: -5 }}
+                className="group cursor-pointer overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl max-w-[200px] sm:min-w-[250px] h-72 sm:h-80 flex-shrink-0 border hover:border-black"
+              >
+                <Link href={`/categories/${category.slug}`} className="block h-full flex flex-col">
+                  {/* Category Image */}
+                  <div className="relative flex-1 overflow-hidden">
+                    <Image
+                      src={category.image}
+                      alt={category.name}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    {/* Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    
+                    {/* Category Badge */}
+                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider shadow-lg">
+                      {category.name}
+                    </div>
+                  </div>
+
+                  {/* Product Teaser */}
+                  <div className="p-4 sm:p-6 flex-1 flex flex-col justify-end">
+                    <div className="space-y-1">
+                      <p className="text-xs uppercase tracking-wider font-medium text-gray-500">
+                        Popular: {category.products.slice(0, 2).join(" • ")}
+                      </p>
+                      <p className="text-xl sm:text-2xl font-light uppercase tracking-widest text-gray-900">
+                        {category.featuredPrice}
+                      </p>
+                    </div>
+                    
+                    {/* Shop CTA */}
+                    <div className="flex items-center justify-between mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100">
+                      <span className="text-xs sm:text-sm uppercase tracking-wider font-bold text-gray-600 group-hover:text-black transition-colors">
+                        Shop Collection
+                      </span>
+                      <motion.div
+                        whileHover={{ x: 4 }}
+                        className="text-base sm:text-lg font-bold"
+                      >
+                        →
+                      </motion.div>
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
         {/* Main CTA */}

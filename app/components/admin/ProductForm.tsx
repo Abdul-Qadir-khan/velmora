@@ -3,6 +3,41 @@
 import { useState, useEffect, useRef, DragEvent } from "react";
 import { useRouter } from "next/navigation";
 
+// 🔥 ADD THIS HERE 👇 (AFTER imports, BEFORE export default function)
+type FormData = {
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  originalPrice: number;
+  stock: number;
+  rating: number;
+  category: string;
+  isNew: boolean;
+  bestSeller: boolean;
+  images: string[];
+  brand: {
+    name: string;
+    logo: string;
+  };
+  variations: {
+    colors: string[];
+    sizes: string[];
+    specs: {
+      material: string;
+      fit: string;
+      sleeve: string;
+      pattern: string;
+      washing: string;
+    };
+  };
+  seo: {
+    title: string;
+    description: string;
+    keywords: string;
+  };
+};
+
 interface ProductFormProps {
   initialData?: any;
 }
@@ -22,6 +57,10 @@ export default function ProductForm({ initialData }: ProductFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const brandLogoInputRef = useRef<HTMLInputElement>(null);
 
+  // 🔥 ADD THESE 2 LINES after your existing useState
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [currentImages, setCurrentImages] = useState<string[]>([]);
+
   // Categories
   const categories = [
     { value: "mens", label: "Men's" },
@@ -40,29 +79,29 @@ export default function ProductForm({ initialData }: ProductFormProps) {
       ...initialData,
       slug: initialData.slug || "",
       images: Array.isArray(initialData.images)
-  ? initialData.images
-  : initialData.images
-  ? JSON.parse(initialData.images)
-  : [],
-     variations: {
-  colors: Array.isArray(initialData.variations?.[0]?.colors)
-    ? initialData.variations[0].colors
-    : initialData.variations?.[0]?.colors
-    ? JSON.parse(initialData.variations[0].colors)
-    : [],
+        ? initialData.images
+        : initialData.images
+          ? JSON.parse(initialData.images)
+          : [],
+      variations: {
+        colors: Array.isArray(initialData.variations?.[0]?.colors)
+          ? initialData.variations[0].colors
+          : initialData.variations?.[0]?.colors
+            ? JSON.parse(initialData.variations[0].colors)
+            : [],
 
-  sizes: Array.isArray(initialData.variations?.[0]?.sizes)
-    ? initialData.variations[0].sizes
-    : initialData.variations?.[0]?.sizes
-    ? JSON.parse(initialData.variations[0].sizes)
-    : [],
+        sizes: Array.isArray(initialData.variations?.[0]?.sizes)
+          ? initialData.variations[0].sizes
+          : initialData.variations?.[0]?.sizes
+            ? JSON.parse(initialData.variations[0].sizes)
+            : [],
 
-  specs: typeof initialData.variations?.[0]?.specs === "object"
-    ? initialData.variations[0].specs
-    : initialData.variations?.[0]?.specs
-    ? JSON.parse(initialData.variations[0].specs)
-    : { material: "", fit: "", sleeve: "", pattern: "", washing: "" },
-},
+        specs: typeof initialData.variations?.[0]?.specs === "object"
+          ? initialData.variations[0].specs
+          : initialData.variations?.[0]?.specs
+            ? JSON.parse(initialData.variations[0].specs)
+            : { material: "", fit: "", sleeve: "", pattern: "", washing: "" },
+      },
       brand: initialData.brand || { name: "", logo: "" },
       seo: {
         title: initialData.seoTitle || "",
@@ -91,7 +130,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
       seo: { title: "", description: "", keywords: "" },
     };
 
-  const [form, setForm] = useState(initialFormData);
+  const [form, setForm] = useState<FormData>(initialFormData); // ✅ FIXED
   const [imageFiles, setImageFiles] = useState<ImageFile[]>([]);
   const [brandLogoFile, setBrandLogoFile] = useState<File | null>(null);
   const [brandLogoPreview, setBrandLogoPreview] = useState<string>("");
@@ -106,17 +145,28 @@ export default function ProductForm({ initialData }: ProductFormProps) {
         .replace(/[\s_-]+/g, '-')
         .replace(/^-+|-+$/g, '');
 
-      setForm((prev: typeof form) => ({ ...prev, slug }));
+      setForm((prev: FormData) => ({ ...prev, slug })); // ✅ FIXED
     }
   }, [form.name, initialData]);
 
-  // Cleanup blob URLs on unmount
+  // 🔥 ADD THIS useEffect (after your slug useEffect)
   useEffect(() => {
-    return () => {
-      imageFiles.forEach(img => URL.revokeObjectURL(img.preview));
-      if (brandLogoPreview) URL.revokeObjectURL(brandLogoPreview);
-    };
-  }, [imageFiles, brandLogoPreview]);
+    if (initialData?.images) {
+      const imageUrls = Array.isArray(initialData.images)
+        ? initialData.images
+        : typeof initialData.images === 'string'
+          ? JSON.parse(initialData.images)
+          : [];
+
+      setForm((prev: FormData) => ({ // ✅ FIXED
+        ...prev,
+        images: imageUrls
+      }));
+
+      setExistingImages(imageUrls);
+      setCurrentImages(imageUrls);
+    }
+  }, [initialData]);
 
   // Validation
   const validateForm = (): string | null => {
@@ -241,12 +291,11 @@ export default function ProductForm({ initialData }: ProductFormProps) {
       const preview = URL.createObjectURL(file);
       setBrandLogoPreview(preview);
 
-      // ✅ FIXED: Type 'prev' parameter
-      setForm((prev: typeof form) => ({
+      setForm((prev: FormData) => ({ // ✅ FIXED
         ...prev,
         brand: {
           ...prev.brand,
-          logo: preview  // Store preview URL as string
+          logo: preview
         }
       }));
     }
@@ -259,72 +308,90 @@ export default function ProductForm({ initialData }: ProductFormProps) {
       const preview = URL.createObjectURL(file);
       setBrandLogoPreview(preview);
 
-      // ✅ FIXED: Type 'prev' parameter
-      setForm((prev: typeof form) => ({
+      setForm((prev: FormData) => ({ // ✅ FIXED
         ...prev,
         brand: {
           ...prev.brand,
-          logo: preview  // Better: store preview URL
+          logo: preview
         }
       }));
     }
-
-    // ✅ Reset input
     e.target.value = '';
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target as any;
-    setError("");
+  // 🔥 REPLACE ENTIRE handleChange function
+const handleChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+) => {
+  const target = e.target;
+  const { name, value, type } = target;
+  setError("");
+
+  setForm((prev: FormData) => {
     if (type === "checkbox") {
-      setForm({ ...form, [name]: checked });
+      const checked = (target as HTMLInputElement).checked;
+      return { ...prev, [name]: checked };
     } else if (type === "number") {
-      setForm({ ...form, [name]: parseFloat(value) || 0 });
+      return { ...prev, [name]: parseFloat(value as string) || 0 };
     } else {
-      setForm({ ...form, [name]: value });
+      return { ...prev, [name]: value };
     }
-  };
+  });
+};
 
   // ✅ Option 1: Full type-safe version (Recommended)
   const handleNestedChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    path: (keyof typeof form | string)[]
+    path: (keyof FormData | string)[]
   ) => {
     const value = e.target.value;
     setError("");
 
-    setForm((prev: typeof form) => {
-      // ✅ Type-safe deep update
-      const updated = { ...prev };
+    setForm((prev: FormData) => { // ✅ FIXED
+      const updated = { ...prev } as FormData;
       let current: any = updated;
 
-      // Navigate to nested object
       for (let i = 0; i < path.length - 1; i++) {
         current[path[i]] = { ...current[path[i]] };
         current = current[path[i]];
       }
 
-      // Update leaf value
       current[path[path.length - 1]] = value;
-
-      return updated as typeof form;
+      return updated;
     });
   };
 
-  const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors" | "sizes") => {
-    const { value, checked } = e.target;
-    const arr = form.variations[key] as string[];
-    if (checked) {
-      setForm({
-        ...form,
-        variations: { ...form.variations, [key]: [...arr, value] }
-      });
-    } else {
-      setForm({
-        ...form,
-        variations: { ...form.variations, [key]: arr.filter((v: string) => v !== value) }
-      });
+ // 🔥 REPLACE ENTIRE handleArrayChange function
+const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors" | "sizes") => {
+  const target = e.target;
+  const value = target.value;
+  const checked = target.checked;
+  const arr = form.variations[key] as string[];
+  
+  setForm((prev: FormData) => ({
+    ...prev,
+    variations: { 
+      ...prev.variations, 
+      [key]: checked 
+        ? [...arr, value] 
+        : arr.filter((v: string) => v !== value) 
     }
+  }));
+};
+  // 🔥 REPLACE THIS FUNCTION
+  const removeExistingImage = (imageUrl: string) => {
+    setExistingImages(prev => prev.filter(img => img !== imageUrl));
+    setCurrentImages(prev => prev.filter(img => img !== imageUrl));
+
+    setForm((prev: FormData) => ({ // ✅ FIXED
+      ...prev,
+      images: prev.images.filter(img => img !== imageUrl)
+    }));
+  };
+
+  // When new images upload, add to current
+  const addToCurrentImages = (newImageUrl: string) => {
+    setCurrentImages(prev => [...prev, newImageUrl]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -362,7 +429,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
         ...form,
 
         // ✅ KEEP AS ARRAY (NO stringify)
-        images: allImageUrls,
+        images: [...currentImages, ...allImageUrls], // ✅ Existing + New
 
         brand: {
           ...form.brand,
@@ -576,15 +643,45 @@ export default function ProductForm({ initialData }: ProductFormProps) {
 
               {/* Right Column */}
               <div className="space-y-6">
-                {/* Product Images */}
+                {/* 🔥 COMPLETE FIXED IMAGES SECTION */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-4">
-                    Product Images ({imageFiles.length}/5)
+                    Product Images ({form.images.length + imageFiles.length}/10)
                   </label>
+
+                  {/* 1. ALL CURRENT IMAGES (Existing + Form images) */}
+                  {(existingImages.length > 0 || form.images.length > 0) && (
+                    <div className="mb-6 p-4 bg-blue-50 rounded-2xl">
+                      <h4 className="text-sm font-semibold text-blue-800 mb-3">
+                        Current Images ({form.images.length})
+                      </h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {form.images.map((imgUrl: string, index: number) => (
+                          <div key={`${imgUrl}-${index}`} className="relative group">
+                            <img
+                              src={imgUrl}
+                              alt="Current"
+                              className="w-full h-32 object-cover rounded-2xl shadow-md border-2 border-blue-200 hover:border-blue-400 transition-all"
+                              loading="lazy"
+                            />
+                            <button
+                              onClick={() => removeExistingImage(imgUrl)}
+                              className="absolute -top-1 -right-1 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-lg hover:bg-red-600 text-xs font-bold"
+                              title="Remove"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 2. NEW UPLOAD ZONE */}
                   <div
                     className={`relative border-3 border-dashed rounded-3xl p-8 text-center transition-all duration-300 cursor-pointer hover:shadow-xl ${dragActive
-                      ? "border-blue-400 bg-blue-50 shadow-2xl"
-                      : "border-gray-300 hover:border-gray-400 bg-white/50"
+                        ? "border-blue-400 bg-blue-50 shadow-2xl"
+                        : "border-gray-300 hover:border-gray-400 bg-white/50"
                       }`}
                     onDragEnter={handleDrag}
                     onDragLeave={handleDrag}
@@ -600,19 +697,21 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                       onChange={handleImageSelect}
                       className="hidden"
                     />
-                    <div className="space-y-3">
-                      <div className="w-16 h-16 bg-linear-to-br from-blue-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center text-white font-semibold shadow-lg">
-                        📸
+                    <div className="space-y-2">
+                      <div className="w-12 h-12 bg-blue-500 text-white rounded-2xl mx-auto flex items-center justify-center">
+                        📷
                       </div>
-                      <div>
-                        <p className="font-semibold text-xl text-gray-800">
-                          {dragActive ? "Drop images here" : "Click or drag & drop"}
-                        </p>
-                        <p className="text-sm text-gray-500">PNG, JPG up to 5MB (Max 5 images)</p>
-                      </div>
+                      <p className="text-sm font-medium text-gray-700">
+                        {imageFiles.length === 0
+                          ? "Drop images here or click to browse"
+                          : `Added ${imageFiles.length} new image(s)`
+                        }
+                      </p>
+                      <p className="text-xs text-gray-500">PNG, JPG up to 5MB each (Max 10 total)</p>
                     </div>
                   </div>
 
+                  {/* 3. NEW IMAGE PREVIEWS */}
                   {imageFiles.length > 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-6">
                       {imageFiles.map((img) => (
@@ -623,9 +722,8 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                             className="w-full h-32 object-cover rounded-2xl shadow-md"
                           />
                           <button
-                            type="button"
                             onClick={() => removeImage(img.id)}
-                            className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-lg hover:bg-red-600"
+                            className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-all shadow-lg hover:bg-red-600"
                           >
                             ✕
                           </button>
@@ -636,9 +734,11 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                 </div>
 
                 {/* Brand Section */}
-                <div className="space-y-4 p-6 bg-linear-to-r from-emerald-50 to-teal-50 rounded-3xl border-2 border-emerald-100">
+                {/* 🔥 CORRECT BRAND SECTION - REPLACE ENTIRE BRAND DIV */}
+                <div className="space-y-4 p-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-3xl border-2 border-emerald-100">
                   <h3 className="text-lg font-bold text-emerald-900 flex items-center gap-2">🏷️ Brand</h3>
 
+                  {/* Brand Name */}
                   <input
                     placeholder="Brand Name (e.g. Nike, Adidas)"
                     value={form.brand.name}
@@ -646,8 +746,39 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                     className="w-full p-4 border border-emerald-200 rounded-2xl focus:ring-4 focus:ring-emerald-100 focus:border-emerald-400 transition-all bg-white/70"
                   />
 
+                  {/* 🔥 1. SHOW EXISTING LOGO (if any) */}
+                  {form.brand.logo && !brandLogoPreview && (
+                    <div className="relative p-4 bg-white rounded-2xl shadow-md border-2 border-emerald-200">
+                      <img
+                        src={form.brand.logo}
+                        alt="Current Brand Logo"
+                        className="w-24 h-24 object-contain rounded-xl mx-auto block"
+                        loading="lazy"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForm((prev: FormData) => ({ // ✅ FIXED
+                            ...prev,
+                            brand: { ...prev.brand, logo: "" }
+                          }));
+                          setBrandLogoPreview("");
+                          setBrandLogoFile(null);
+                        }}
+                        className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-2xl flex items-center justify-center shadow-lg hover:bg-red-600 transition-all font-bold text-sm"
+                        title="Remove current logo"
+                      >
+                        ✕
+                      </button>
+                      <p className="text-xs text-emerald-700 font-medium text-center mt-2">
+                        Current logo - click ✕ to remove
+                      </p>
+                    </div>
+                  )}
+
+                  {/* 🔥 2. UPLOAD NEW LOGO */}
                   <div
-                    className="relative border-2 border-dashed border-emerald-300 rounded-2xl p-6 text-center hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white/50"
+                    className="relative border-2 border-dashed border-emerald-300 rounded-2xl p-8 text-center hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white/50 min-h-[120px] flex items-center justify-center"
                     onClick={() => brandLogoInputRef.current?.click()}
                     onDrop={handleBrandLogoDrop}
                     onDragOver={(e) => e.preventDefault()}
@@ -659,23 +790,25 @@ export default function ProductForm({ initialData }: ProductFormProps) {
                       onChange={handleBrandLogoSelect}
                       className="hidden"
                     />
-                    {brandLogoPreview || form.brand.logo ? (
-                      <div className="flex flex-col items-center gap-2">
+
+                    {brandLogoPreview ? (
+                      <>
                         <img
-                          src={brandLogoPreview || form.brand.logo}
-                          alt="Brand Logo"
-                          className="w-24 h-24 object-contain rounded-xl shadow-md bg-white p-2"
+                          src={brandLogoPreview}
+                          alt="New logo preview"
+                          className="w-24 h-24 object-contain rounded-xl shadow-md bg-white p-3 mx-auto block"
                         />
-                        <p className="text-xs text-emerald-700 font-medium">
-                          {brandLogoPreview ? "New logo - will be uploaded" : "Click to change"}
-                        </p>
-                      </div>
+                        <p className="text-xs text-emerald-700 font-medium mt-2">New logo selected</p>
+                      </>
                     ) : (
-                      <div className="space-y-2">
-                        <div className="w-16 h-16 bg-emerald-500 text-white rounded-xl mx-auto flex items-center justify-center font-semibold shadow-lg">
+                      <div className="space-y-2 text-center">
+                        <div className="w-16 h-16 bg-emerald-500 text-white rounded-2xl mx-auto flex items-center justify-center font-semibold shadow-lg">
                           🏷️
                         </div>
-                        <p className="text-sm font-medium text-emerald-800">Drop logo or click to upload</p>
+                        <p className="text-sm font-medium text-emerald-800">
+                          {form.brand.logo ? "Change logo" : "Drop logo or click to upload"}
+                        </p>
+                        <p className="text-xs text-emerald-600">PNG, JPG up to 2MB</p>
                       </div>
                     )}
                   </div>
