@@ -22,10 +22,10 @@ export default async function CategoryNav() {
           >
             All Products
           </Link>
-          {categories.map((category: Category) => (  // ✅ TYPED
+          {categories.map((category: Category) => (
             <Link
               key={category.id}
-              href={`/categories/${category.slug}`}
+              href={`/shop?category=${category.slug}`}
               className="whitespace-nowrap px-6 py-3 text-sm font-medium rounded-full transition-all mr-2 flex-shrink-0 text-slate-700 hover:text-slate-900 hover:bg-slate-100"
             >
               {category.name}

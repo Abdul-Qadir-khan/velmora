@@ -1,4 +1,4 @@
-// lib/api/product.ts - ✅ COMPLETE FIX
+// app/lib/api/product.ts
 export async function getProducts(filters: {
   category?: string;
   brand?: string;
@@ -15,34 +15,30 @@ export async function getProducts(filters: {
     if (filters.price) params.append("price", filters.price);
     if (filters.sort) params.append("sort", filters.sort);
 
-    // 🔥 PRODUCTION-READY URL DETECTION
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
                    (typeof window !== 'undefined' ? window.location.origin : 
                    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
                    'http://localhost:3000');
 
-    const url = `${baseUrl}/api/products${params.toString() ? `?${params.toString()}` : ''}`;
+    const url = `${baseUrl}/api/products?${params.toString()}`;
     
-    console.log('🌐 Shop fetching:', url); // ✅ Debug log
+    console.log('🌐 Fetching products:', url);
     
     const res = await fetch(url, {
-      // 🔥 NO CACHE - Always fresh data
       cache: "no-store",
-      headers: {
-        'Cache-Control': 'no-cache',
-      },
+      next: { revalidate: 0 }
     });
 
     if (!res.ok) {
       console.error('API Error:', res.status, await res.text());
-      throw new Error(`Products fetch failed: ${res.status}`);
+      return { products: [], filters: {}, pagination: {} };
     }
 
     const data = await res.json();
-    console.log('✅ Products loaded:', (data.products || data || []).length);
+    console.log('✅ Products loaded:', data.products?.length || 0);
     
     return {
-      products: data.products || data || [],
+      products: data.products || [],
       filters: data.filters || { categories: [], brands: [], sizes: [], priceRanges: [] },
       pagination: data.pagination || {}
     };

@@ -8,13 +8,16 @@ datasource db {
 }
 
 model Category {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  products  Product[]
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  image       String?
+  minPrice    Float?   // ✅ ADD THIS LINE
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  products    Product[]
 }
+
 
 model Product {
   id              String      @id @default(cuid())
@@ -25,8 +28,10 @@ model Product {
   originalPrice   Float?
   stock           Int         @default(0)
   rating          Float       @default(0)
-  category        String      // ✅ String field
-  categoryId      String?     // ✅ Relation (nullable)
+  category        String      // ✅ String field (for display)
+  
+  // ✅ FIXED: categoryId must be Int? to match Category.id
+  categoryId      Int?        // ✅ CHANGED: String? → Int?
   categoryObj     Category?   @relation(fields: [categoryId], references: [id])
   
   isNew           Boolean     @default(false)

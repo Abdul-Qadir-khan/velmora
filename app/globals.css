@@ -77,3 +77,38 @@ h1, h2, h3, h4, h5, h6 {
 .animate-fadeInSlide {
   animation: fadeInSlide 0.8s ease forwards;
 }
+
+/* app/globals.css - Add at bottom */
+@layer utilities {
+  /* 🔥 PERFECT THIN INTERACTIVE SCROLLBAR */
+  .scrollbar-thin-custom {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+  }
+  
+  .scrollbar-thin-custom::-webkit-scrollbar {
+    width: 2px;
+    height: 2px;
+  }
+  
+  .scrollbar-thin-custom::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+  }
+  
+  .scrollbar-thin-custom::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+  }
+  
+  .scrollbar-thin-custom::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+    box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  }
+  
+  /* Mobile touch support */
+  .scrollbar-thin-custom::-webkit-scrollbar-thumb:active {
+    background: #6b7280;
+  }
+}
