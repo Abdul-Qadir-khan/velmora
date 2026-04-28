@@ -15,9 +15,9 @@ const nextConfig = {
   output: "standalone",
   trailingSlash: true,
   
-  // 🔥 FIXED Next.js 16
+  // 🔥 FIXED: Correct key for Next.js 14+
   experimental: {
-    serverExternalPackages: ['prisma'], // ✅ Correct key
+    serverComponentsExternalPackages: ['prisma'], // ✅ CHANGED THIS LINE
   },
   
   async headers() {

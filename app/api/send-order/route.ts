@@ -8,19 +8,29 @@ export async function POST(req: NextRequest) {
     const data = await req.json();
 
     // VALIDATION (unchanged)
-    const requiredFields = ['email', 'name', 'orderId', 'total', 'items'];
+    const requiredFields = ["email", "name", "orderId", "total", "items"];
     for (const field of requiredFields) {
       if (!data[field]) {
-        return NextResponse.json({ error: `Missing required field: ${field}` }, { status: 400 });
+        return NextResponse.json(
+          { error: `Missing required field: ${field}` },
+          { status: 400 },
+        );
       }
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(data.email)) {
-      return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid email format" },
+        { status: 400 },
+      );
     }
 
-    const sanitizeHTML = (str: string) => str.replace(/[<>&"']/g, "").replace(/\n/g, " ").trim();
+    const sanitizeHTML = (str: string) =>
+      str
+        .replace(/[<>&"']/g, "")
+        .replace(/\n/g, " ")
+        .trim();
 
     const orderId = data.orderId;
     const customerName = sanitizeHTML(data.name);
@@ -64,7 +74,9 @@ export async function POST(req: NextRequest) {
       </h3>
       
       <div style="display: flex; flex-direction: column; gap: 12px;">
-        ${items.map((item: any) => `
+        ${items
+          .map(
+            (item: any) => `
           <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #f8f9fa; border-radius: 6px; border: 1px solid #e9ecef;">
             <div style="flex: 1;">
               <div style="font-weight: 500; font-size: 14px; color: #1a1a1a; margin-bottom: 4px;">
@@ -84,7 +96,9 @@ export async function POST(req: NextRequest) {
               </div>
             </div>
           </div>
-        `).join("")}
+        `,
+          )
+          .join("")}
       </div>
     </div>
     
@@ -100,7 +114,7 @@ export async function POST(req: NextRequest) {
     <div style="padding: 24px; background: #f8f9fa; border-top: 1px solid #e9ecef;">
       <h4 style="margin: 0 0 12px; font-size: 14px; font-weight: 500; color: #1a1a1a;">Delivery Address</h4>
       <p style="margin: 0 0 8px; font-size: 13px; line-height: 1.5;">${address}</p>
-      ${phone ? `<p style="margin: 0; font-size: 13px; color: #666;"><strong>Phone:</strong> ${phone}</p>` : ''}
+      ${phone ? `<p style="margin: 0; font-size: 13px; color: #666;"><strong>Phone:</strong> ${phone}</p>` : ""}
     </div>
     
     <!-- Footer -->
@@ -138,7 +152,7 @@ export async function POST(req: NextRequest) {
       <div style="padding: 20px; background: #f8f9fa; border-radius: 6px; border: 1px solid #e9ecef;">
         <p style="margin: 0 0 8px; font-size: 13px;"><strong>Name:</strong> ${customerName}</p>
         <p style="margin: 0 0 8px; font-size: 13px;"><strong>Email:</strong> ${customerEmail}</p>
-        <p style="margin: 0 0 8px; font-size: 13px;"><strong>Phone:</strong> ${phone || 'N/A'}</p>
+        <p style="margin: 0 0 8px; font-size: 13px;"><strong>Phone:</strong> ${phone || "N/A"}</p>
         <p style="margin: 0; font-size: 13px;"><strong>Address:</strong> ${address}</p>
       </div>
     </div>
@@ -168,7 +182,7 @@ export async function POST(req: NextRequest) {
       html: adminHTML,
     });
 
-    // 2. CUSTOMER: Receipt ONLY  
+    // 2. CUSTOMER: Receipt ONLY
     await transporter.sendMail({
       from: `"Lycoon WearStore" <${process.env.EMAIL_USER}>`,
       to: customerEmail,
@@ -179,8 +193,11 @@ export async function POST(req: NextRequest) {
     console.log("✅ Admin alert:", ADMIN_EMAIL);
     console.log("✅ Customer receipt:", customerEmail);
 
-    return NextResponse.json({ success: true, admin: ADMIN_EMAIL, customer: customerEmail });
-    
+    return NextResponse.json({
+      success: true,
+      admin: ADMIN_EMAIL,
+      customer: customerEmail,
+    });
   } catch (error: any) {
     console.error("💥 Error:", error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
