@@ -536,12 +536,12 @@ export default function CheckoutPage() {
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Refined typography */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-light tracking-tight bg-linear-to-r from-white via-slate-100 to-emerald-100/80 bg-clip-text text-transparent mb-8 leading-[0.9] drop-shadow-xl">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-light tracking-tight bg-linear-to-r from-white via-slate-100 to-emerald-100/80 bg-clip-text text-transparent md:mb-8 mb-4 leading-[0.9] drop-shadow-xl">
             Checkout
           </h1>
 
           {/* Elegant info bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4 text-lg lg:text-xl text-slate-300 font-light">
+          <div className="flex flex-col sm:flex-row items-center justify-center md:gap-4 gap-2 text-lg lg:text-xl text-slate-300 font-light">
             <span className="flex items-center gap-2">
               <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />

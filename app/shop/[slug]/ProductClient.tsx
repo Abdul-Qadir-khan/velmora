@@ -130,31 +130,31 @@ const handleBuyNow = async () => {
       <h1 className="text-4xl md:text-5xl mt-10"></h1>
     </section>
 
-    <div className="max-w-7xl mx-auto px-4 md:px-12 py-12 space-y-16">
+    <div className="max-w-7xl mx-auto px-4 md:px-12 md:py-12 space-y-16">
       {/* MAIN GRID */}
       <div className="grid md:grid-cols-2 gap-12">
         {/* LEFT: IMAGES */}
         <div className="flex flex-col md:flex-row gap-4">
           {/* Thumbnails */}
-          <div className="flex flex-row md:flex-col order-2 md:order-1 gap-2 md:overflow-hidden overflow-x-auto mt-4 pe-3">
+          <div className="flex flex-row md:flex-col order-2 md:order-1 gap-2 md:overflow-hidden overflow-x-auto pe-3">
             {images.map((img, i) => (
               <img
                 key={i}
                 src={img}
                 onClick={() => setSelectedImage(i)}
-                className={`w-15 h-15 max-w-15 max-h-15 object-contain border rounded-lg cursor-pointer transition-transform duration-200 ${selectedImage === i ? "border-black" : "border-gray-300"
+                className={`w-15 h-15 max-w-15 max-h-15 object-cover border rounded-lg cursor-pointer transition-transform duration-200 ${selectedImage === i ? "border-black" : "border-gray-300"
                   }`}
               />
             ))}
           </div>
 
           <div
-            className="relative group rounded-2xl order-1 md:order-2 overflow-hidden shadow-lg cursor-zoom-in bg-gray-100"
+            className="w-full relative group rounded-xl order-1 md:order-2 overflow-hidden shadow-lg cursor-zoom-in bg-gray-100"
             onClick={() => setLightboxOpen(true)}
           >
             <img
               src={images[selectedImage] || "/placeholder.png"}
-              className="w-full h-100  md:h-150 object-cover transition-transform duration-300 group-hover:scale-105"
+              className="w-full max-h-75  md:h-150 object-cover transition-transform duration-300 group-hover:scale-105"
             />
             {discount && (
               <span className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -169,7 +169,7 @@ const handleBuyNow = async () => {
         <div className="flex flex-col space-y-6 sticky top-24">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold">{product.name}</h1>
+              <h1 className="text-2xl md:text-4xl font-bold">{product.name}</h1>
               <p className="text-gray-500 font-medium">{product.brand?.name}</p>
             </div>
             <button
@@ -245,14 +245,14 @@ const handleBuyNow = async () => {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setQty((q) => Math.max(1, q - 1))}
-                className="px-3 py-1 border rounded-full hover:bg-gray-100 transition-transform hover:scale-110"
+                className="min-w-8 min-h-8 border rounded-full hover:bg-gray-100 transition-transform hover:scale-110"
               >
                 -
               </button>
               <span className="text-lg">{qty}</span>
               <button
                 onClick={() => setQty((q) => q + 1)}
-                className="px-3 py-1 border rounded-full hover:bg-gray-100 transition-transform hover:scale-110"
+                className="min-w-8 min-h-8 border rounded-full hover:bg-gray-100 transition-transform hover:scale-110"
               >
                 +
               </button>
@@ -289,7 +289,7 @@ const handleBuyNow = async () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 font-medium transition-all ${activeTab === tab
+              className={`md:px-4 mx-2 py-2 font-medium transition-all ${activeTab === tab
                 ? "border-b-2 border-black text-black"
                 : "text-gray-500 hover:text-black"
                 }`}
