@@ -1,4 +1,4 @@
-// app/lib/api/product.ts
+// app/lib/api/product.ts - REPLACED VERSION
 export async function getProducts(filters: {
   category?: string;
   brand?: string;
@@ -15,14 +15,23 @@ export async function getProducts(filters: {
     if (filters.price) params.append("price", filters.price);
     if (filters.sort) params.append("sort", filters.sort);
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
-                   (typeof window !== 'undefined' ? window.location.origin : 
-                   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
-                   'http://localhost:3000');
+    // 🔥 FIXED: Vercel-safe URL detection
+    let baseUrl: string;
+    
+    if (typeof window !== 'undefined') {
+      // Client-side: use current origin
+      baseUrl = window.location.origin;
+    } else {
+      // Server-side: use env var or Vercel URL
+      baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
+                process.env.VERCEL_URL 
+                  ? `https://${process.env.VERCEL_URL}`
+                  : 'http://localhost:3000';
+    }
 
     const url = `${baseUrl}/api/products?${params.toString()}`;
     
-    console.log('🌐 Fetching products:', url);
+    console.log('🌐 Fetching:', url); // Keep for debugging
     
     const res = await fetch(url, {
       cache: "no-store",
@@ -30,8 +39,28 @@ export async function getProducts(filters: {
     });
 
     if (!res.ok) {
-      console.error('API Error:', res.status, await res.text());
-      return { products: [], filters: {}, pagination: {} };
+      const errorText = await res.text();
+      console.error('❌ API Error:', res.status, errorText);
+      
+      // 🔥 BETTER FALLBACK: Try relative URL
+      const fallbackUrl = `/api/products?${params.toString()}`;
+      console.log('🔄 Trying fallback:', fallbackUrl);
+      
+      const fallbackRes = await fetch(fallbackUrl, {
+        cache: "no-store",
+        next: { revalidate: 0 }
+      });
+      
+      if (fallbackRes.ok) {
+        const data = await fallbackRes.json();
+        return {
+          products: data.products || [],
+          filters: data.filters || { categories: [], brands: [], sizes: [] },
+          pagination: data.pagination || {}
+        };
+      }
+      
+      return { products: [], filters: { categories: [], brands: [], sizes: [] }, pagination: {} };
     }
 
     const data = await res.json();
@@ -39,14 +68,14 @@ export async function getProducts(filters: {
     
     return {
       products: data.products || [],
-      filters: data.filters || { categories: [], brands: [], sizes: [], priceRanges: [] },
+      filters: data.filters || { categories: [], brands: [], sizes: [] },
       pagination: data.pagination || {}
     };
   } catch (error) {
-    console.error("❌ getProducts error:", error);
+    console.error("💥 getProducts error:", error);
     return {
       products: [],
-      filters: { categories: [], brands: [], sizes: [], priceRanges: [] },
+      filters: { categories: [], brands: [], sizes: [] },
       pagination: {}
     };
   }

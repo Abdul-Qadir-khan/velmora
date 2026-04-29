@@ -565,7 +565,7 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
                 {/* Price, Original Price, Stock & Rating */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Price ($)</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Price (₹)</label>
                     <input
                       name="price"
                       type="number"
@@ -577,7 +577,7 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Original Price ($)</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Original Price (₹)</label>
                     <input
                       name="originalPrice"
                       type="number"
