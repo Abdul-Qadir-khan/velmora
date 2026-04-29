@@ -15,10 +15,8 @@ const nextConfig = {
   output: "standalone",
   trailingSlash: true,
   
-  // 🔥 FIXED FOR Next.js 15+: Use ppr instead of experimental
-  ppr: {
-    externalPackages: ['prisma']
-  },
+  // 🔥 REMOVED: No Prisma config needed in Next.js 15+
+  // Prisma works out-of-box now!
   
   async headers() {
     return [
