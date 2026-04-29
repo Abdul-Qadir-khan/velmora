@@ -15,9 +15,9 @@ const nextConfig = {
   output: "standalone",
   trailingSlash: true,
   
-  // 🔥 FIXED: Correct key for Next.js 14+
-  experimental: {
-    serverComponentsExternalPackages: ['prisma'], // ✅ CHANGED THIS LINE
+  // 🔥 FIXED FOR Next.js 15+: Use ppr instead of experimental
+  ppr: {
+    externalPackages: ['prisma']
   },
   
   async headers() {
