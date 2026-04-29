@@ -5,6 +5,9 @@
     },
     "app/api/order/route.ts": {
       "maxDuration": 30
+    },
+    "api/test-smtp/route.ts": {
+      "maxDuration": 20
     }
   }
 }
