@@ -8,30 +8,27 @@ export async function POST(req: Request) {
 
     // 🔥 FIX: Flatten customer data for send-order API
     const order = {
-      // ✅ FLATTEN customer object
       orderId: body.orderId,
       name: body.customer?.name || body.name || "Customer",
-      email: body.customer?.email || body.email || "test@example.com",  // ✅ FLATTENED
+      email: body.customer?.email || body.email || "test@example.com",
       phone: body.customer?.phone || body.phone || "",
       address: body.customer?.address || body.address || "",
-      
-      // Original data
       ...body,
       id: Date.now().toString(),
       createdAt: new Date(),
     };
 
     console.log("✅ Order saved:", order.orderId);
-    console.log("📧 Order email:", order.email);  // ✅ DEBUG
+    console.log("📧 Order email:", order.email);
 
     orders.push(order);
 
-    // 🔥 SEND EMAIL with FLATTENED data
+    // ✅ FIXED: Use relative URL for Vercel
     try {
-      const emailRes = await fetch('http://localhost:3000/api/send-order', {
+      const emailRes = await fetch('/api/send-order', {  // ← RELATIVE URL
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(order)  // ✅ Now has flat email field
+        body: JSON.stringify(order)
       });
       
       console.log('📧 Email API response:', emailRes.status);
@@ -51,8 +48,4 @@ export async function POST(req: Request) {
     console.error('❌ Order error:', err);
     return NextResponse.json({ error: "Failed to save order" }, { status: 500 });
   }
-}
-
-export async function GET() {
-  return NextResponse.json(orders);
 }
