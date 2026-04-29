@@ -134,7 +134,7 @@ const handleBuyNow = async () => {
       {/* MAIN GRID */}
       <div className="grid md:grid-cols-2 gap-12">
         {/* LEFT: IMAGES */}
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex flex-col md:flex-row gap-4 mt-5 md:mt-0">
           {/* Thumbnails */}
           <div className="flex flex-row md:flex-col order-2 md:order-1 gap-2 md:overflow-hidden overflow-x-auto pe-3">
             {images.map((img, i) => (
@@ -154,7 +154,7 @@ const handleBuyNow = async () => {
           >
             <img
               src={images[selectedImage] || "/placeholder.png"}
-              className="w-full max-h-75  md:h-150 object-cover transition-transform duration-300 group-hover:scale-105"
+              className="w-full max-h-75  md:h-150 md:max-h-150 object-cover transition-transform duration-300 group-hover:scale-105"
             />
             {discount && (
               <span className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
