@@ -1,95 +1,59 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
-const ADMIN_EMAIL = "khanabdulqadir781@gmail.com";
-
 export async function POST(req: NextRequest) {
   try {
-    // DEBUG: Log everything
-    console.log("🚀 SEND-ORDER STARTED");
-    console.log("🔍 ENV:", {
-      EMAIL_USER: process.env.EMAIL_USER ? `${process.env.EMAIL_USER.slice(0,3)}***` : "MISSING",
-      EMAIL_PASS: process.env.EMAIL_PASS ? "SET" : "MISSING",
-    });
-
     const data = await req.json();
-    console.log("📦 DATA RECEIVED:", JSON.stringify(data, null, 2));
+    
+    // 🔥 ENV CHECK FIRST
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      return NextResponse.json({ 
+        error: "EMAIL_USER/EMAIL_PASS missing in Vercel env vars ❌",
+        hasUser: !!process.env.EMAIL_USER,
+        hasPass: !!process.env.EMAIL_PASS
+      }, { status: 500 });
+    }
 
-    // Create transporter
-    console.log("🔌 CREATING TRANSPORTER...");
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
       secure: false,
-      auth: {
-        user: process.env.EMAIL_USER!,
-        pass: process.env.EMAIL_PASS!,
-      },
-      logger: true,  // Enable nodemailer logs
-      debug: true,   // Show SMTP conversation
+      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
     });
 
-    console.log("✅ TRANSPORTER CREATED");
-
-    // TEST CONNECTION FIRST
-    console.log("🔍 TESTING CONNECTION...");
+    // 🔥 STEP-BY-STEP DEBUG
     await transporter.verify();
-    console.log("✅ CONNECTION OK!");
-
-    // SIMPLE TEST EMAIL FIRST (like test-smtp)
-    console.log("📤 SENDING TEST EMAIL...");
+    
+    // 1. Test to SELF
     await transporter.sendMail({
       from: process.env.EMAIL_USER!,
-      to: process.env.EMAIL_USER!,  // Send to yourself first
-      subject: "🧪 SEND-ORDER TEST - STEP 1",
-      text: "If you receive this, transporter works! Next will be order emails.",
+      to: process.env.EMAIL_USER!,
+      subject: "✅ API/ORDER TEST - Step 1 OK",
+      text: "Self-test passed!"
     });
-    console.log("✅ TEST EMAIL SENT");
-
-    // NOW TRY ADMIN EMAIL
-    console.log("📤 SENDING ADMIN EMAIL...");
-    await transporter.sendMail({
-      from: `"Lycoon Store" <${process.env.EMAIL_USER}>`,
-      to: ADMIN_EMAIL,
-      subject: "🧪 SEND-ORDER TEST - STEP 2 (ADMIN)",
-      text: "Admin test email - if this fails, check ADMIN_EMAIL or timeout",
-    });
-    console.log("✅ ADMIN EMAIL SENT");
-
-    // NOW TRY CUSTOMER EMAIL
-    const customerEmail = data.email;
-    console.log("📤 SENDING CUSTOMER EMAIL:", customerEmail);
-    await transporter.sendMail({
-      from: `"Lycoon Store" <${process.env.EMAIL_USER}>`,
-      to: customerEmail,
-      subject: "🧪 SEND-ORDER TEST - STEP 3 (CUSTOMER)",
-      text: `Customer test email for order #${data.orderId}`,
-    });
-    console.log("✅ CUSTOMER EMAIL SENT");
-
-    console.log("🎉 ALL 3 EMAILS SENT SUCCESSFULLY!");
 
     return NextResponse.json({ 
       success: true, 
-      message: "All test emails sent! Check your inbox.",
-      steps: ["transporter", "self-test", "admin", "customer"]
+      message: "✅ Self-test passed! Env vars OK. Use /api/send-order for real orders.",
+      nextStep: "Test POST /api/send-order with customer email"
     });
 
   } catch (error: any) {
-    console.error("💥 DETAILED ERROR:", {
-      message: error.message,
-      code: error.code,
-      response: error.response,
-      responseCode: error.responseCode,
-      responseData: error.responseData,
-      stack: error.stack?.split('\n').slice(0, 5)
-    });
-
     return NextResponse.json({ 
-      error: "Detailed error logged to console",
-      message: error.message,
+      error: error.message,
       code: error.code,
-      step: "unknown"
+      debug: {
+        EMAIL_USER_SET: !!process.env.EMAIL_USER,
+        EMAIL_PASS_SET: !!process.env.EMAIL_PASS,
+        fix: "1. Enable Gmail 2FA 2. Generate App Password 3. Add to Vercel env vars"
+      }
     }, { status: 500 });
   }
+}
+
+export async function GET() {
+  return NextResponse.json({
+    message: "Use POST method",
+    endpoints: ["/api/order (debug)", "/api/send-order (production)"]
+  });
 }
