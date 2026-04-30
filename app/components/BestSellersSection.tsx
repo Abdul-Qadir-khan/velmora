@@ -192,7 +192,7 @@ export default function BestSellersSection({ filteredProducts }: BestSellersSect
           <div className="text-center py-20 text-gray-500">No products found.</div>
         ) : (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-8">
               {/* 🔥 KEY FIX #3: Use uniqueKey instead of product.id */}
               {visibleProducts.map((product, index) => {
                 const uniqueKey = getUniqueKey(product, index); // ✅ FIXED NaN KEYS

@@ -10,6 +10,9 @@ import { products, Product } from "../data/product";
 import NewsletterPopup from "./components/Popup";
 // ✅ FIXED IMPORT
 import CategoryShowcase from "./components/CategoryShowcase";
+import VideoHeroSection from "./components/VideoHeroSection";
+import InstagramFeed from "./components/Instagram";
+import PradaTestimonials from "./components/Testimonials";
 
 export default function Home() {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -29,15 +32,20 @@ export default function Home() {
     <div>
       <NewsletterPopup />
       <Hero />
+
+      {/* <VideoHeroSection /> */}
       <BrandsSlider />
-      
+
       {/* ✅ Works perfectly now */}
       <CategoryShowcase />
-      
+
       <hr className="border-gray-300" />
       <BestSellerSection />
       <DiscountsSection />
       <WhyChoose />
+
+      <InstagramFeed/>
+<PradaTestimonials/>
     </div>
   );
 }
