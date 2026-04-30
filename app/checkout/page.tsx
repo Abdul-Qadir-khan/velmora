@@ -2,6 +2,7 @@
 
 import { useCart } from '@/app/context/CartContext';
 import { useState, useCallback, useMemo } from "react";
+import { ShoppingCart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -126,9 +127,10 @@ const CartStep = ({
     {cart.length === 0 ? (
       <div className="text-center py-16 lg:py-20">
         <div className="w-20 h-20 lg:w-24 lg:h-24 mx-auto mb-6 lg:mb-8 bg-linear-to-br from-gray-50 to-gray-100 rounded-2xl flex items-center justify-center border border-gray-200">
-          <svg className="w-8 h-8 lg:w-12 lg:h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {/* <svg className="w-8 h-8 lg:w-12 lg:h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 7.5M7 13l-1.5 7.5M17 13l1.5 7.5M17 13l2.5-7.5M16 15a4 4 0 01-8 0" />
-          </svg>
+          </svg> */}
+          <ShoppingCart size={40} />
         </div>
         <p className="text-lg lg:text-xl text-gray-600 font-light mb-6 lg:mb-8">Your bag is empty</p>
         <Link
