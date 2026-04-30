@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, DragEvent } from "react";
 import { useRouter } from "next/navigation";
 
-// 🔥 ADD THIS HERE 👇 (AFTER imports, BEFORE export default function)
 type FormData = {
   name: string;
   slug: string;
@@ -57,11 +56,13 @@ export default function ProductForm({ initialData }: ProductFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const brandLogoInputRef = useRef<HTMLInputElement>(null);
 
-  // 🔥 ADD THESE 2 LINES after your existing useState
-  const [existingImages, setExistingImages] = useState<string[]>([]);
+  // 🔥 CLEAN STATE - ALL STATES DECLARED
   const [currentImages, setCurrentImages] = useState<string[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]); // 🔥 ADD THIS
+  const [newImageFiles, setNewImageFiles] = useState<ImageFile[]>([]);
+  const [brandLogoFile, setBrandLogoFile] = useState<File | null>(null);
+  const [brandLogoPreview, setBrandLogoPreview] = useState<string>("");
 
-  // Categories
   const categories = [
     { value: "mens", label: "Men's" },
     { value: "womens", label: "Women's" },
@@ -78,31 +79,41 @@ export default function ProductForm({ initialData }: ProductFormProps) {
     ? {
       ...initialData,
       slug: initialData.slug || "",
+      // 🔥 FIXED: Properly parse ALL data from backend
       images: Array.isArray(initialData.images)
         ? initialData.images
-        : initialData.images
-          ? JSON.parse(initialData.images)
+        : typeof initialData.images === 'string'
+          ? JSON.parse(initialData.images || '[]')
           : [],
+
+      // 🔥 FIXED: Brand - handle properly
+      brand: {
+        name: initialData.brand?.name || "",
+        logo: initialData.brand?.logo || ""
+      },
+
+      // 🔥 FIXED: Variations - parse properly
       variations: {
         colors: Array.isArray(initialData.variations?.[0]?.colors)
           ? initialData.variations[0].colors
-          : initialData.variations?.[0]?.colors
-            ? JSON.parse(initialData.variations[0].colors)
+          : typeof initialData.variations?.[0]?.colors === 'string'
+            ? JSON.parse(initialData.variations[0].colors || '[]')
             : [],
 
         sizes: Array.isArray(initialData.variations?.[0]?.sizes)
           ? initialData.variations[0].sizes
-          : initialData.variations?.[0]?.sizes
-            ? JSON.parse(initialData.variations[0].sizes)
+          : typeof initialData.variations?.[0]?.sizes === 'string'
+            ? JSON.parse(initialData.variations[0].sizes || '[]')
             : [],
 
-        specs: typeof initialData.variations?.[0]?.specs === "object"
+        specs: typeof initialData.variations?.[0]?.specs === 'object'
           ? initialData.variations[0].specs
-          : initialData.variations?.[0]?.specs
-            ? JSON.parse(initialData.variations[0].specs)
+          : typeof initialData.variations?.[0]?.specs === 'string'
+            ? JSON.parse(initialData.variations[0].specs || '{}')
             : { material: "", fit: "", sleeve: "", pattern: "", washing: "" },
       },
-      brand: initialData.brand || { name: "", logo: "" },
+
+      // 🔥 FIXED: SEO - map backend fields to frontend
       seo: {
         title: initialData.seoTitle || "",
         description: initialData.seoDescription || "",
@@ -130,40 +141,70 @@ export default function ProductForm({ initialData }: ProductFormProps) {
       seo: { title: "", description: "", keywords: "" },
     };
 
-  const [form, setForm] = useState<FormData>(initialFormData); // ✅ FIXED
-  const [imageFiles, setImageFiles] = useState<ImageFile[]>([]);
-  const [brandLogoFile, setBrandLogoFile] = useState<File | null>(null);
-  const [brandLogoPreview, setBrandLogoPreview] = useState<string>("");
+  const [form, setForm] = useState<FormData>(initialFormData);
 
-  // ✅ FIXED: Type 'prev' parameter
+  // 🔥 FIXED: Auto-generate slug
   useEffect(() => {
     if (form.name && !initialData) {
       const slug = form.name
         .toLowerCase()
         .trim()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/[\s_-]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-
-      setForm((prev: FormData) => ({ ...prev, slug })); // ✅ FIXED
+        .replace(/[^\w\s-]/g, "")
+        .replace(/[\s_-]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      setForm((prev: FormData) => ({ ...prev, slug }));
     }
   }, [form.name, initialData]);
 
-  // 🔥 ADD THIS useEffect (after your slug useEffect)
+  // 🔥 FIXED: Initialize images on mount
+useEffect(() => {
+  if (initialData?.images) {
+    const imageUrls = Array.isArray(initialData.images)
+      ? initialData.images
+      : typeof initialData.images === 'string'
+        ? JSON.parse(initialData.images)
+        : [];
+    
+    setCurrentImages(imageUrls);
+    setExistingImages(imageUrls);
+    setForm(prev => ({ ...prev, images: imageUrls }));
+  }
+}, [initialData]);
+
+// 🔥 FIXED: Slug auto-update + initialData handling
   useEffect(() => {
-    if (initialData?.images) {
+    if (initialData && initialData.name) {
+      // For EDIT - use existing slug or generate new
+      const slug = initialData.slug || generateSlug(initialData.name);
+      setForm(prev => ({ ...prev, slug }));
+    } else if (form.name && !initialData) {
+      // For NEW - auto-generate
+      const slug = generateSlug(form.name);
+      setForm(prev => ({ ...prev, slug }));
+    }
+  }, [form.name, initialData]);
+
+  // 🔥 ADD generateSlug function at top (after imports)
+  function generateSlug(name: string): string {
+    return name
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  // 🔥 ADD THIS useEffect - Syncs ALL initial data
+  useEffect(() => {
+    if (initialData) {
+      setForm(initialFormData);
+
+      // Sync images separately for currentImages state
       const imageUrls = Array.isArray(initialData.images)
         ? initialData.images
         : typeof initialData.images === 'string'
           ? JSON.parse(initialData.images)
           : [];
-
-      setForm((prev: FormData) => ({ // ✅ FIXED
-        ...prev,
-        images: imageUrls
-      }));
-
-      setExistingImages(imageUrls);
       setCurrentImages(imageUrls);
     }
   }, [initialData]);
@@ -177,57 +218,37 @@ export default function ProductForm({ initialData }: ProductFormProps) {
     return null;
   };
 
-  // Upload images
+  // Upload functions
   const uploadImages = async (files: File[]): Promise<string[]> => {
     if (files.length === 0) return [];
-
     const urls: string[] = [];
-
     for (const file of files) {
       const formData = new FormData();
-
-      // ✅ FIX HERE
-      formData.append('file', file);
-
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
       if (!res.ok) {
         const errorText = await res.text();
         throw new Error(`Upload failed: ${res.status} ${errorText}`);
       }
-
       const data = await res.json();
       urls.push(data.url);
     }
-
     return urls;
   };
 
-  // Upload brand logo
   const uploadBrandLogo = async (file: File): Promise<string> => {
     const formData = new FormData();
-
-    // ✅ FIX HERE
-    formData.append('file', file);
-
-    const res = await fetch('/api/upload', {
-      method: 'POST',
-      body: formData,
-    });
-
+    formData.append("file", file);
+    const res = await fetch("/api/upload", { method: "POST", body: formData });
     if (!res.ok) {
       const errorText = await res.text();
       throw new Error(`Logo upload failed: ${res.status} ${errorText}`);
     }
-
     const data = await res.json();
     return data.url;
   };
 
-  // Handle drag & drop for product images
+  // 🔥 ALL IMAGE HANDLERS - FIXED
   const handleDrag = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -242,14 +263,13 @@ export default function ProductForm({ initialData }: ProductFormProps) {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-
     if (e.dataTransfer.files) {
-      const files = Array.from(e.dataTransfer.files).slice(0, 5 - imageFiles.length);
-      files.forEach(file => {
-        if (file.type.startsWith('image/') && file.size < 5 * 1024 * 1024) {
+      const files = Array.from(e.dataTransfer.files).slice(0, 10 - newImageFiles.length);
+      files.forEach((file) => {
+        if (file.type.startsWith("image/") && file.size < 5 * 1024 * 1024) {
           const preview = URL.createObjectURL(file);
           const id = Math.random().toString(36).substr(2, 9);
-          setImageFiles(prev => [...prev, { file, preview, id }]);
+          setNewImageFiles((prev) => [...prev, { file, preview, id }]);
         }
       });
     }
@@ -261,139 +281,103 @@ export default function ProductForm({ initialData }: ProductFormProps) {
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const files = Array.from(e.target.files).slice(0, 5 - imageFiles.length);
-      files.forEach(file => {
-        if (file.type.startsWith('image/') && file.size < 5 * 1024 * 1024) {
+      const files = Array.from(e.target.files).slice(0, 10 - newImageFiles.length);
+      files.forEach((file) => {
+        if (file.type.startsWith("image/") && file.size < 5 * 1024 * 1024) {
           const preview = URL.createObjectURL(file);
           const id = Math.random().toString(36).substr(2, 9);
-          setImageFiles(prev => [...prev, { file, preview, id }]);
+          setNewImageFiles((prev) => [...prev, { file, preview, id }]);
         }
       });
-      e.target.value = '';
+      e.target.value = "";
     }
   };
 
-  const removeImage = (id: string) => {
-    setImageFiles(prev => {
-      const updated = prev.filter(img => img.id !== id);
-      const removed = prev.find(img => img.id === id);
+  // 🔥 FIXED: removeExistingImage
+  const removeExistingImage = (imageUrl: string) => {
+    // 🔥 FIXED: Update form.images directly (main source of truth)
+    setForm((prev: FormData) => ({
+      ...prev,
+      images: prev.images.filter((img: string) => img !== imageUrl)
+    }));
+
+    // Update display states
+    setExistingImages(prev => prev.filter((img: string) => img !== imageUrl));
+    setCurrentImages(prev => prev.filter((img: string) => img !== imageUrl));
+  };
+
+  // 🔥 NEW: Sync form.images with display states
+  const syncImagesToForm = () => {
+    setForm((prev: FormData) => ({
+      ...prev,
+      images: currentImages.filter(url => url && !url.startsWith('blob:'))
+    }));
+  };
+
+  // 🔥 FIXED: removeNewImage
+  const removeNewImage = (id: string) => {
+    setNewImageFiles((prev) => {
+      const updated = prev.filter((img: ImageFile) => img.id !== id);
+      const removed = prev.find((img: ImageFile) => img.id === id);
       if (removed) URL.revokeObjectURL(removed.preview);
       return updated;
     });
   };
 
-  // ✅ FIXED: Explicitly type 'prev'
-  const handleBrandLogoDrop = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const file = e.dataTransfer!.files[0];
-    if (file && file.type.startsWith('image/') && file.size < 2 * 1024 * 1024) {
-      setBrandLogoFile(file);
-      const preview = URL.createObjectURL(file);
-      setBrandLogoPreview(preview);
-
-      setForm((prev: FormData) => ({ // ✅ FIXED
-        ...prev,
-        brand: {
-          ...prev.brand,
-          logo: preview
-        }
-      }));
-    }
+  // Form handlers
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const target = e.target;
+    const { name, value, type } = target;
+    setError("");
+    setForm((prev: FormData) => {
+      if (type === "checkbox") {
+        const checked = (target as HTMLInputElement).checked;
+        return { ...prev, [name as keyof FormData]: checked };
+      } else if (type === "number") {
+        return { ...prev, [name as keyof FormData]: parseFloat(value) || 0 };
+      } else {
+        return { ...prev, [name as keyof FormData]: value };
+      }
+    });
   };
 
-  const handleBrandLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type.startsWith('image/') && file.size < 2 * 1024 * 1024) {
-      setBrandLogoFile(file);
-      const preview = URL.createObjectURL(file);
-      setBrandLogoPreview(preview);
-
-      setForm((prev: FormData) => ({ // ✅ FIXED
-        ...prev,
-        brand: {
-          ...prev.brand,
-          logo: preview
-        }
-      }));
-    }
-    e.target.value = '';
-  };
-
-  // 🔥 REPLACE ENTIRE handleChange function
-const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-) => {
-  const target = e.target;
-  const { name, value, type } = target;
-  setError("");
-
-  setForm((prev: FormData) => {
-    if (type === "checkbox") {
-      const checked = (target as HTMLInputElement).checked;
-      return { ...prev, [name]: checked };
-    } else if (type === "number") {
-      return { ...prev, [name]: parseFloat(value as string) || 0 };
-    } else {
-      return { ...prev, [name]: value };
-    }
-  });
-};
-
-  // ✅ Option 1: Full type-safe version (Recommended)
   const handleNestedChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     path: (keyof FormData | string)[]
   ) => {
     const value = e.target.value;
     setError("");
-
-    setForm((prev: FormData) => { // ✅ FIXED
+    setForm((prev: FormData) => {
       const updated = { ...prev } as FormData;
       let current: any = updated;
-
       for (let i = 0; i < path.length - 1; i++) {
         current[path[i]] = { ...current[path[i]] };
         current = current[path[i]];
       }
-
       current[path[path.length - 1]] = value;
       return updated;
     });
   };
 
- // 🔥 REPLACE ENTIRE handleArrayChange function
-const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors" | "sizes") => {
-  const target = e.target;
-  const value = target.value;
-  const checked = target.checked;
-  const arr = form.variations[key] as string[];
-  
-  setForm((prev: FormData) => ({
-    ...prev,
-    variations: { 
-      ...prev.variations, 
-      [key]: checked 
-        ? [...arr, value] 
-        : arr.filter((v: string) => v !== value) 
-    }
-  }));
-};
-  // 🔥 REPLACE THIS FUNCTION
-  const removeExistingImage = (imageUrl: string) => {
-    setExistingImages(prev => prev.filter(img => img !== imageUrl));
-    setCurrentImages(prev => prev.filter(img => img !== imageUrl));
-
-    setForm((prev: FormData) => ({ // ✅ FIXED
+  const handleArrayChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    key: "colors" | "sizes"
+  ) => {
+    const value = e.target.value;
+    const checked = e.target.checked;
+    const arr = form.variations[key] as string[];
+    setForm((prev: FormData) => ({
       ...prev,
-      images: prev.images.filter(img => img !== imageUrl)
+      variations: {
+        ...prev.variations,
+        [key]: checked ? [...arr, value] : arr.filter((v: string) => v !== value),
+      },
     }));
   };
 
-  // When new images upload, add to current
-  const addToCurrentImages = (newImageUrl: string) => {
-    setCurrentImages(prev => [...prev, newImageUrl]);
-  };
-
+  // 🔥 COMPLETE FIXED: handleSubmit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -407,50 +391,48 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
         return;
       }
 
-      let allImageUrls: string[] = form.images.filter((url: string) =>
-        typeof url === 'string' && url && !url.startsWith('blob:')
+      // 🔥 FIXED: Get ALL current images (existing + form images - remove blob URLs)
+      let allImageUrls: string[] = [];
+
+      // Add existing images from form.images (remove blob URLs)
+      allImageUrls = form.images.filter((url: string) =>
+        typeof url === 'string' && url && !url.startsWith('blob:') && url !== ''
       );
 
-      if (imageFiles.length > 0) {
-        setUploadProgress(30);
-        const newImageUrls = await uploadImages(imageFiles.map(img => img.file));
-        allImageUrls = [...allImageUrls, ...newImageUrls];
-        setUploadProgress(60);
-      }
+      // 🔥 FIXED: Upload new images and add to allImageUrls
+     if (newImageFiles.length > 0) {
+  setUploadProgress(30);
+  const newImageUrls = await uploadImages(newImageFiles.map(img => img.file));
+  allImageUrls = [...allImageUrls, ...newImageUrls];
+  setUploadProgress(60);
+}
 
+      // 🔥 FIXED: Handle brand logo
       let finalBrandLogo = form.brand.logo;
-      if (brandLogoFile) {
+      if (brandLogoFile && !form.brand.logo.startsWith('blob:')) {
         setUploadProgress(70);
         finalBrandLogo = await uploadBrandLogo(brandLogoFile);
         setUploadProgress(80);
       }
 
       const payload = {
+        id: initialData?.id, // 🔥 Include ID for updates
         ...form,
-
-        // ✅ KEEP AS ARRAY (NO stringify)
-        images: [...currentImages, ...allImageUrls], // ✅ Existing + New
-
+        images: allImageUrls, // 🔥 Only valid URLs, no blob URLs
         brand: {
           ...form.brand,
-          logo: finalBrandLogo
+          logo: finalBrandLogo && !finalBrandLogo.startsWith('blob:') ? finalBrandLogo : form.brand.logo
         },
-
         variations: {
-          // ✅ KEEP AS ARRAY
-          colors: form.variations.colors,
-          sizes: form.variations.sizes,
-
-          // ✅ KEEP AS OBJECT
-          specs: form.variations.specs
+          colors: form.variations.colors || [],
+          sizes: form.variations.sizes || [],
+          specs: form.variations.specs || {}
         },
-
         seo: {
           title: form.seo?.title || '',
           description: form.seo?.description || '',
           keywords: form.seo?.keywords || ''
         },
-
         price: Number(form.price),
         originalPrice: Number(form.originalPrice),
         stock: Number(form.stock),
@@ -462,6 +444,8 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
       const method = initialData ? "PUT" : "POST";
       const url = initialData ? `/api/products/${initialData.id}` : "/api/products";
 
+      console.log("🚀 Submitting:", { method, url, payload }); // Debug log
+
       const res = await fetch(url, {
         method,
         headers: {
@@ -472,14 +456,22 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
 
       if (!res.ok) {
         const errorText = await res.text();
+        console.error("❌ API Error:", errorText); // Debug log
         throw new Error(`Save failed: ${res.status} - ${errorText}`);
       }
 
+      const data = await res.json();
+      console.log("✅ Success:", data); // Debug log
+
       setUploadProgress(100);
-      router.push("/admin/products");
+
+      // 🔥 Reset form and images after successful save
+      setTimeout(() => {
+        router.push("/admin/products");
+      }, 1000);
 
     } catch (err: any) {
-      // console.error("Submit error:", err);
+      console.error("Submit error:", err); // Debug log
       setError(err.message || "Failed to save product");
     } finally {
       setLoading(false);
@@ -487,14 +479,43 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
     }
   };
 
+  // Brand logo handlers
+  const handleBrandLogoDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const file = e.dataTransfer!.files[0];
+    if (file && file.type.startsWith("image/") && file.size < 2 * 1024 * 1024) {
+      setBrandLogoFile(file);
+      const preview = URL.createObjectURL(file);
+      setBrandLogoPreview(preview);
+      setForm((prev: FormData) => ({
+        ...prev,
+        brand: { ...prev.brand, logo: preview },
+      }));
+    }
+  };
+
+  const handleBrandLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith("image/") && file.size < 2 * 1024 * 1024) {
+      setBrandLogoFile(file);
+      const preview = URL.createObjectURL(file);
+      setBrandLogoPreview(preview);
+      setForm((prev: FormData) => ({
+        ...prev,
+        brand: { ...prev.brand, logo: preview },
+      }));
+    }
+    e.target.value = "";
+  };
+
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-blue-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl border border-white/50 p-8">
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Header */}
             <div className="text-center pb-8 border-b border-gray-200">
-              <h1 className="text-3xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 {initialData ? "Edit Product" : "Add New Product"}
               </h1>
               <p className="text-gray-600 mt-2">Fill out all fields to create/update your product</p>
@@ -507,10 +528,11 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
               </div>
             )}
 
+            {/* Rest of your JSX remains EXACTLY THE SAME */}
+            {/* ... (Left Column, Right Column, Variations, SEO, etc.) ... */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left Column */}
+              {/* LEFT COLUMN - SAME AS BEFORE */}
               <div className="space-y-6">
-                {/* Product Name & Slug */}
                 <div className="space-y-3">
                   <label className="block text-sm font-semibold text-gray-700">Product Name</label>
                   <input
@@ -535,10 +557,10 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
                         const slug = form.name
                           ?.toLowerCase()
                           .trim()
-                          .replace(/[^\w\s-]/g, '')
-                          .replace(/[\s_-]+/g, '-')
-                          .replace(/^-+|-+$/g, '') || '';
-                        setForm({ ...form, slug });
+                          .replace(/[^\w\s-]/g, "")
+                          .replace(/[\s_-]+/g, "-")
+                          .replace(/^-+|-+$/g, "") || "";
+                        setForm((prev: FormData) => ({ ...prev, slug }));
                       }}
                       className="px-6 py-3 bg-green-500 text-white rounded-2xl hover:bg-green-600 transition-all font-medium"
                     >
@@ -547,7 +569,6 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
                   </div>
                 </div>
 
-                {/* Category */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-3">Category</label>
                   <select
@@ -556,8 +577,10 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
                     onChange={handleChange}
                     className="w-full p-4 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-100 focus:border-purple-400 transition-all bg-white/50"
                   >
-                    {categories.map(cat => (
-                      <option key={cat.value} value={cat.value}>{cat.label}</option>
+                    {categories.map((cat) => (
+                      <option key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -619,11 +642,23 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
                 {/* Flags */}
                 <div className="flex gap-6 p-4 bg-blue-50 rounded-2xl">
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" name="isNew" checked={form.isNew} onChange={handleChange} className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500" />
+                    <input
+                      type="checkbox"
+                      name="isNew"
+                      checked={form.isNew}
+                      onChange={handleChange}
+                      className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                    />
                     <span className="font-medium text-blue-900">New Arrival</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" name="bestSeller" checked={form.bestSeller} onChange={handleChange} className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500" />
+                    <input
+                      type="checkbox"
+                      name="bestSeller"
+                      checked={form.bestSeller}
+                      onChange={handleChange}
+                      className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500"
+                    />
                     <span className="font-medium text-orange-900">Best Seller</span>
                   </label>
                 </div>
@@ -641,16 +676,16 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
                 </div>
               </div>
 
-              {/* Right Column */}
+              {/* RIGHT COLUMN */}
               <div className="space-y-6">
                 {/* 🔥 COMPLETE FIXED IMAGES SECTION */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-4">
-                    Product Images ({form.images.length + imageFiles.length}/10)
+                    Product Images ({form.images.length + newImageFiles.length}/10)
                   </label>
 
-                  {/* 1. ALL CURRENT IMAGES (Existing + Form images) */}
-                  {(existingImages.length > 0 || form.images.length > 0) && (
+                  {/* 1. EXISTING IMAGES FROM FORM (Main source of truth) */}
+                  {form.images.length > 0 && (
                     <div className="mb-6 p-4 bg-blue-50 rounded-2xl">
                       <h4 className="text-sm font-semibold text-blue-800 mb-3">
                         Current Images ({form.images.length})
@@ -663,6 +698,9 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
                               alt="Current"
                               className="w-full h-32 object-cover rounded-2xl shadow-md border-2 border-blue-200 hover:border-blue-400 transition-all"
                               loading="lazy"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
                             />
                             <button
                               onClick={() => removeExistingImage(imgUrl)}
@@ -702,51 +740,47 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
                         📷
                       </div>
                       <p className="text-sm font-medium text-gray-700">
-                        {imageFiles.length === 0
+                        {newImageFiles.length === 0
                           ? "Drop images here or click to browse"
-                          : `Added ${imageFiles.length} new image(s)`
+                          : `Added ${newImageFiles.length} new image(s) - will upload on save`
                         }
                       </p>
                       <p className="text-xs text-gray-500">PNG, JPG up to 5MB each (Max 10 total)</p>
                     </div>
                   </div>
 
-                  {/* 3. NEW IMAGE PREVIEWS */}
-                  {imageFiles.length > 0 && (
+                  {/* 3. NEW IMAGE PREVIEWS (Pending upload) */}
+                  {newImageFiles.length > 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-6">
-                      {imageFiles.map((img) => (
+                      {newImageFiles.map((img: ImageFile) => (
                         <div key={img.id} className="relative group">
                           <img
                             src={img.preview}
                             alt="Preview"
-                            className="w-full h-32 object-cover rounded-2xl shadow-md"
+                            className="w-full h-32 object-cover rounded-2xl shadow-md border-2 border-orange-200"
                           />
                           <button
-                            onClick={() => removeImage(img.id)}
+                            onClick={() => removeNewImage(img.id)}
                             className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-all shadow-lg hover:bg-red-600"
                           >
                             ✕
                           </button>
+                          <p className="text-xs text-orange-700 mt-1 text-center font-medium">Pending upload</p>
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
 
-                {/* Brand Section */}
-                {/* 🔥 CORRECT BRAND SECTION - REPLACE ENTIRE BRAND DIV */}
+                {/* BRAND SECTION */}
                 <div className="space-y-4 p-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-3xl border-2 border-emerald-100">
                   <h3 className="text-lg font-bold text-emerald-900 flex items-center gap-2">🏷️ Brand</h3>
-
-                  {/* Brand Name */}
                   <input
                     placeholder="Brand Name (e.g. Nike, Adidas)"
                     value={form.brand.name}
                     onChange={(e) => handleNestedChange(e, ["brand", "name"])}
                     className="w-full p-4 border border-emerald-200 rounded-2xl focus:ring-4 focus:ring-emerald-100 focus:border-emerald-400 transition-all bg-white/70"
                   />
-
-                  {/* 🔥 1. SHOW EXISTING LOGO (if any) */}
                   {form.brand.logo && !brandLogoPreview && (
                     <div className="relative p-4 bg-white rounded-2xl shadow-md border-2 border-emerald-200">
                       <img
@@ -758,9 +792,9 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
                       <button
                         type="button"
                         onClick={() => {
-                          setForm((prev: FormData) => ({ // ✅ FIXED
+                          setForm((prev: FormData) => ({
                             ...prev,
-                            brand: { ...prev.brand, logo: "" }
+                            brand: { ...prev.brand, logo: "" },
                           }));
                           setBrandLogoPreview("");
                           setBrandLogoFile(null);
@@ -775,8 +809,6 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
                       </p>
                     </div>
                   )}
-
-                  {/* 🔥 2. UPLOAD NEW LOGO */}
                   <div
                     className="relative border-2 border-dashed border-emerald-300 rounded-2xl p-8 text-center hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer bg-white/50 min-h-[120px] flex items-center justify-center"
                     onClick={() => brandLogoInputRef.current?.click()}
@@ -790,7 +822,6 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
                       onChange={handleBrandLogoSelect}
                       className="hidden"
                     />
-
                     {brandLogoPreview ? (
                       <>
                         <img
@@ -816,17 +847,15 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
               </div>
             </div>
 
-            {/* Variations & Specs */}
+            {/* VARIATIONS & SPECS */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Variations */}
-              <div className="space-y-4 p-6 bg-linear-to-r from-purple-50 to-indigo-50 rounded-3xl border-2 border-purple-100">
+              <div className="space-y-4 p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-3xl border-2 border-purple-100">
                 <h3 className="text-lg font-bold text-purple-900 flex items-center gap-2">🎨 Variations</h3>
-
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-semibold text-purple-800 mb-3">Colors</h4>
                     <div className="grid grid-cols-4 gap-2">
-                      {["Black", "White", "Blue", "Red", "Green", "Yellow"].map(c => (
+                      {["Black", "White", "Blue", "Red", "Green", "Yellow"].map((c) => (
                         <label key={c} className="flex items-center gap-2 p-2 rounded-xl hover:bg-purple-100 cursor-pointer transition-all">
                           <input
                             type="checkbox"
@@ -840,11 +869,10 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
                       ))}
                     </div>
                   </div>
-
                   <div>
                     <h4 className="font-semibold text-purple-800 mb-3">Sizes</h4>
                     <div className="grid grid-cols-5 gap-2">
-                      {["XS", "S", "M", "L", "XL"].map(s => (
+                      {["XS", "S", "M", "L", "XL"].map((s) => (
                         <label key={s} className="flex items-center gap-2 p-2 rounded-xl hover:bg-purple-100 cursor-pointer transition-all">
                           <input
                             type="checkbox"
@@ -861,8 +889,7 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
                 </div>
               </div>
 
-              {/* Specifications */}
-              <div className="space-y-4 p-6 bg-linear-to-r from-orange-50 to-rose-50 rounded-3xl border-2 border-orange-100">
+              <div className="space-y-4 p-6 bg-gradient-to-r from-orange-50 to-rose-50 rounded-3xl border-2 border-orange-100">
                 <h3 className="text-lg font-bold text-orange-900 flex items-center gap-2">📋 Specifications</h3>
                 <div className="grid grid-cols-1 gap-3">
                   {Object.entries(form.variations.specs).map(([key, value]) => (
@@ -881,7 +908,7 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
             </div>
 
             {/* SEO Section */}
-            <div className="p-8 bg-linear-to-r from-indigo-50 to-violet-50 rounded-3xl border-2 border-indigo-100">
+            <div className="p-8 bg-gradient-to-r from-indigo-50 to-violet-50 rounded-3xl border-2 border-indigo-100">
               <h3 className="text-xl font-bold text-indigo-900 mb-6 flex items-center gap-2">🔍 SEO Settings</h3>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
@@ -917,14 +944,14 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
 
             {/* Progress Bar */}
             {uploadProgress > 0 && (
-              <div className="p-4 bg-linear-to-r from-blue-50 to-purple-50 rounded-2xl border-2 border-blue-200">
+              <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl border-2 border-blue-200">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-blue-900">Saving Progress</span>
                   <span className="text-sm font-medium text-blue-900">{uploadProgress}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
                   <div
-                    className="bg-linear-to-r from-blue-600 to-purple-600 h-3 rounded-full transition-all duration-300 shadow-lg"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 h-3 rounded-full transition-all duration-300 shadow-lg"
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
@@ -936,21 +963,37 @@ const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>, key: "colors"
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative px-12 py-6 bg-linear-to-r from-blue-600 to-purple-600 text-white font-bold text-lg rounded-3xl hover:from-blue-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-200 transform hover:scale-[1.02] transition-all duration-200 shadow-2xl hover:shadow-3xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="group relative px-12 py-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-lg rounded-3xl hover:from-blue-700 hover:to-purple-700 focus:ring-4 focus:ring-blue-200 transform hover:scale-[1.02] transition-all duration-200 shadow-2xl hover:shadow-3xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 <span className="relative z-10 flex items-center gap-2">
                   {loading ? (
                     <>
                       <svg className="animate-spin -ml-1 h-5 w-5" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
                       </svg>
                       Saving...
                     </>
                   ) : (
                     <>
                       {initialData ? "Update Product" : "Create Product"}
-                      <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg
+                        className="w-5 h-5 group-hover:translate-x-1 transition-transform"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </>
