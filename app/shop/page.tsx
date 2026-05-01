@@ -24,8 +24,10 @@ function capitalizeWords(str: string): string {
 }
 
 // 🔥 FORCE DYNAMIC - Fresh data always
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// export const dynamic = 'force-dynamic';
+// export const revalidate = 0;
+
+export const revalidate = 300;
 
 export default async function ShopPage({ searchParams }: ShopPageProps) {
   const params = await searchParams;
