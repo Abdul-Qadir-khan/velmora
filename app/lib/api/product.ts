@@ -24,15 +24,10 @@ export async function getProducts(filters: {
     
     console.log('🌐 Fetching products:', url);
     
-    // const res = await fetch(url, {
-    //   cache: "no-store",
-    //   next: { revalidate: 0 }
-    // });
-
     const res = await fetch(url, {
-  next: { revalidate: 300 },
-  cache: 'force-cache'
-});
+      cache: "no-store",
+      next: { revalidate: 0 }
+    });
 
     if (!res.ok) {
       console.error('API Error:', res.status, await res.text());

@@ -97,15 +97,32 @@ export default function ClientProductGrid({ initialProducts, searchParams }: Pro
     }
   };
 
- const getProductImage = (images: any): string => {
-  if (!images) return "https://via.placeholder.com/300x400/E5E7EB/FFFFFF?text=Product";
-  try {
-    const imgArray = Array.isArray(images) ? images : JSON.parse(images);
-    return (imgArray[0] as string) || "https://via.placeholder.com/300x400/E5E7EB/FFFFFF?text=Product";
-  } catch {
-    return "https://via.placeholder.com/300x400/E5E7EB/FFFFFF?text=Product";
-  }
-};
+  const getProductImage = (images: any): string => {
+    if (!images || images === null || images === undefined || images === "") {
+      return "https://via.placeholder.com/400x500/6B7280/FFFFFF?text=No+Image";
+    }
+
+    let imgArray: string[] = [];
+    if (typeof images === "string") {
+      try {
+        imgArray = JSON.parse(images);
+      } catch (e) {
+        imgArray = [images];
+      }
+    } else if (Array.isArray(images)) {
+      imgArray = images;
+    } else {
+      imgArray = [images];
+    }
+
+    if (imgArray.length > 0) {
+      const firstImage = imgArray[0];
+      if (typeof firstImage === "string" && firstImage.trim()) {
+        return firstImage;
+      }
+    }
+    return "https://via.placeholder.com/400x500/6B7280/FFFFFF?text=Product";
+  };
 
   const isWishlisted = (id: any) => wishlist.some((p) => String(p.id) === String(id));
 

@@ -31,9 +31,9 @@ export default function Home() {
   return (
     <div>
       <NewsletterPopup />
-      {/* <Hero /> */}
+      <Hero />
 
-      <VideoHeroSection />
+      {/* <VideoHeroSection /> */}
       <BrandsSlider />
 
       {/* ✅ Works perfectly now */}
